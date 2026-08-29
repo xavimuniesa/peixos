@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Aquari Relaxant - Peixos Pallasso</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #010a15;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .aquarium-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: linear-gradient(180deg, #0b4f6c 0%, #042743 65%, #011326 90%, #15100c 100%);
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.9);
+    }
+
+    .sunrays {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background: radial-gradient(ellipse at 50% -10%, rgba(120, 225, 255, 0.25) 0%, rgba(10, 60, 100, 0.05) 50%, transparent 80%);
+      pointer-events: none;
+    }
+
+    .seabed {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 12%;
+      background: linear-gradient(360deg, #2b1f17 0%, #4a382a 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="aquarium-container">
+  <div class="sunrays"></div>
+  <div class="seabed"></div>
+  <canvas id="aquariumCanvas"></canvas>
+</div>
+
+<script>
+  const canvas = document.getElementById('aquariumCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 250));
+  resizeCanvas();
+
+  let globalTime = 0;
+
+  // -------------------------------------------------------------
+  // 1. CLASSE ALGUES I ANÈMONES
+  // -------------------------------------------------------------
+  class Seaweed {
+    constructor(x, baseWidth, height, segments, color, waveSpeed, waveAmp) {
+      this.x = x;
+      this.baseWidth = baseWidth;
+      this.height = height;
+      this.segments = segments;
+      this.color = color;
+      this.waveSpeed = waveSpeed;
+      this.waveAmp = waveAmp;
+      this.offset = Math.random() * 100;
+    }
+
+    draw(time) {
+      ctx.save();
+      ctx.beginPath();
+
+      let startY = canvas.height;
+      ctx.moveTo(this.x - this.baseWidth / 2, startY);
+
+      for (let i = 0; i <= this.segments; i++) {
+        let progress = i / this.segments;
+        let currentY = startY - progress * this.height;
+        let wave = Math.sin(time * this.waveSpeed + this.offset + progress * 2.5) * (this.waveAmp * progress);
+        let width = (this.baseWidth / 2) * (1 - progress * 0.7);
+        ctx.lineTo(this.x + wave - width, currentY);
+      }
+
+      for (let i = this.segments; i >= 0; i--) {
+        let progress = i / this.segments;
+        let currentY = startY - progress * this.height;
+        let wave = Math.sin(time * this.waveSpeed + this.offset + progress * 2.5) * (this.waveAmp * progress);
+        let width = (this.baseWidth / 2) * (1 - progress * 0.7);
+        ctx.lineTo(this.x + wave + width, currentY);
+      }
+
+      ctx.closePath();
+
+      let grad = ctx.createLinearGradient(this.x, canvas.height, this.x, canvas.height - this.height);
+      grad.addColorStop(0, '#0a2e14');
+      grad.addColorStop(0.5, this.color);
+      grad.addColorStop(1, '#3a8c4c');
+
+      ctx.fillStyle = grad;
+      ctx.shadowColor = 'rgba(0,0,0,0.25)';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 2. CLASSE BAMBOLLES
+  // -------------------------------------------------------------
+  class Bubble {
+    constructor(x, y, isFromFish = false) {
+      this.isFromFish = isFromFish;
+      if (isFromFish) {
+        this.x = x;
+        this.y = y;
+        this.radius = 0.8 + Math.random() * 2.5;
+        this.speed = 0.3 + Math.random() * 0.5;
+        this.swing = Math.random() * 0.03;
+        this.swingAngle = Math.random() * Math.PI * 2;
+        this.opacity = 0.5 + Math.random() * 0.4;
+      } else {
+        this.reset();
+      }
+    }
+
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height + 20;
+      this.radius = 1 + Math.random() * 3.5;
+      this.speed = 0.3 + Math.random() * 0.6;
+      this.swing = Math.random() * 0.03;
+      this.swingAngle = Math.random() * Math.PI * 2;
+      this.opacity = 0.15 + Math.random() * 0.3;
+    }
+
+    update() {
+      this.y -= this.speed;
+      this.swingAngle += this.swing;
+      this.x += Math.sin(this.swingAngle) * 0.3;
+
+      if (this.y < -10) {
+        if (this.isFromFish) {
+          return false;
+        } else {
+          this.reset();
+        }
+      }
+      return true;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220, 245, 255, ${this.opacity})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity + 0.3})`;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  let fishBubbles = [];
+
+  // -------------------------------------------------------------
+  // 3. CLASSE PEIX PALLASSO REALISTA, ARTICULAT I AMB SENSACIO 3D
+  // -------------------------------------------------------------
+  class RealisticClownfish {
+    constructor(x, y, scale, hueShift = 0) {
+      this.x = x;
+      this.y = y;
+      this.scale = scale;
+      this.hueShift = hueShift;
+
+      // Velocitat horitzontal i, ara, un rang vertical molt mes ampli
+      this.vx = (Math.random() - 0.5) * 0.6;
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.targetVx = this.vx;
+      this.targetVy = this.vy;
+
+      // Profunditat (z): 0 = lluny del vidre, 1 = enganxat al vidre
+      this.z = 0.35 + Math.random() * 0.65;
+      this.targetZ = this.z;
+      this.zTimer = 0;
+
+      this.pitch = 0;
+      this.pitchTarget = 0;
+      this.changeTimer = 0;
+      this.facingRight = true;
+
+      this.bubbleTimer = Math.random() * 300 + 200;
+      this.bobPhase = Math.random() * Math.PI * 2;
+
+      this.numSegments = 5;
+      this.segmentAngles = new Array(this.numSegments).fill(0);
+      this.tailPhase = Math.random() * Math.PI * 2;
+    }
+
+    update() {
+      this.changeTimer++;
+      if (this.changeTimer > 220 + Math.random() * 220) {
+        this.targetVx = (Math.random() - 0.5) * 0.8;
+        // Component vertical generosa: el peix puja i baixa de veritat
+        this.targetVy = (Math.random() - 0.5) * 1.1;
+        this.changeTimer = 0;
+      }
+
+      // Deriva lenta de profunditat (s'acosta i s'allunya del vidre)
+      this.zTimer++;
+      if (this.zTimer > 260 + Math.random() * 260) {
+        this.targetZ = 0.3 + Math.random() * 0.7;
+        this.zTimer = 0;
+      }
+      this.z += (this.targetZ - this.z) * 0.004;
+
+      this.vx += (this.targetVx - this.vx) * 0.006;
+      this.vy += (this.targetVy - this.vy) * 0.007;
+
+      // Segona xarxa de seguretat: la velocitat real tampoc pot disparar-se mai
+      const maxRealSpeed = 1.1;
+      const realSpeed = Math.hypot(this.vx, this.vy);
+      if (realSpeed > maxRealSpeed) {
+        this.vx = (this.vx / realSpeed) * maxRealSpeed;
+        this.vy = (this.vy / realSpeed) * maxRealSpeed;
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Limits adaptats a la mida real de pantalla (marges relatius)
+      const marginX = Math.max(70, canvas.width * 0.09);
+      const marginTop = Math.max(70, canvas.height * 0.14);
+      const marginBottom = canvas.height * 0.86;
+
+      // Rebot: es fixa una velocitat nova i moderada (NO s'acumula sobre l'anterior,
+      // aquest era el bug que feia accelerar els peixos sense limit).
+      if (this.x < marginX) this.targetVx = 0.35 + Math.random() * 0.35;
+      if (this.x > canvas.width - marginX) this.targetVx = -(0.35 + Math.random() * 0.35);
+      if (this.y < marginTop) this.targetVy = 0.25 + Math.random() * 0.3;
+      if (this.y > marginBottom) this.targetVy = -(0.25 + Math.random() * 0.3);
+
+      // Xarxa de seguretat: mai es permet una velocitat objectiu desbocada
+      const maxTargetSpeed = 0.9;
+      const tSpeed = Math.hypot(this.targetVx, this.targetVy);
+      if (tSpeed > maxTargetSpeed) {
+        this.targetVx = (this.targetVx / tSpeed) * maxTargetSpeed;
+        this.targetVy = (this.targetVy / tSpeed) * maxTargetSpeed;
+      }
+
+      if (Math.abs(this.vx) > 0.05) {
+        this.facingRight = this.vx > 0;
+      }
+
+      // Inclinacio (pitch) segons si puja o baixa, suavitzada
+      let rawPitch = Math.atan2(this.vy, Math.abs(this.vx) + 0.15);
+      this.pitchTarget = Math.max(-0.6, Math.min(0.6, rawPitch));
+      this.pitch += (this.pitchTarget - this.pitch) * 0.05;
+
+      let currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      this.tailPhase += currentSpeed * 0.08 + 0.012;
+      for (let i = 0; i < this.numSegments; i++) {
+        this.segmentAngles[i] = Math.sin(this.tailPhase - i * 0.35) * (0.1 + i * 0.035);
+      }
+
+      this.bubbleTimer--;
+      if (this.bubbleTimer <= 0) {
+        this.emitBubbles();
+        this.bubbleTimer = 350 + Math.random() * 450;
+      }
+    }
+
+    emitBubbles() {
+      let zScale = 0.72 + 0.55 * this.z;
+      let mouthX = this.x + (this.facingRight ? 48 : -48) * this.scale * zScale;
+      let mouthY = this.y + 2 * this.scale * zScale;
+
+      let count = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          fishBubbles.push(new Bubble(
+            mouthX + (Math.random() * 6 - 3),
+            mouthY + (Math.random() * 6 - 3),
+            true
+          ));
+        }, i * 180);
+      }
+    }
+
+    // Ombra de contacte projectada sobre la sorra: dona sensacio de profunditat real
+    castShadow(seabedY) {
+      const zScale = 0.72 + 0.55 * this.z;
+      const distToBed = Math.max(0, seabedY - this.y);
+      const falloff = Math.max(0, 1 - distToBed / (canvas.height * 0.55));
+      if (falloff <= 0.02) return;
+      const shadowW = 46 * this.scale * zScale * (0.6 + falloff * 0.6);
+      const shadowH = 8 * this.scale * zScale * falloff;
+      const parallaxX = this.x + (this.y - seabedY) * 0.02;
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(parallaxX, seabedY, shadowW, shadowH, 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,0,0,${0.28 * falloff * (0.4 + 0.6 * this.z)})`;
+      ctx.filter = 'blur(3px)';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    draw(time) {
+      const zScale = 0.72 + 0.55 * this.z;
+      const bob = Math.sin(time * 1.4 + this.bobPhase) * 4;
+      const bodyStretch = 1 - Math.abs(Math.sin(this.pitch)) * 0.16;
+      const haze = 1 - this.z;
+
+      ctx.save();
+      ctx.translate(this.x, this.y + bob);
+      ctx.filter = `blur(${(haze * 1.1).toFixed(2)}px) saturate(${(0.55 + 0.45 * this.z).toFixed(2)}) brightness(${(0.86 + 0.14 * this.z).toFixed(2)}) hue-rotate(${this.hueShift}deg)`;
+
+      let pitchApplied = this.facingRight ? this.pitch : -this.pitch;
+      ctx.rotate(pitchApplied);
+
+      const sc = this.scale * zScale;
+      if (!this.facingRight) {
+        ctx.scale(-sc, sc * bodyStretch);
+      } else {
+        ctx.scale(sc, sc * bodyStretch);
+      }
+
+      ctx.shadowColor = 'rgba(0, 10, 30, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 12;
+
+      // --- CUA ARTICULADA ---
+      ctx.save();
+      ctx.translate(-35, 0);
+      ctx.rotate(this.segmentAngles[4]);
+
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2.5;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(-20, -18, -32, -22);
+      ctx.quadraticCurveTo(-26, 0, -32, 22);
+      ctx.quadraticCurveTo(-20, 18, 0, 0);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.moveTo(-28, -20);
+      ctx.quadraticCurveTo(-32, -22, -33, -20);
+      ctx.quadraticCurveTo(-27, 0, -33, 20);
+      ctx.quadraticCurveTo(-32, 22, -28, 20);
+      ctx.quadraticCurveTo(-23, 0, -28, -20);
+      ctx.fill();
+
+      // Radis de l'aleta (detall de realisme)
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 0.8;
+      for (let r = -18; r <= 18; r += 9) {
+        ctx.beginPath();
+        ctx.moveTo(-4, r * 0.15);
+        ctx.lineTo(-30, r);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // --- ALETA DORSAL ---
+      ctx.save();
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-22, -18);
+      ctx.quadraticCurveTo(-5, -34, 15, -20);
+      ctx.quadraticCurveTo(-2, -10, -22, -18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 0.7;
+      for (let i = 0; i < 5; i++) {
+        let t = i / 4;
+        ctx.beginPath();
+        ctx.moveTo(-22 + t * 37, -18 - t * 2);
+        ctx.lineTo(-8 + t * 18, -30 + t * 12);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // --- ALETA VENTRAL ---
+      ctx.save();
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-15, 16);
+      ctx.quadraticCurveTo(0, 32, 18, 14);
+      ctx.quadraticCurveTo(2, 10, -15, 16);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // --- COS PRINCIPAL (degradat radial de volum) ---
+      let bodyGrad = ctx.createRadialGradient(10, -8, 4, 2, 2, 52);
+      bodyGrad.addColorStop(0, '#ffb04d');
+      bodyGrad.addColorStop(0.35, '#ff851b');
+      bodyGrad.addColorStop(0.7, '#ff5500');
+      bodyGrad.addColorStop(1, '#c93900');
+
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 48, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- FRANGES BLANQUES ---
+      const drawStripe = (pathFn) => {
+        ctx.save();
+        ctx.fillStyle = '#111111';
+        ctx.beginPath();
+        pathFn(ctx, 3.5);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        pathFn(ctx, 0);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      drawStripe((context, expand) => {
+        context.ellipse(22, -1, 7 + expand, 22 + expand, -0.1, 0, Math.PI * 2);
+      });
+
+      drawStripe((context, expand) => {
+        context.moveTo(-5 - expand, -23 - expand);
+        context.quadraticCurveTo(8 + expand, 0, -3 - expand, 23 + expand);
+        context.quadraticCurveTo(-14 - expand, 0, -5 - expand, -23 - expand);
+      });
+
+      drawStripe((context, expand) => {
+        context.ellipse(-32, 0, 5 + expand, 16 + expand, 0, 0, Math.PI * 2);
+      });
+
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 48, 24, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // --- BRILLANTOR ESPECULAR AL LLOM (dona volum 3D) ---
+      ctx.save();
+      let specGrad = ctx.createLinearGradient(-30, -20, 30, -14);
+      specGrad.addColorStop(0, 'rgba(255,255,255,0)');
+      specGrad.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+      specGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = specGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, -16, 32, 6, -0.05, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // --- LINIA DE BRANQUIA ---
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(24, -16);
+      ctx.quadraticCurveTo(20, 0, 24, 16);
+      ctx.stroke();
+      ctx.restore();
+
+      // --- ULL I BOCA ---
+      ctx.fillStyle = '#ff7700';
+      ctx.beginPath();
+      ctx.arc(32, -4, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(33, -4, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(34.5, -5.5, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#b83200';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(46, 2, 4, Math.PI * 0.8, Math.PI * 1.4);
+      ctx.stroke();
+
+      // --- ALETA PECTORAL ---
+      ctx.save();
+      ctx.translate(12, 6);
+      let finAngle = Math.sin(this.tailPhase * 1.2) * 0.25;
+      ctx.rotate(0.3 + finAngle);
+
+      let finGrad = ctx.createLinearGradient(0, 0, 15, 10);
+      finGrad.addColorStop(0, 'rgba(255, 110, 0, 0.9)');
+      finGrad.addColorStop(0.8, 'rgba(255, 140, 0, 0.8)');
+      finGrad.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+
+      ctx.fillStyle = finGrad;
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(8, 4, 12, 7, Math.PI / 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore();
+    }
+  }
+
+  // -------------------------------------------------------------
+  // INICIALITZACIO
+  // -------------------------------------------------------------
+  const seaweeds = [];
+  const colors = ['#1e5927', '#277a35', '#194d22', '#2d8c3c', '#0f3d17'];
+
+  for (let i = 0; i < 26; i++) {
+    let x = (canvas.width / 24) * i + (Math.random() * 40 - 20);
+    let baseWidth = 18 + Math.random() * 16;
+    let height = canvas.height * (0.35 + Math.random() * 0.45);
+    let segments = 8 + Math.floor(Math.random() * 4);
+    let color = colors[Math.floor(Math.random() * colors.length)];
+    let waveSpeed = 0.5 + Math.random() * 0.5;
+    let waveAmp = 15 + Math.random() * 20;
+
+    seaweeds.push(new Seaweed(x, baseWidth, height, segments, color, waveSpeed, waveAmp));
+  }
+
+  const bubbles = [];
+  for (let i = 0; i < 25; i++) {
+    bubbles.push(new Bubble());
+  }
+
+  const clownfish1 = new RealisticClownfish(canvas.width * 0.3, canvas.height * 0.45, 1.15, 0);
+  const clownfish2 = new RealisticClownfish(canvas.width * 0.68, canvas.height * 0.55, 0.95, -6);
+
+  // -------------------------------------------------------------
+  // BUCLE D'ANIMACIO
+  // -------------------------------------------------------------
+  function animate() {
+    globalTime += 0.008;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    seaweeds.forEach(seaweed => seaweed.draw(globalTime));
+
+    bubbles.forEach(bubble => {
+      bubble.update();
+      bubble.draw();
+    });
+
+    fishBubbles = fishBubbles.filter(b => {
+      let alive = b.update();
+      if (alive) b.draw();
+      return alive;
+    });
+
+    const seabedY = canvas.height * 0.9;
+    clownfish1.update();
+    clownfish1.castShadow(seabedY);
+    clownfish2.update();
+    clownfish2.castShadow(seabedY);
+
+    // Es dibuixa primer el peix mes al fons (menys z) perque el mes proper tapi
+    const ordered = [clownfish1, clownfish2].sort((a, b) => a.z - b.z);
+    ordered.forEach(f => f.draw(globalTime));
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+
+</body>
+</html>
