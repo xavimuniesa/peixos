@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aquari Realista amb Peixos Pallasso i Algues</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #010a15;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Contenidor de l'aquari amb fons profund i sorra */
+    .aquarium-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #0b4f6c 0%, #042743 65%, #011326 90%, #15100c 100%);
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Efecte de llum de la superfície (Caustics/Sunrays) */
+    .sunrays {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background: radial-gradient(ellipse at 50% -10%, rgba(120, 225, 255, 0.35) 0%, rgba(10, 60, 100, 0.1) 50%, transparent 80%);
+      pointer-events: none;
+    }
+
+    /* Gradient de sorra/corall al fons */
+    .seabed {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 12%;
+      background: linear-gradient(360deg, #2b1f17 0%, #4a382a 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="aquarium-container">
+  <div class="sunrays"></div>
+  <div class="seabed"></div>
+  <canvas id="aquariumCanvas"></canvas>
+</div>
+
+<script>
+  const canvas = document.getElementById('aquariumCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  let globalTime = 0;
+
+  // -------------------------------------------------------------
+  // 1. CLASSE ALGUES I ANÈMONES (Moviment per l'aigua)
+  // -------------------------------------------------------------
+  class Seaweed {
+    constructor(x, baseWidth, height, segments, color, waveSpeed, waveAmp) {
+      this.x = x;
+      this.baseWidth = baseWidth;
+      this.height = height;
+      this.segments = segments;
+      this.color = color;
+      this.waveSpeed = waveSpeed;
+      this.waveAmp = waveAmp;
+      this.offset = Math.random() * 100;
+    }
+
+    draw(time) {
+      ctx.save();
+      ctx.beginPath();
+      
+      let startY = canvas.height;
+      ctx.moveTo(this.x - this.baseWidth / 2, startY);
+
+      // Part esquerra de la fulla d'alga
+      for (let i = 0; i <= this.segments; i++) {
+        let progress = i / this.segments;
+        let currentY = startY - progress * this.height;
+        let wave = Math.sin(time * this.waveSpeed + this.offset + progress * 3) * (this.waveAmp * progress);
+        let width = (this.baseWidth / 2) * (1 - progress * 0.7);
+        ctx.lineTo(this.x + wave - width, currentY);
+      }
+
+      // Punta i part dreta de la fulla
+      for (let i = this.segments; i >= 0; i--) {
+        let progress = i / this.segments;
+        let currentY = startY - progress * this.height;
+        let wave = Math.sin(time * this.waveSpeed + this.offset + progress * 3) * (this.waveAmp * progress);
+        let width = (this.baseWidth / 2) * (1 - progress * 0.7);
+        ctx.lineTo(this.x + wave + width, currentY);
+      }
+
+      ctx.closePath();
+      
+      // Degradat per a realisme visual en l'alga
+      let grad = ctx.createLinearGradient(this.x, canvas.height, this.x, canvas.height - this.height);
+      grad.addColorStop(0, '#0a2e14');
+      grad.addColorStop(0.5, this.color);
+      grad.addColorStop(1, '#3a8c4c');
+      
+      ctx.fillStyle = grad;
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 2. CLASSE BAMBOLLES
+  // -------------------------------------------------------------
+  class Bubble {
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height + 20;
+      this.radius = 1 + Math.random() * 3.5;
+      this.speed = 0.6 + Math.random() * 1.2;
+      this.swing = Math.random() * 0.04;
+      this.swingAngle = Math.random() * Math.PI * 2;
+      this.opacity = 0.2 + Math.random() * 0.4;
+    }
+
+    update() {
+      this.y -= this.speed;
+      this.swingAngle += this.swing;
+      this.x += Math.sin(this.swingAngle) * 0.4;
+
+      if (this.y < -10) this.reset();
+    }
+
+    draw() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220, 245, 255, ${this.opacity})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity + 0.3})`;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 3. CLASSE PEIX PALLASSO REALISTE I ARTICULAT
+  // -------------------------------------------------------------
+  class RealisticClownfish {
+    constructor(x, y, scale) {
+      this.x = x;
+      this.y = y;
+      this.scale = scale;
+
+      // Velocitats i direcció
+      this.vx = (Math.random() - 0.5) * 1.5;
+      this.vy = (Math.random() - 0.5) * 0.8;
+      this.targetVx = this.vx;
+      this.targetVy = this.vy;
+
+      // Orientació i articularitat (cadena de segments per la cua)
+      this.angle = 0;
+      this.changeTimer = 0;
+      this.facingRight = true;
+
+      // Segments de la cua per a un moviment suau (snake-like motion)
+      this.numSegments = 5;
+      this.segmentAngles = new Array(this.numSegments).fill(0);
+      this.tailPhase = Math.random() * Math.PI * 2;
+    }
+
+    update() {
+      this.changeTimer++;
+      // Canvi de trajectòria aleatori suau
+      if (this.changeTimer > 150 + Math.random() * 120) {
+        this.targetVx = (Math.random() - 0.5) * 2.2;
+        this.targetVy = (Math.random() - 0.5) * 1.2;
+        this.changeTimer = 0;
+      }
+
+      // Lerp de velocitat
+      this.vx += (this.targetVx - this.vx) * 0.015;
+      this.vy += (this.targetVy - this.vy) * 0.015;
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Límits de la pantalla
+      const margin = 100;
+      if (this.x < margin) this.targetVx = Math.abs(this.targetVx) + 0.5;
+      if (this.x > canvas.width - margin) this.targetVx = -Math.abs(this.targetVx) - 0.5;
+      if (this.y < margin + 50) this.targetVy = Math.abs(this.targetVy) + 0.3;
+      if (this.y > canvas.height - margin) this.targetVy = -Math.abs(this.targetVy) - 0.3;
+
+      // Orientació del cos segons el vector de velocitat
+      let currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      if (Math.abs(this.vx) > 0.1) {
+        this.facingRight = this.vx > 0;
+      }
+
+      // Animació articulada de la cua
+      this.tailPhase += currentSpeed * 0.12 + 0.03;
+      for (let i = 0; i < this.numSegments; i++) {
+        // Cada segment s'ondula amb un retard de fase respecte a l'anterior
+        this.segmentAngles[i] = Math.sin(this.tailPhase - i * 0.4) * (0.15 + i * 0.05);
+      }
+    }
+
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+
+      // Rotació suau segons ascens/descens
+      let pitch = Math.atan2(this.vy, Math.abs(this.vx)) * 0.5;
+      if (!this.facingRight) pitch = -pitch;
+      ctx.rotate(pitch);
+
+      // Invertir horitzontalment si va a la meitat esquerra
+      if (!this.facingRight) {
+        ctx.scale(-this.scale, this.scale);
+      } else {
+        ctx.scale(this.scale, this.scale);
+      }
+
+      // Umbra/Ombra suau sota el peix per a profunditat 3D
+      ctx.shadowColor = 'rgba(0, 10, 30, 0.4)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 15;
+
+      // --- DIBUIX DE LA CUA ARTICULADA (Part posterior) ---
+      ctx.save();
+      ctx.translate(-35, 0); // Ancoratge posterior
+      
+      // Aplicar articularitat del darrer segment de la cua
+      ctx.rotate(this.segmentAngles[4]);
+      
+      // Cua Caudal (Taronja amb vora negra fina i límit exterior transparent/blanc)
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2.5;
+      
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(-20, -18, -32, -22);
+      ctx.quadraticCurveTo(-26, 0, -32, 22);
+      ctx.quadraticCurveTo(-20, 18, 0, 0);
+      ctx.fill();
+      ctx.stroke();
+
+      // Banda negra exterior a la cua (com la imatge de referència)
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.moveTo(-28, -20);
+      ctx.quadraticCurveTo(-32, -22, -33, -20);
+      ctx.quadraticCurveTo(-27, 0, -33, 20);
+      ctx.quadraticCurveTo(-32, 22, -28, 20);
+      ctx.quadraticCurveTo(-23, 0, -28, -20);
+      ctx.fill();
+
+      ctx.restore(); // Fi dibuix cua
+
+      // --- ALETA DORSAL (Superior, taronja intens amb vora negra) ---
+      ctx.save();
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-22, -18);
+      ctx.quadraticCurveTo(-5, -34, 15, -20);
+      ctx.quadraticCurveTo(-2, -10, -22, -18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Vora negra superior de la dorsal
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-22, -18);
+      ctx.quadraticCurveTo(-5, -34, 15, -20);
+      ctx.stroke();
+      ctx.restore();
+
+      // --- ALETA ANAL / VENTRAL (Inferior) ---
+      ctx.save();
+      ctx.fillStyle = '#ff6a00';
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-15, 16);
+      ctx.quadraticCurveTo(0, 32, 18, 14);
+      ctx.quadraticCurveTo(2, 10, -15, 16);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Vora negra de la ventral
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-15, 16);
+      ctx.quadraticCurveTo(0, 32, 18, 14);
+      ctx.stroke();
+      ctx.restore();
+
+      // --- COS PRINCIPAL (Degradat realista taronja-vermellós) ---
+      let bodyGrad = ctx.createRadialGradient(10, -5, 5, 0, 0, 50);
+      bodyGrad.addColorStop(0, '#ff851b');
+      bodyGrad.addColorStop(0.6, '#ff5500');
+      bodyGrad.addColorStop(1, '#d94100');
+
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 48, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- FRANGES BLANQUES AMB VORES NEGRES RECTES I CURVES (Pattern fidel a la imatge) ---
+      // Dibuixem les 3 franges blanques icòniques de Amphiprion ocellaris
+
+      const drawStripe = (pathFn) => {
+        // Primer capa negra (vora exterior)
+        ctx.save();
+        ctx.fillStyle = '#111111';
+        ctx.beginPath();
+        pathFn(ctx, 3.5);
+        ctx.fill();
+
+        // Segona capa blanca (interior)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        pathFn(ctx, 0);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      // 1. Franja del cap (Cinta darrere l'ull)
+      drawStripe((context, expand) => {
+        context.ellipse(22, -1, 7 + expand, 22 + expand, -0.1, 0, Math.PI * 2);
+      });
+
+      // 2. Franja central (Amb la característic abombament central com la foto)
+      drawStripe((context, expand) => {
+        context.moveTo(-5 - expand, -23 - expand);
+        context.quadraticCurveTo(8 + expand, 0, -3 - expand, 23 + expand);
+        context.quadraticCurveTo(-14 - expand, 0, -5 - expand, -23 - expand);
+      });
+
+      // 3. Franja posterior (A la base de la cua)
+      drawStripe((context, expand) => {
+        context.ellipse(-32, 0, 5 + expand, 16 + expand, 0, 0, Math.PI * 2);
+      });
+
+      // --- RE-DIBUIXAR CONTORN DEL COS PER NETEJA DE GRADIENT ---
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 48, 24, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // --- DETALLS DEL CAP I ULL ---
+      // Ull realista
+      ctx.fillStyle = '#ff7700';
+      ctx.beginPath();
+      ctx.arc(32, -4, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(33, -4, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Petit punt de brillantor blanca a l'ull
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(34.5, -5.5, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Llavi / Boca delicada
+      ctx.strokeStyle = '#b83200';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(46, 2, 4, Math.PI * 0.8, Math.PI * 1.4);
+      ctx.stroke();
+
+      // --- ALETA PECTORAL (Transparent/Taronja amb batec suau) ---
+      ctx.save();
+      ctx.translate(12, 6);
+      let finAngle = Math.sin(this.tailPhase * 1.8) * 0.35;
+      ctx.rotate(0.3 + finAngle);
+      
+      let finGrad = ctx.createLinearGradient(0, 0, 15, 10);
+      finGrad.addColorStop(0, 'rgba(255, 110, 0, 0.9)');
+      finGrad.addColorStop(0.8, 'rgba(255, 140, 0, 0.8)');
+      finGrad.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+
+      ctx.fillStyle = finGrad;
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(8, 4, 12, 7, Math.PI / 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore(); // Restablir estat global del peix
+    }
+  }
+
+  // -------------------------------------------------------------
+  // INICIALITZACIÓ DE L'ESCENA
+  // -------------------------------------------------------------
+
+  // Crear fons d'algues
+  const seaweeds = [];
+  const colors = ['#1e5927', '#277a35', '#194d22', '#2d8c3c', '#0f3d17'];
+
+  // Generar algues al fons de l'aquari
+  for (let i = 0; i < 28; i++) {
+    let x = (canvas.width / 26) * i + (Math.random() * 40 - 20);
+    let baseWidth = 18 + Math.random() * 16;
+    let height = canvas.height * (0.35 + Math.random() * 0.45);
+    let segments = 8 + Math.floor(Math.random() * 4);
+    let color = colors[Math.floor(Math.random() * colors.length)];
+    let waveSpeed = 1.2 + Math.random() * 1.2;
+    let waveAmp = 20 + Math.random() * 25;
+
+    seaweeds.push(new Seaweed(x, baseWidth, height, segments, color, waveSpeed, waveAmp));
+  }
+
+  // Crear bambolles d'aigua
+  const bubbles = [];
+  for (let i = 0; i < 35; i++) {
+    bubbles.push(new Bubble());
+  }
+
+  // Crear 2 Peixos Pallasso realistes com el de la imatge de referència
+  const clownfish1 = new RealisticClownfish(canvas.width * 0.3, canvas.height * 0.45, 1.15);
+  const clownfish2 = new RealisticClownfish(canvas.width * 0.68, canvas.height * 0.55, 0.95);
+
+  // -------------------------------------------------------------
+  // BUCLE PRINCIPAL D'ANIMACIÓ
+  // -------------------------------------------------------------
+  function animate() {
+    globalTime += 0.015;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Dibuixar algues que s'ondulen al fons
+    seaweeds.forEach(seaweed => seaweed.draw(globalTime));
+
+    // 2. Dibuixar i actualitzar bambolles ascendents
+    bubbles.forEach(bubble => {
+      bubble.update();
+      bubble.draw();
+    });
+
+    // 3. Dibuixar i actualitzar els dos peixos pallasso articulats
+    clownfish1.update();
+    clownfish1.draw();
+
+    clownfish2.update();
+    clownfish2.draw();
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+
+</body>
+</html>
