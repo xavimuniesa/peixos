@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Cadena de bicicleta — serp mecànica</title>
+<style>
+  :root{
+    --bg-0:#0b0c0e;
+    --bg-1:#16181b;
+    --steel-hi:#eef1f3;
+    --steel-mid:#9aa1a8;
+    --steel-lo:#3c4045;
+    --steel-shadow:#0e1012;
+    --brass:#caa25a;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg-0);
+    overflow:hidden;
+    touch-action:none;
+    -webkit-user-select:none; user-select:none;
+  }
+  #stage{
+    position:fixed; inset:0;
+    width:100vw; height:100dvh;
+    background:
+      radial-gradient(120% 90% at 50% 8%, var(--bg-1) 0%, var(--bg-0) 62%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  }
+  canvas{
+    display:block;
+    width:100%; height:100%;
+  }
+  #hud{
+    position:fixed; left:0; right:0; bottom:max(10px, env(safe-area-inset-bottom));
+    display:flex; justify-content:center;
+    pointer-events:none;
+    font-family:-apple-system, "Oswald", "Segoe UI", sans-serif;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:rgba(202,162,90,0.55);
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+
+  var W = 0, H = 0; // mida CSS (px lògics)
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', function(){ setTimeout(resize, 60); });
+  resize();
+
+  // ---------------------------------------------------------------
+  // Paràmetres de la cadena
+  // ---------------------------------------------------------------
+  var LINKS = 36;
+
+  function linkSize(){
+    var base = Math.min(W, H);
+    var len = Math.max(48, Math.min(90, base * 0.072));
+    return {
+      len: len,                 // distància entre eixos de baula
+      rollerR: len * 0.20,      // radi del pern/rivet
+      plateOuterH: len * 0.40,  // alçada plaques exteriors
+      plateInnerH: len * 0.27   // alçada plaques interiors
+    };
+  }
+  var LS = linkSize();
+  window.addEventListener('resize', function(){ LS = linkSize(); });
+
+  var SPEED = Math.min(W, H) * 0.34;
+
+  var margin = function(){ return LS.rollerR + 2; };
+
+  function clampNum(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
+  function clampPoint(p){
+    var m = margin();
+    if (p.x < m) p.x = m; else if (p.x > W - m) p.x = W - m;
+    if (p.y < m) p.y = m; else if (p.y > H - m) p.y = H - m;
+  }
+
+  // Punt i direcció d'inici aleatoris a cada càrrega
+  var initX = margin() + Math.random() * (W - 2 * margin());
+  var initY = margin() + Math.random() * (H - 2 * margin());
+  var initAngle = Math.random() * Math.PI * 2;
+
+  // Estat del cap
+  var head = {
+    x: initX,
+    y: initY,
+    vx: SPEED * Math.cos(initAngle),
+    vy: SPEED * Math.sin(initAngle)
+  };
+  var moveAngle = initAngle;
+  var angVel = 0;
+
+  var pos = [], prevPos = [];
+  (function seedBody(){
+    for (var i = 0; i < LINKS; i++){
+      var d = i * LS.len;
+      var p = {
+        x: initX - Math.cos(initAngle) * d,
+        y: initY - Math.sin(initAngle) * d
+      };
+      clampPoint(p);
+      pos.push({x: p.x, y: p.y});
+      prevPos.push({x: p.x, y: p.y});
+    }
+    pos[0].x = head.x; pos[0].y = head.y;
+    prevPos[0].x = head.x; prevPos[0].y = head.y;
+  })();
+
+  window.addEventListener('resize', function(){
+    for (var i = 0; i < LINKS; i++){ clampPoint(pos[i]); clampPoint(prevPos[i]); }
+  });
+
+  // ---------------------------------------------------------------
+  // Lògica d'Inversió de Sentit (30s min + interval aleatori)
+  // ---------------------------------------------------------------
+  var headIndex = 0; // 0 indica que la baula tractora és la primera, LINKS-1 indica la darrera
+
+  function scheduleNextReverse(){
+    // Minim 30 segons + entre 0 i 20 segons aleatoris extres
+    var delay = 30000 + Math.random() * 20000;
+    setTimeout(function(){
+      reverseChainDirection();
+      scheduleNextReverse(); // Programar la següent inversió
+    }, delay);
+  }
+
+  function reverseChainDirection(){
+    if (headIndex === 0) {
+      headIndex = LINKS - 1;
+    } else {
+      headIndex = 0;
+    }
+
+    // Calcular el nou vector de moviment basat en la posició de la nova baula tractora
+    var newHead = pos[headIndex];
+    var adjacentIndex = (headIndex === 0) ? 1 : LINKS - 2;
+    var adjacent = pos[adjacentIndex];
+
+    var dx = newHead.x - adjacent.x;
+    var dy = newHead.y - adjacent.y;
+
+    // Si la distància és quasi nul·la, utilitzem l'angle actual oposat
+    if (Math.hypot(dx, dy) < 1e-4) {
+      moveAngle = moveAngle + Math.PI;
+    } else {
+      moveAngle = Math.atan2(dy, dx);
+    }
+
+    angVel = 0;
+    head.x = newHead.x;
+    head.y = newHead.y;
+    head.vx = SPEED * Math.cos(moveAngle);
+    head.vy = SPEED * Math.sin(moveAngle);
+  }
+
+  // Iniciar el cicle d'inversions aleatòries
+  scheduleNextReverse();
+
+  // Restricció de distància rígida
+  function solveDistance(a, b, restLen, aFixed){
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var dist = Math.hypot(dx, dy) || 0.0001;
+    var diff = (dist - restLen) / dist;
+    if (aFixed){
+      b.x -= dx * diff;
+      b.y -= dy * diff;
+    } else {
+      var ox = dx * diff * 0.5, oy = dy * diff * 0.5;
+      a.x += ox; a.y += oy;
+      b.x -= ox; b.y -= oy;
+    }
+  }
+
+  function closestSegSeg(p1, p2, p3, p4){
+    var d1x = p2.x - p1.x, d1y = p2.y - p1.y;
+    var d2x = p4.x - p3.x, d2y = p4.y - p3.y;
+    var rx = p1.x - p3.x, ry = p1.y - p3.y;
+    var a = d1x*d1x + d1y*d1y;
+    var e = d2x*d2x + d2y*d2y;
+    var f = d2x*rx + d2y*ry;
+    var s, t;
+    if (a <= 1e-9 && e <= 1e-9){
+      s = 0; t = 0;
+    } else if (a <= 1e-9){
+      s = 0; t = clampNum(f / e, 0, 1);
+    } else {
+      var c = d1x*rx + d1y*ry;
+      if (e <= 1e-9){
+        t = 0; s = clampNum(-c / a, 0, 1);
+      } else {
+        var b = d1x*d2x + d1y*d2y;
+        var denom = a*e - b*b;
+        s = (denom !== 0) ? clampNum((b*f - c*e) / denom, 0, 1) : 0;
+        t = (b*s + f) / e;
+        if (t < 0){ t = 0; s = clampNum(-c/a, 0, 1); }
+        else if (t > 1){ t = 1; s = clampNum((b-c)/a, 0, 1); }
+      }
+    }
+    return {
+      ax: p1.x + d1x*s, ay: p1.y + d1y*s,
+      bx: p3.x + d2x*t, by: p3.y + d2y*t,
+      s: s, t: t
+    };
+  }
+
+  function solveSelfCollision(){
+    var SEP = LS.plateOuterH * 0.85;
+    var SEP2 = SEP * SEP;
+
+    for (var i = 0; i < LINKS - 1; i++){
+      var a1 = pos[i], a2 = pos[i+1];
+      for (var j = i + 2; j < LINKS - 1; j++){
+        var b1 = pos[j], b2 = pos[j+1];
+        var cp = closestSegSeg(a1, a2, b1, b2);
+        var dx = cp.bx - cp.ax, dy = cp.by - cp.ay;
+        var d2 = dx*dx + dy*dy;
+        if (d2 < SEP2 && d2 > 1e-8){
+          var d = Math.sqrt(d2);
+          var push = (SEP - d) / d;
+          var ox = dx * push * 0.5, oy = dy * push * 0.5;
+          var wa1 = 1 - cp.s, wa2 = cp.s;
+          var wb1 = 1 - cp.t, wb2 = cp.t;
+
+          var headSegmentIndex = (headIndex === 0) ? 0 : LINKS - 2;
+
+          if (i === headSegmentIndex){
+            b1.x += ox*2*wb1; b1.y += oy*2*wb1;
+            b2.x += ox*2*wb2; b2.y += oy*2*wb2;
+          } else if (j === headSegmentIndex){
+            a1.x -= ox*2*wa1; a1.y -= oy*2*wa1;
+            a2.x -= ox*2*wa2; a2.y -= oy*2*wa2;
+          } else {
+            a1.x -= ox*wa1; a1.y -= oy*wa1;
+            a2.x -= ox*wa2; a2.y -= oy*wa2;
+            b1.x += ox*wb1; b1.y += oy*wb1;
+            b2.x += ox*wb2; b2.y += oy*wb2;
+          }
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Física: moviment del cap + rebot segons l'angle d'impacte
+  // ---------------------------------------------------------------
+  var lastT = null;
+  var simTime = 0;
+
+  var ANG_IMPULSE = 3.4;
+  var ANG_DAMPING = 1.6;
+  var MAX_ANGVEL  = 2.6;
+
+  function step(dt){
+    simTime += dt;
+
+    // -- 1) steering
+    angVel += (Math.random() * 2 - 1) * ANG_IMPULSE * dt;
+    angVel -= angVel * ANG_DAMPING * dt;
+    angVel = clampNum(angVel, -MAX_ANGVEL, MAX_ANGVEL);
+    moveAngle += angVel * dt;
+
+    // -- 2) pols de velocitat
+    var speedNow = SPEED * (1 + 0.07 * Math.sin(simTime * 3.1));
+
+    head.vx = speedNow * Math.cos(moveAngle);
+    head.vy = speedNow * Math.sin(moveAngle);
+
+    var m = margin();
+    var nx = head.x + head.vx * dt;
+    var ny = head.y + head.vy * dt;
+
+    // Rebot especular
+    var bounced = false;
+    if (nx < m){ nx = m; head.vx = Math.abs(head.vx); bounced = true; }
+    else if (nx > W - m){ nx = W - m; head.vx = -Math.abs(head.vx); bounced = true; }
+
+    if (ny < m){ ny = m; head.vy = Math.abs(head.vy); bounced = true; }
+    else if (ny > H - m){ ny = H - m; head.vy = -Math.abs(head.vy); bounced = true; }
+
+    if (bounced){
+      moveAngle = Math.atan2(head.vy, head.vx);
+      angVel *= 0.4;
+    }
+
+    head.x = nx; head.y = ny;
+    pos[headIndex].x = head.x; pos[headIndex].y = head.y; // l'àncora dinàmica segons headIndex
+
+    // -- 3) Verlet per a la resta del cos
+    var damping = 0.985;
+    for (var i = 0; i < LINKS; i++){
+      if (i === headIndex) continue;
+      var p = pos[i], pp = prevPos[i];
+      var vx = (p.x - pp.x) * damping;
+      var vy = (p.y - pp.y) * damping;
+      pp.x = p.x; pp.y = p.y;
+      p.x += vx; p.y += vy;
+    }
+
+    // -- 4) Relaxació iterativa segons el sentit actual
+    var ITER = 9;
+    for (var it = 0; it < ITER; it++){
+      if (headIndex === 0) {
+        for (i = 0; i < LINKS - 1; i++){
+          solveDistance(pos[i], pos[i+1], LS.len, i === 0);
+        }
+      } else {
+        for (i = LINKS - 1; i > 0; i--){
+          solveDistance(pos[i], pos[i-1], LS.len, i === LINKS - 1);
+        }
+      }
+      solveSelfCollision();
+      for (i = 0; i < LINKS; i++) {
+        if (i !== headIndex) clampPoint(pos[i]);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Render (Modificat per a busques Tissot PRS516)
+  // ---------------------------------------------------------------
+  function drawChain(){
+    ctx.clearRect(0, 0, W, H);
+
+    var pts = pos;
+    var i;
+
+    // Ombra de contacte (Modificada per ser més suau)
+    ctx.save();
+    ctx.filter = 'blur(6px)';
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = LS.plateOuterH * 0.9;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y + 3);
+    for (i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y + 3);
+    ctx.stroke();
+    ctx.restore();
+
+    // Dibuixar plaques (metall polit satinat)
+    for (i = 0; i < pts.length - 1; i++){
+      drawPlate(pts[i], pts[i+1], i % 2 === 0);
+    }
+
+    // Dibuixar corrons (metall polit amb bisell)
+    for (i = 0; i < pts.length; i++){
+      drawRoller(pts[i]);
+    }
+
+    // -- INVERSIONS VISUALS DE CAP I CUA I BUSQUES NOVES --
+
+    // El verd sempre va a la baula tractora actual, i el vermell a la cua
+    var headPos = pts[headIndex];
+    var tailPos = pts[headIndex === 0 ? LINKS - 1 : 0];
+
+    // -- Draw the new Tissot PRS516 style hands at the tractor baula --
+    // We use the same color and styling as in the model photo.
+    // The previous simple drawLED calls are replaced.
+    
+    // Position of the tractor baula (where the hands are)
+    var cx = headPos.x;
+    var cy = headPos.y;
+
+    // Angle of movement of the chain tractor (hands align to this)
+    var angle = moveAngle; 
+
+    // Find previous link to compute orientation for tractor baula
+    var tractorIndex = headIndex;
+    var prevIndex = (tractorIndex === 0) ? 1 : LINKS - 2;
+    var prevPos = pos[prevIndex];
+
+    var dx = headPos.x - prevPos.x;
+    var dy = headPos.y - prevPos.y;
+    var lengthFromPrev = Math.hypot(dx, dy);
+    
+    // Base hand orientation is along the tractor link's vector.
+    var baseHandAngle;
+    if(lengthFromPrev > 0.001) {
+        baseHandAngle = Math.atan2(dy, dx);
+    } else {
+        // If not separated, hands align to tractor movement.
+        baseHandAngle = moveAngle;
+    }
+
+    // Hand styling parameters (relative to link size)
+    var baseLength = LS.len * 1.5; // Hands are much longer than a single link.
+    var handWidth = LS.plateInnerH * 1.0; // Same width as inner links
+    var innerHandRatio = 0.45; // Amount of hand filled with white
+
+    // -- Draw Hands at cx, cy oriented along baseHandAngle --
+    
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(baseHandAngle); // Tractor link alignment
+
+    // 1. Minute hand (longer)
+    drawHand(baseLength, handWidth, innerHandRatio, true); // true for minute hand specific details
+
+    // 2. Hour hand (shorter and often rotated slightly relative to minute baula)
+    // For this simulation, we make them collinear but offset for variety, 
+    // or just make them appear at different times in a real clock sense.
+    // Here we'll draw them as collinear but different lengths, a common clock representation when moving fast.
+    ctx.rotate(Math.PI); // Hour hand 180 deg offset
+    drawHand(baseLength * 0.7, handWidth, innerHandRatio, false); // Shorter, different styling
+
+    ctx.restore();
+
+    // 3. Central Cap/Pin (polishing brass look)
+    drawCentralPin(cx, cy, LS.rollerR * 1.3);
+
+    // -- Draw the tail LED (Red, original style) --
+    drawOriginalLED(tailPos, '239,68,68', LS.rollerR * 1.9); // vermell — cua
+  }
+
+  // --- Hand drawing function (Model: Tissot PRS516) ---
+  function drawHand(length, width, innerRatio, isMinute) {
+    var bevel = width * 0.12;
+    var cornerRadius = bevel * 1.5;
+    var startX = width * 0.3; // Hands don't start at the very center, have a 'tail'
+    
+    // Hand shape path
+    ctx.beginPath();
+    // Inner filled part
+    var fillLen = (length + startX) * innerRatio;
+    ctx.rect(-startX, -width/2 + bevel, fillLen, width - 2*bevel);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Steel boundary
+    ctx.beginPath();
+    ctx.moveTo(-startX, -width/2);
+    ctx.lineTo(length - cornerRadius, -width/2);
+    ctx.arcTo(length, -width/2, length, 0, cornerRadius);
+    ctx.arcTo(length, width/2, length - cornerRadius, width/2, cornerRadius);
+    ctx.lineTo(-startX, width/2);
+    ctx.closePath();
+
+    // Hand base gradient (steel mid-tone polit)
+    var hGrad = ctx.createLinearGradient(0, -width/2, 0, width/2);
+    hGrad.addColorStop(0.00, '#9da3a9');
+    hGrad.addColorStop(0.25, '#d5d9dc');
+    hGrad.addColorStop(0.50, '#f1f3f4');
+    hGrad.addColorStop(0.75, '#d5d9dc');
+    hGrad.addColorStop(1.00, '#9da3a9');
+    ctx.fillStyle = hGrad;
+    ctx.fill();
+
+    // Bevels
+    ctx.lineWidth = bevel * 0.8;
+    ctx.strokeStyle = '#0e1012'; // dark steel line for contrast
+    ctx.stroke();
+
+    // Specific minute/hour details (Minute often has white tip extension)
+    if(isMinute) {
+        // Red tip (like in photo model)
+        var tipSize = width * 1.2;
+        ctx.fillStyle = '#ef4444'; // vermell viu del model
+        ctx.beginPath();
+        ctx.moveTo(length - cornerRadius, -tipSize/2);
+        ctx.arcTo(length, -tipSize/2, length, 0, cornerRadius*1.5);
+        ctx.arcTo(length, tipSize/2, length - cornerRadius, tipSize/2, cornerRadius*1.5);
+        ctx.lineTo(length - cornerRadius * 1.8, tipSize/2);
+        ctx.closePath();
+        ctx.fill();
+
+        // White Tip Extension detail
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.rect(length - cornerRadius, -width/3, cornerRadius*2, width*0.66);
+        ctx.fill();
+    }
+  }
+
+  // --- Central Pin drawing function (Polished steel look) ---
+  function drawCentralPin(x, y, radius) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Ombra de base
+    ctx.beginPath();
+    ctx.arc(0.5, radius*0.32, radius, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fill();
+
+    // Cap del pern: metall polit (gradient radial)
+    var g = ctx.createRadialGradient(-radius*0.35, -radius*0.4, radius*0.12, 0, 0, radius*1.05);
+    g.addColorStop(0.00, '#ffffff');
+    g.addColorStop(0.30, '#d6dade');
+    g.addColorStop(0.65, '#8a9096');
+    g.addColorStop(1.00, '#4a4f54');
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = Math.max(0.6, radius*0.12);
+    ctx.strokeStyle = '#0e1012';
+    ctx.stroke();
+
+    // Forat central del pern (fosc profund)
+    ctx.beginPath();
+    ctx.arc(0, 0, radius*0.35, 0, Math.PI*2);
+    var g2 = ctx.createRadialGradient(-radius*0.10,-radius*0.10,radius*0.02, 0,0, radius*0.37);
+    g2.addColorStop(0, '#2e3134');
+    g2.addColorStop(1, '#0a0a0b');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // --- Original style LED (used for tail) ---
+  function drawOriginalLED(p, rgb, r){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    var glow = ctx.createRadialGradient(0, 0, r*0.1, 0, 0, r);
+    glow.addColorStop(0.00, 'rgba(' + rgb + ',1)');
+    glow.addColorStop(0.45, 'rgba(' + rgb + ',0.55)');
+    glow.addColorStop(1.00, 'rgba(' + rgb + ',0)');
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = glow;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawPlate(p0, p1, outer){
+    var dx = p1.x - p0.x, dy = p1.y - p0.y;
+    var ang = Math.atan2(dy, dx);
+    var midx = (p0.x + p1.x) / 2, midy = (p0.y + p1.y) / 2;
+    var len = Math.hypot(dx, dy) * 1.04;
+    var h = outer ? LS.plateOuterH : LS.plateInnerH;
+
+    ctx.save();
+    ctx.translate(midx, midy);
+    ctx.rotate(ang);
+
+    var x0 = -len/2, x1 = len/2;
+
+    ctx.save();
+    ctx.translate(0, h*0.20);
+    ctx.globalAlpha = 0.28;
+    dogbone(x0, x1, h);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.restore();
+
+    var grad = ctx.createLinearGradient(0, -h/2, 0, h/2);
+    if (outer){
+      grad.addColorStop(0.00, '#fdfdfe');
+      grad.addColorStop(0.18, '#e6e9ec');
+      grad.addColorStop(0.45, '#b3b9be');
+      grad.addColorStop(0.72, '#82898f');
+      grad.addColorStop(1.00, '#52585e');
+    } else {
+      grad.addColorStop(0.00, '#f1f3f4');
+      grad.addColorStop(0.20, '#d5d9dc');
+      grad.addColorStop(0.50, '#9da3a9');
+      grad.addColorStop(0.78, '#6f757b');
+      grad.addColorStop(1.00, '#40454a');
+    }
+    dogbone(x0, x1, h);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.lineWidth = Math.max(0.5, h*0.035);
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x0 + h*0.5, -h*0.30);
+    ctx.lineTo(x1 - h*0.5, -h*0.30);
+    ctx.lineWidth = Math.max(0.4, h*0.055);
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x0 + h*0.5, -h*0.06);
+    ctx.lineTo(x1 - h*0.5, -h*0.06);
+    ctx.lineWidth = Math.max(0.3, h*0.02);
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function dogbone(x0, x1, h){
+    var r = h * 0.5;
+    var waist = h * 0.60;
+    var mid = (x0 + x1) / 2;
+    ctx.beginPath();
+    ctx.arc(x0, 0, r, Math.PI*0.5, Math.PI*1.5);
+    ctx.quadraticCurveTo(mid, -waist/2, x1, -r);
+    ctx.arc(x1, 0, r, Math.PI*1.5, Math.PI*0.5);
+    ctx.quadraticCurveTo(mid, waist/2, x0, r);
+    ctx.closePath();
+  }
+
+  function drawRoller(p){
+    var r = LS.rollerR;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    ctx.beginPath();
+    ctx.arc(0.5, r*0.32, r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fill();
+
+    var g = ctx.createRadialGradient(-r*0.35, -r*0.4, r*0.12, 0, 0, r*1.05);
+    g.addColorStop(0.00, '#ffffff');
+    g.addColorStop(0.30, '#d6dade');
+    g.addColorStop(0.65, '#8a9096');
+    g.addColorStop(1.00, '#4a4f54');
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = Math.max(0.4, r*0.10);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, r*0.32, 0, Math.PI*2);
+    var g2 = ctx.createRadialGradient(-r*0.10,-r*0.10,r*0.02, 0,0, r*0.34);
+    g2.addColorStop(0, '#2e3134');
+    g2.addColorStop(1, '#0a0a0b');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(-r*0.32, -r*0.36, r*0.16, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function frame(t){
+    if (lastT === null) lastT = t;
+    var dt = Math.min(0.033, (t - lastT) / 1000);
+    lastT = t;
+
+    step(dt);
+    drawChain();
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
