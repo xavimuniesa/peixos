@@ -346,7 +346,7 @@
       border-radius: 1px;
     }
 
-    /* AGULLES (BUSQUES) MODIFICADES */
+    /* AGULLES (BUSQUES) FIDELS AL MODEL PRS 516 */
     .hand {
       position: absolute;
       bottom: 50%;
@@ -366,22 +366,20 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
+      padding: 0.2cqw;
     }
 
     .hour-hand::before {
       content: '';
-      width: 0.4cqw;
+      width: 100%;
       height: 25%;
       background: #111111;
     }
 
     .hour-hand::after {
       content: '';
-      position: absolute;
-      bottom: 0;
-      width: 200%;
-      height: 75%;
+      width: 100%;
+      height: 62%;
       background: #ffffff;
       border: 0.2cqw solid #111111;
       box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
@@ -398,22 +396,20 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
+      padding: 0.2cqw;
     }
 
     .minute-hand::before {
       content: '';
-      width: 0.4cqw;
+      width: 100%;
       height: 20%;
       background: #111111;
     }
 
     .minute-hand::after {
       content: '';
-      position: absolute;
-      bottom: 0;
-      width: 200%;
-      height: 80%;
+      width: 100%;
+      height: 72%;
       background: #ffffff;
       border: 0.2cqw solid #111111;
       box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
