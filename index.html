@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orloj — Rellotge astronòmic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --nit: #0a1330;
+    --nit2: #142452;
+    --pedra: #211a13;
+    --pedra2: #16110c;
+    --or: #d4af37;
+    --or-clar: #f2d98a;
+    --or-fosc: #8a6d1f;
+    --or-viu: #f0c65c;
+    --ivori: #f2e8d0;
+    --vermell: #7a1f1f;
+    --arg: #c9d2e0;
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; min-height:100%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #3a2c18 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 120%, #000 0%, transparent 60%),
+      linear-gradient(180deg, var(--pedra) 0%, var(--pedra2) 100%);
+    color: var(--ivori);
+    font-family: 'Cormorant Garamond', serif;
+  }
+  body{
+    height: 100dvh; display:flex; justify-content:center; align-items:center;
+    padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  }
+  .marc{
+    width:100%; max-width:1260px; border-radius:22px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.06), transparent 60%), linear-gradient(180deg, #1b140d 0%, #100c08 100%);
+    padding: clamp(18px,2.6vw,34px) clamp(24px,3.4vw,46px); position:relative;
+  }
+  .contingut{ display:flex; align-items:center; gap: clamp(20px,3.5vw,48px); }
+  .columna-esq{ flex:1 1 58%; min-width:0; text-align:center; }
+  .columna-dre{ flex:1 1 38%; min-width:0; display:flex; flex-direction:column; align-items:center; }
+  @media (max-width:780px){ .contingut{ flex-direction:column; } .columna-esq,.columna-dre{ flex:1 1 auto; width:100%; } }
+  header{ text-align:center; margin-bottom:4px; }
+  h1{ font-family:'UnifrakturMaguntia',cursive; font-weight:400; font-size:clamp(32px,4.4vw,52px); margin:4px 0 2px; color:var(--or-clar); text-shadow:0 0 18px rgba(212,175,55,0.35); letter-spacing:1px; }
+  .subtitol{ font-family:'Cinzel',serif; font-size:clamp(10px,1.3vw,13px); letter-spacing:3px; text-transform:uppercase; color:var(--or-viu); font-weight:600; text-shadow:0 0 6px rgba(240,198,92,0.35); }
+  .subtitol-secundari{ font-family:'Cinzel',serif; font-size:clamp(7px,0.85vw,9px); letter-spacing:2px; text-transform:uppercase; color:var(--or-fosc); font-weight:600; }
+  .disc-wrap{ width:100%; max-width:660px; margin:14px auto 0; display:block; }
+  .disc-wrap svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .calendari-wrap{ width:78%; max-width:355px; margin:4px auto 0; position:relative; z-index:2; }
+  .calendari-wrap svg{ width:100%; height:auto; display:block; }
+  .lectura{ text-align:center; margin-top:22px; font-family:'Cinzel',serif; }
+  .hora-digital{ font-size:clamp(28px,3.4vw,40px); color:var(--or-clar); text-shadow:0 0 12px rgba(212,175,55,0.3); }
+  .data-digital{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(15px,1.7vw,19px); color:var(--arg); margin-top:3px; }
+  .luna-linia{ margin-top:9px; font-size:clamp(12px,1.3vw,14px); letter-spacing:1.5px; color:var(--or-viu); font-weight:600; text-transform:uppercase; }
+  .ambient-linia{ margin-top:5px; font-size:clamp(10px,2.4vw,12px); letter-spacing:1.2px; color:var(--or-viu); text-transform:uppercase; opacity:0.9; }
+  .separador{ width:70%; max-width:260px; height:1px; margin:20px auto; background:linear-gradient(90deg, transparent, var(--or-fosc), transparent); }
+  .lema{ text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(12px,1.3vw,14px); color:#8b7a5e; letter-spacing:0.5px; margin-top:4px; }
+  text{ font-family:'Cinzel',serif; user-select:none; }
+  .num-antic{ font-family:'UnifrakturMaguntia',cursive; }
+</style>
+</head>
+<body>
+<div class="marc">
+<div class="contingut">
+<div class="columna-esq">
+<header>
+<div class="subtitol">Praga · MCDX</div>
+<h1>Orloj</h1>
+<div class="subtitol-secundari">Homenatge al rellotge astronòmic</div>
+</header>
+<div class="disc-wrap">
+<svg id="astrolabi" viewBox="0 0 600 600"></svg>
+</div>
+</div>
+<div class="columna-dre">
+<div class="calendari-wrap"><svg id="calendari" viewBox="0 0 300 300"></svg></div>
+<div class="separador"></div>
+<div class="lectura">
+<div class="hora-digital" id="lecturaHora">--:--:--</div>
+<div class="data-digital" id="lecturaData">—</div>
+<div class="luna-linia" id="lecturaLluna">—</div>
+<div class="ambient-linia" id="lecturaAmbient"><span id="lecturaTemp">—</span> · <span id="lecturaLloc">Sils</span></div>
+</div>
+<div class="lema">Tempus fugit, memoria manet</div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+  const svg = document.getElementById('astrolabi');
+  const NS = "http://www.w3.org/2000/svg";
+  const CX=300, CY=300;
+  const el = (t,a={})=>{ const e=document.createElementNS(NS,t); for(const[k,v]of Object.entries(a)) e.setAttribute(k,v); return e; };
+  const polarX=(cx,r,ang)=> cx + r*Math.sin(ang*Math.PI/180);
+  const polarY=(cy,r,ang)=> cy - r*Math.cos(ang*Math.PI/180);
+
+  // fons
+  svg.appendChild(el('circle',{cx:CX, cy:CY, r:298, fill:'#0a1330', stroke:'#d4af37', 'stroke-width':2.2, opacity:0.98}));
+  svg.appendChild(el('circle',{cx:CX, cy:CY, r:282, fill:'none', stroke:'#8a6d1f', 'stroke-width':0.7, opacity:0.6}));
+  svg.appendChild(el('circle',{cx:CX, cy:CY, r:252, fill:'none', stroke:'#8a6d1f', 'stroke-width':0.5, opacity:0.4, 'stroke-dasharray':'6 8'}));
+  svg.appendChild(el('circle',{cx:CX, cy:CY, r:208, fill:'#142452', stroke:'#d4af37', 'stroke-width':0.8, opacity:0.9}));
+  svg.appendChild(el('circle',{cx:CX, cy:CY, r:32, fill:'#f2d98a', opacity:0.12}));
+
+  // anell hores romanes
+  const horesRomanes = ['XII','I','II','III','IIII','V','VI','VII','VIII','VIIII','X','XI'];
+  horesRomanes.forEach((h,i)=>{
+    const ang=i*30;
+    const t=el('text',{x:polarX(CX,270,ang), y:polarY(CY,270,ang), 'text-anchor':'middle','dominant-baseline':'middle', fill:'#f2d98a', 'font-size':18, 'font-family':'UnifrakturMaguntia', opacity:0.9});
+    t.textContent=h;
+    t.setAttribute('transform',`rotate(${ang}, ${polarX(CX,270,ang)}, ${polarY(CY,270,ang)})`);
+    svg.appendChild(t);
+  });
+
+  // GRUP ZODIAC - NOVA VERSIÓ FIDEL A IMATGE ADJUNTA
+  const zodiGrup = el('g',{id:'zodiGrup'});
+  svg.appendChild(zodiGrup);
+
+  // Dades fidels a la imatge: ordre horari començant a AQUARIUS a l'oest (270deg)
+  // Disposició exacta de la teva imatge de referència
+  const zodiacData = [
+    // angleTop0 = 0 a dalt, horari. Ajustat per coincidir amb foto
+    { nom:'SCORPIUS',    glyph:'♏', ang: 18,  glyphAng: -12 },
+    { nom:'LIBRA',       glyph:'♎', ang: 48,  glyphAng: 18 },
+    { nom:'VIRGO',       glyph:'♍', ang: 78,  glyphAng: 28 },
+    { nom:'LEO',         glyph:'♌', ang: 105, glyphAng: 35 },
+    { nom:'CANCER',      glyph:'♋', ang: 135, glyphAng: 55 },
+    { nom:'GEMINI',      glyph:'♊', ang: 162, glyphAng: 72 },
+    { nom:'TAURUS',      glyph:'♉', ang: 188, glyphAng: 98 },
+    { nom:'ARIES',       glyph:'♈', ang: 214, glyphAng: 124 },
+    { nom:'PISCES',      glyph:'♓', ang: 240, glyphAng: -120 },
+    { nom:'AQUARIUS',    glyph:'♒', ang: 270, glyphAng: -90 }, // a l'oest, on és la TERRA
+    { nom:'CAPRICORNUS', glyph:'♑', ang: 300, glyphAng: -60 },
+    { nom:'SAGITTARIUS', glyph:'♐', ang: 330, glyphAng: -30 },
+  ];
+
+  const R_LABEL = 322; // radi extern on van els noms + glifs (fora del disc)
+  const R_GLYPH = 297;
+
+  zodiacData.forEach(z=>{
+    const g = el('g',{class:'zod'});
+    // posicions
+    const lx = polarX(CX, R_LABEL, z.ang);
+    const ly = polarY(CY, R_LABEL, z.ang);
+    const gx = polarX(CX, R_GLYPH, z.ang);
+    const gy = polarY(CY, R_GLYPH, z.ang);
+
+    // glif zodiacal - fidel a la imatge, estil gravat daurat
+    const glyph = el('text',{
+      x: gx, y: gy,
+      'text-anchor':'middle',
+      'dominant-baseline':'middle',
+      fill:'#f2d98a',
+      'font-size':28,
+      'font-weight':700,
+      'font-family':'Cinzel',
+      opacity:0.98
+    });
+    glyph.textContent = z.glyph;
+    glyph.style.filter = 'drop-shadow(0 0 6px rgba(212,175,55,0.45))';
+    // orientació radial com a la imatge (glif lleugerament inclinat cap al centre)
+    glyph.setAttribute('transform',`rotate(${z.ang}, ${gx}, ${gy})`);
+
+    // nom llatí - exactament com a la foto, en majúscules serif
+    const label = el('text',{
+      x: lx, y: ly,
+      'text-anchor':'middle',
+      'dominant-baseline':'middle',
+      fill:'#f2e8d0',
+      'font-size':11,
+      'font-weight':600,
+      'letter-spacing':0.6,
+      'font-family':'Cinzel',
+      opacity:0.92
+    });
+    label.textContent = z.nom;
+    label.setAttribute('transform',`rotate(${z.ang-90}, ${lx}, ${ly})`);
+
+    g.appendChild(glyph);
+    g.appendChild(label);
+    zodiGrup.appendChild(g);
+  });
+
+  // Orbita Terra + Sol/Lluna + busques (simplificat per demo, manté l'estètica original)
+  const orbita = el('circle',{cx:CX, cy:CY, r:152, fill:'none', stroke:'#c9d2e0', 'stroke-width':1.2, 'stroke-dasharray':'12 14', opacity:0.65});
+  svg.appendChild(orbita);
+
+  // Sol centre
+  const solG = el('g',{id:'sol'});
+  const solCircle = el('circle',{cx:CX, cy:CY, r:22, fill:'#f2d98a', stroke:'#d4af37', 'stroke-width':1.2});
+  const solText = el('text',{x:CX+34, y:CY+6, fill:'#f2d98a','font-size':9,'letter-spacing':1}); solText.textContent='SOL';
+  solG.appendChild(solCircle); solG.appendChild(solText);
+  svg.appendChild(solG);
+
+  // Terra + busques
+  const busquaHora = el('g',{id:'busquaHora'});
+  const agullaHora = el('line',{x1:CX, y1:CY, x2:CX, y2:CY-172, stroke:'#f2d98a','stroke-width':2.2, 'stroke-linecap':'round'});
+  busquaHora.appendChild(agullaHora);
+  svg.appendChild(busquaHora);
+
+  const solPunta = el('g',{id:'solPunta'});
+  solPunta.appendChild(el('circle',{cx:0,cy:0,r:6,fill:'#f0c65c',stroke:'#d4af37','stroke-width':1}));
+  svg.appendChild(solPunta);
+
+  const busquaMinut = el('g',{id:'busquaMinut'});
+  busquaMinut.appendChild(el('line',{x1:CX,y1:CY,x2:CX,y2:CY-236,stroke:'#c9d2e0','stroke-width':1.4, opacity:0.9}));
+  svg.appendChild(busquaMinut);
+
+  const lunaPunta = el('g',{id:'lunaPunta'});
+  lunaPunta.appendChild(el('circle',{cx:0,cy:0,r:9,fill:'#142452',stroke:'#c9d2e0','stroke-width':1}));
+  svg.appendChild(lunaPunta);
+
+  const busquaSegon = el('g',{id:'busquaSegon'});
+  busquaSegon.appendChild(el('line',{x1:CX,y1:CY,x2:CX,y2:CY-252,stroke:'#7a1f1f','stroke-width':0.9, opacity:0.85}));
+  svg.appendChild(busquaSegon);
+
+  const perla24 = el('g',{id:'perla24'});
+  perla24.appendChild(el('circle',{cx:0,cy:0,r:5,fill:'#f2d98a'}));
+  svg.appendChild(perla24);
+
+  const terraGrup = el('g',{id:'terra'});
+  const terraDot = el('circle',{cx:polarX(CX,152,270), cy:polarY(CY,152,270), r:9, fill:'#c9d2e0', stroke:'#0a1330','stroke-width':1.2});
+  const terraTxt = el('text',{x:polarX(CX,152,270)+14, y:polarY(CY,152,270)+4, fill:'#c9d2e0','font-size':10}); terraTxt.textContent='TERRA';
+  terraGrup.appendChild(terraDot); terraGrup.appendChild(terraTxt);
+  svg.appendChild(terraGrup);
+
+  // --------- CALENDARI (mantingut) ---------
+  const calSvg = document.getElementById('calendari');
+  const CCX=150, CCY=150;
+  calSvg.appendChild(el('circle',{cx:CCX,cy:CCY,r:145,fill:'#0a1330',stroke:'#d4af37','stroke-width':1.5}));
+  calSvg.appendChild(el('circle',{cx:CCX,cy:CCY,r:118,fill:'none',stroke:'#8a6d1f','stroke-width':0.6,opacity:0.5}));
+  const mesos = ['GENER','FEBRER','MARÇ','ABRIL','MAIG','JUNY','JULIOL','AGOST','SETEMBRE','OCTUBRE','NOVEMBRE','DESEMBRE'];
+  mesos.forEach((m,i)=>{
+    const ang=i*30;
+    const t=el('text',{x:polarX(CCX,132,ang), y:polarY(CCY,132,ang),'text-anchor':'middle','dominant-baseline':'middle', fill:'#f2d98a','font-size':8,'font-weight':600}); t.textContent=m;
+    t.setAttribute('transform',`rotate(${ang}, ${polarX(CCX,132,ang)}, ${polarY(CCY,132,ang)})`);
+    calSvg.appendChild(t);
+  });
+  const calGrup = el('g',{id:'calGrup'});
+  calSvg.appendChild(calGrup);
+  const diaText = el('text',{id:'diaText', x:CCX, y:CCY-70, 'text-anchor':'middle', fill:'#f2e8d0','font-size':22,'font-weight':700}); calSvg.appendChild(diaText);
+  const diaSetmanaText = el('text',{id:'diaSetmanaText', x:CCX, y:CCY-48, 'text-anchor':'middle', fill:'#c9d2e0','font-size':9}); calSvg.appendChild(diaSetmanaText);
+
+  // rellotge
+  function polarX(cx,r,ang){ return cx + r*Math.sin(ang*Math.PI/180); }
+  function polarY(cy,r,ang){ return cy - r*Math.cos(ang*Math.PI/180); }
+  function diaDeLany(d){ const inici=new Date(d.getFullYear(),0,0); return Math.floor((d - inici)/86400000); }
+  const fronteresZodiac=[1,32,61,92,122,153,183,214,245,275,306,336,367];
+  function angleZodiacActual(doy){ let i=11; for(let k=0;k<12;k++){ if(doy>=fronteresZodiac[k] && doy<fronteresZodiac[k+1]){ i=k; break; } } const f=(doy-fronteresZodiac[i])/(fronteresZodiac[i+1]-fronteresZodiac[i]); return (i-0.5+f)*30; }
+  const fronteresMes=[1,32,60,91,121,152,182,213,244,274,305,335,366];
+  function angleMesActual(doy){ let m=11; for(let k=0;k<12;k++){ if(doy>=fronteresMes[k] && doy<fronteresMes[k+1]){ m=k; break; } } const f=(doy-fronteresMes[m])/(fronteresMes[m+1]-fronteresMes[m]); return (m-0.5+f)*30; }
+  const diesSetmana=['diumenge','dilluns','dimarts','dimecres','dijous','divendres','dissabte'];
+  const nomsMesos=['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+  const abrevSetmana=['DG','DL','DT','DC','DJ','DV','DS'];
+  function formataHoraAmplaFixa(s){ return s.split('').map(c=> c===':'?'<span class="separador-hora">:</span>':`<span class="xifra">${c}</span>`).join(''); }
+
+  let zodiacActualitzat=false, calendariActualitzat=false;
+  function actualitza(){
+    const ara=new Date();
+    const h=ara.getHours()%12, m=ara.getMinutes(), s=ara.getSeconds();
+    const angHora=h*30+m*0.5, angMinut=m*6+s*0.1, angSegon=s*6;
+    busquaHora.setAttribute('transform',`rotate(${angHora}, ${CX}, ${CY})`);
+    document.getElementById('solPunta').setAttribute('transform',`translate(${polarX(CX,172,angHora)}, ${polarY(CY,172,angHora)})`);
+    busquaMinut.setAttribute('transform',`rotate(${angMinut}, ${CX}, ${CY})`);
+    document.getElementById('lunaPunta').setAttribute('transform',`translate(${polarX(CX,236,angMinut)}, ${polarY(CY,236,angMinut)})`);
+    busquaSegon.setAttribute('transform',`rotate(${angSegon}, ${CX}, ${CY})`);
+    const ang24=(ara.getHours()+m/60+s/3600)*15;
+    document.getElementById('perla24').setAttribute('transform',`translate(${polarX(CX,294,ang24)}, ${polarY(CY,294,ang24)})`);
+    const hh=String(ara.getHours()).padStart(2,'0'), mm=String(m).padStart(2,'0'), ss=String(s).padStart(2,'0');
+    document.getElementById('lecturaHora').innerHTML=formataHoraAmplaFixa(`${hh}:${mm}:${ss}`);
+    const diaSetmana=diesSetmana[ara.getDay()], diaMes=ara.getDate(), mes=nomsMesos[ara.getMonth()], any=ara.getFullYear();
+    document.getElementById('lecturaData').textContent=`${diaSetmana.charAt(0).toUpperCase()+diaSetmana.slice(1)}, ${diaMes} de ${mes} de ${any}`;
+    if(!zodiacActualitzat){ const doy=diaDeLany(ara); const angleZ=angleZodiacActual(doy); zodiGrup.setAttribute('transform',`rotate(${-angleZ}, ${CX}, ${CY})`); zodiacActualitzat=true; }
+    if(!calendariActualitzat){ const doy=diaDeLany(ara); const angleM=angleMesActual(doy); calGrup.setAttribute('transform',`rotate(${-angleM}, ${CCX}, ${CCY})`); diaText.setAttribute('transform',`rotate(${angleM}, ${CCX}, ${CCY})`); diaText.textContent=diaMes; diaSetmanaText.setAttribute('transform',`rotate(${angleM}, ${CCX}, ${CCY})`); diaSetmanaText.textContent=abrevSetmana[ara.getDay()]; calendariActualitzat=true; }
+  }
+  actualitza(); setInterval(actualitza,1000);
+})();
+</script>
+</body>
+</html>
