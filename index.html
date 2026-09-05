@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Cadena de bicicleta — serp mecànica</title>
+<style>
+  :root{
+    --bg-0:#0b0c0e;
+    --bg-1:#16181b;
+    --steel-hi:#eef1f3;
+    --steel-mid:#9aa1a8;
+    --steel-lo:#3c4045;
+    --steel-shadow:#0e1012;
+    --brass:#caa25a;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg-0);
+    overflow:hidden;
+    touch-action:none;
+    -webkit-user-select:none; user-select:none;
+  }
+  #stage{
+    position:fixed; inset:0;
+    width:100vw; height:100dvh;
+    background:
+      radial-gradient(120% 90% at 50% 8%, var(--bg-1) 0%, var(--bg-0) 62%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  }
+  canvas{
+    display:block;
+    width:100%; height:100%;
+  }
+  #hud{
+    position:fixed; left:0; right:0; bottom:max(10px, env(safe-area-inset-bottom));
+    display:flex; justify-content:center;
+    pointer-events:none;
+    font-family:-apple-system, "Oswald", "Segoe UI", sans-serif;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:rgba(202,162,90,0.55);
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+</div>
+<div id="hud">46 baules · transmissió lliure</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+
+  var W = 0, H = 0; // mida CSS (px lògics)
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', function(){ setTimeout(resize, 60); });
+  resize();
+
+  // ---------------------------------------------------------------
+  // Paràmetres de la cadena
+  // ---------------------------------------------------------------
+  var LINKS = 46; // 36 originals + 10 més
+
+  // Mida de la baula proporcional a la pantalla (tauleta Redmi Pad SE ~ 1920x1200)
+  function linkSize(){
+    var base = Math.min(W, H);
+    var len = Math.max(16, Math.min(30, base * 0.024));
+    return {
+      len: len,                 // distància entre eixos de baula
+      rollerR: len * 0.34,      // radi del corró (roller)
+      plateOuterH: len * 0.66,  // alçada plaques exteriors
+      plateInnerH: len * 0.40   // alçada plaques interiors
+    };
+  }
+  var LS = linkSize();
+  window.addEventListener('resize', function(){ LS = linkSize(); });
+
+  // Velocitat lineal del cap de la cadena (px/s), constant → l'energia es conserva als rebots
+  var SPEED = Math.min(W, H) * 0.34;
+
+  var margin = function(){ return LS.rollerR + 2; };
+
+  // Radi de col·lisió de cada baula (per a l'autocol·lisió del cos)
+  var COLL_R = LS.plateOuterH * 0.5;
+  window.addEventListener('resize', function(){ COLL_R = LS.plateOuterH * 0.5; });
+
+  function clampNum(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
+  function clampPoint(p){
+    var m = margin();
+    if (p.x < m) p.x = m; else if (p.x > W - m) p.x = W - m;
+    if (p.y < m) p.y = m; else if (p.y > H - m) p.y = H - m;
+  }
+
+  // Punt i direcció d'inici aleatoris a cada càrrega
+  var initX = margin() + Math.random() * (W - 2 * margin());
+  var initY = margin() + Math.random() * (H - 2 * margin());
+  var initAngle = Math.random() * Math.PI * 2;
+
+  // Estat del cap: posició + vector velocitat (defineix l'angle d'incidència).
+  // El cap és l'única baula "cinemàtica": mana la direcció, la resta del
+  // cos la segueix per física real (Verlet), no per un rastre gravat.
+  var head = {
+    x: initX,
+    y: initY,
+    vx: SPEED * Math.cos(initAngle),
+    vy: SPEED * Math.sin(initAngle)
+  };
+  var moveAngle = initAngle;
+  var angVel = 0;
+
+  // Partícules del cos (índex 0 = cap). pos/prevPos → integració de Verlet,
+  // que dona inèrcia real: cada baula "sent" el pes i l'impuls de les veïnes
+  // en lloc de teletransportar-se seguint un camí precalculat.
+  var pos = [], prevPos = [];
+  (function seedBody(){
+    for (var i = 0; i < LINKS; i++){
+      var d = i * LS.len;
+      var p = {
+        x: initX - Math.cos(initAngle) * d,
+        y: initY - Math.sin(initAngle) * d
+      };
+      clampPoint(p);
+      pos.push({x: p.x, y: p.y});
+      prevPos.push({x: p.x, y: p.y});
+    }
+    pos[0].x = head.x; pos[0].y = head.y;
+    prevPos[0].x = head.x; prevPos[0].y = head.y;
+  })();
+
+  window.addEventListener('resize', function(){
+    for (var i = 0; i < LINKS; i++){ clampPoint(pos[i]); clampPoint(prevPos[i]); }
+  });
+
+  // Restricció de distància rígida entre dues baules consecutives: ni
+  // s'estiren ni es comprimeixen, com els perns d'una cadena real.
+  function solveDistance(a, b, restLen, aFixed){
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var dist = Math.hypot(dx, dy) || 0.0001;
+    var diff = (dist - restLen) / dist;
+    if (aFixed){
+      b.x -= dx * diff;
+      b.y -= dy * diff;
+    } else {
+      var ox = dx * diff * 0.5, oy = dy * diff * 0.5;
+      a.x += ox; a.y += oy;
+      b.x -= ox; b.y -= oy;
+    }
+  }
+
+  // Autocol·lisió: cap parell de TRAMS no consecutius pot ocupar el
+  // mateix espai — es compara la distància més curta entre trams sencers
+  // (no només els centres de les baules), perquè cap diagonal "salti"
+  // per sobre d'una altra en zones on la cadena s'enrotlla molt densa.
+  function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  function closestSegSeg(p1, p2, p3, p4){
+    var d1x = p2.x - p1.x, d1y = p2.y - p1.y;
+    var d2x = p4.x - p3.x, d2y = p4.y - p3.y;
+    var rx = p1.x - p3.x, ry = p1.y - p3.y;
+    var a = d1x*d1x + d1y*d1y;
+    var e = d2x*d2x + d2y*d2y;
+    var f = d2x*rx + d2y*ry;
+    var s, t;
+
+    if (a <= 1e-9 && e <= 1e-9){
+      s = 0; t = 0;
+    } else if (a <= 1e-9){
+      s = 0; t = clamp01(f / e);
+    } else {
+      var c = d1x*rx + d1y*ry;
+      if (e <= 1e-9){
+        t = 0; s = clamp01(-c / a);
+      } else {
+        var b = d1x*d2x + d1y*d2y;
+        var denom = a*e - b*b;
+        s = (denom !== 0) ? clamp01((b*f - c*e) / denom) : 0;
+        t = (b*s + f) / e;
+        if (t < 0){ t = 0; s = clamp01(-c / a); }
+        else if (t > 1){ t = 1; s = clamp01((b - c) / a); }
+      }
+    }
+
+    return {
+      ax: p1.x + d1x*s, ay: p1.y + d1y*s,
+      bx: p3.x + d2x*t, by: p3.y + d2y*t,
+      s: s, t: t
+    };
+  }
+
+  function solveSelfCollision(){
+    var minD = COLL_R * 2;
+    var minD2 = minD * minD;
+    for (var i = 0; i < LINKS - 1; i++){
+      var a1 = pos[i], a2 = pos[i+1];
+      for (var j = i + 2; j < LINKS - 1; j++){
+        var b1 = pos[j], b2 = pos[j+1];
+        var cp = closestSegSeg(a1, a2, b1, b2);
+        var dx = cp.bx - cp.ax, dy = cp.by - cp.ay;
+        var d2 = dx*dx + dy*dy;
+        if (d2 < minD2 && d2 > 0.000001){
+          var d = Math.sqrt(d2);
+          var push = (minD - d) / d;
+          var ox = dx * push * 0.5, oy = dy * push * 0.5;
+          var wa1 = 1 - cp.s, wa2 = cp.s;
+          var wb1 = 1 - cp.t, wb2 = cp.t;
+          if (i === 0){
+            // el cap no cedeix la seva trajectòria: absorbeix l'altre tram
+            b1.x += ox * 2 * wb1; b1.y += oy * 2 * wb1;
+            b2.x += ox * 2 * wb2; b2.y += oy * 2 * wb2;
+          } else {
+            a1.x -= ox * wa1; a1.y -= oy * wa1;
+            a2.x -= ox * wa2; a2.y -= oy * wa2;
+            b1.x += ox * wb1; b1.y += oy * wb1;
+            b2.x += ox * wb2; b2.y += oy * wb2;
+          }
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Boles d'acer que cauen per gravetat i interfereixen amb la cadena.
+  // Sempre n'hi ha exactament TARGET_BALLS en joc: la que va aterrar
+  // primer desapareix (i en cau una de nova per substituir-la) just
+  // quan ja n'han aterrat 4 més — així el cicle és continu.
+  // ---------------------------------------------------------------
+  var GRAVITY = Math.min(W, H) * 0.9;
+  window.addEventListener('resize', function(){ GRAVITY = Math.min(W, H) * 0.9; });
+
+  var balls = [];
+  var landedOrder = [];
+  var TARGET_BALLS = 5;
+
+  function ballRadius(){ return LS.len * 0.55; }
+
+  function makeBall(){
+    var r = ballRadius();
+    return {
+      x: r + Math.random() * (W - 2 * r),
+      y: -r * 2 - Math.random() * 300,
+      vx: 0, vy: 0, r: r,
+      grounded: false
+    };
+  }
+
+  function removeAndReplaceBall(bi){
+    var b = balls[bi];
+    balls.splice(bi, 1);
+    var oi = landedOrder.indexOf(b);
+    if (oi !== -1) landedOrder.splice(oi, 1);
+    balls.push(makeBall());
+  }
+
+  (function seedBalls(){
+    for (var i = 0; i < TARGET_BALLS; i++) balls.push(makeBall());
+  })();
+
+  function closestPointOnSegment(px, py, a, b){
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var len2 = dx*dx + dy*dy || 1e-9;
+    var t = ((px - a.x) * dx + (py - a.y) * dy) / len2;
+    t = t < 0 ? 0 : (t > 1 ? 1 : t);
+    return { x: a.x + dx * t, y: a.y + dy * t, t: t };
+  }
+
+  function updateBalls(dt){
+    if (balls.length === 0) return;
+    var linkRadius = COLL_R;
+
+    for (var bi = balls.length - 1; bi >= 0; bi--){
+      var ball = balls[bi];
+
+      ball.vy += GRAVITY * dt;
+      ball.x += ball.vx * dt;
+      ball.y += ball.vy * dt;
+
+      if (ball.x - ball.r < 0){ ball.x = ball.r; ball.vx = Math.abs(ball.vx) * 0.5; }
+      else if (ball.x + ball.r > W){ ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx) * 0.5; }
+
+      // Rebot al terra: hi fa un parell de bots i, un cop assentada,
+      // marca l'ordre d'aterratge (vegeu el cicle de 5 boles més avall).
+      if (ball.y + ball.r > H){
+        ball.y = H - ball.r;
+        ball.vy = -Math.abs(ball.vy) * 0.35;
+        ball.vx *= 0.85;
+        if (!ball.grounded){ ball.grounded = true; landedOrder.push(ball); }
+      }
+
+      var minDist = ball.r + linkRadius;
+      for (var i = 0; i < LINKS - 1; i++){
+        var p1 = pos[i], p2 = pos[i+1];
+        var cp = closestPointOnSegment(ball.x, ball.y, p1, p2);
+        var dx = ball.x - cp.x, dy = ball.y - cp.y;
+        var dist = Math.hypot(dx, dy) || 0.0001;
+
+        if (dist < minDist){
+          var nx = dx / dist, ny = dy / dist;
+          var overlap = minDist - dist;
+
+          ball.x += nx * overlap * 0.6;
+          ball.y += ny * overlap * 0.6;
+
+          var vDotN = ball.vx * nx + ball.vy * ny;
+          if (vDotN < 0){
+            ball.vx -= 1.4 * vDotN * nx;
+            ball.vy -= 1.4 * vDotN * ny;
+          }
+
+          // El cap (baula 0) no cedeix la seva trajectòria, igual que a
+          // l'autocol·lisió del cos.
+          var w1 = (i === 0) ? 0 : (1 - cp.t);
+          var w2 = cp.t;
+          p1.x -= nx * overlap * 0.5 * w1; p1.y -= ny * overlap * 0.5 * w1;
+          p2.x -= nx * overlap * 0.5 * w2; p2.y -= ny * overlap * 0.5 * w2;
+        }
+      }
+
+      if (ball.y - ball.r > H + 200) removeAndReplaceBall(bi);
+    }
+
+    // La que va aterrar primer desapareix (i es reposa) just quan ja
+    // n'han aterrat 4 més — així sempre hi ha 5 boles en joc.
+    while (landedOrder.length > 4){
+      var oldest = landedOrder[0];
+      var idx = balls.indexOf(oldest);
+      if (idx !== -1) removeAndReplaceBall(idx);
+      else landedOrder.shift();
+    }
+
+    // Col·lisió bola-bola: reboten realment entre elles.
+    var REST = 0.85;
+    for (var a2 = 0; a2 < balls.length; a2++){
+      for (var b2 = a2 + 1; b2 < balls.length; b2++){
+        var ba = balls[a2], bb = balls[b2];
+        var dx2 = bb.x - ba.x, dy2 = bb.y - ba.y;
+        var dist2 = Math.hypot(dx2, dy2) || 0.0001;
+        var minD = ba.r + bb.r;
+        if (dist2 < minD){
+          var nx2 = dx2 / dist2, ny2 = dy2 / dist2;
+          var ov2 = minD - dist2;
+          ba.x -= nx2 * ov2 * 0.5; ba.y -= ny2 * ov2 * 0.5;
+          bb.x += nx2 * ov2 * 0.5; bb.y += ny2 * ov2 * 0.5;
+
+          var avn = ba.vx * nx2 + ba.vy * ny2;
+          var bvn = bb.vx * nx2 + bb.vy * ny2;
+          if (bvn < avn){
+            ba.vx += (bvn - avn) * nx2 * REST; ba.vy += (bvn - avn) * ny2 * REST;
+            bb.vx += (avn - bvn) * nx2 * REST; bb.vy += (avn - bvn) * ny2 * REST;
+          }
+        }
+      }
+    }
+  }
+
+  function drawBall(ball){
+    ctx.save();
+    ctx.translate(ball.x, ball.y);
+
+    var g = ctx.createRadialGradient(-ball.r*0.3, -ball.r*0.35, ball.r*0.1, 0, 0, ball.r);
+    g.addColorStop(0, '#f8fafc');
+    g.addColorStop(0.35, '#cbd5e1');
+    g.addColorStop(0.7, '#64748b');
+    g.addColorStop(1, '#1e293b');
+
+    ctx.beginPath();
+    ctx.arc(0, 0, ball.r, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = Math.max(1, ball.r*0.06);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(-ball.r*0.35, -ball.r*0.4, ball.r*0.2, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------
+  // Física: moviment del cap + rebot segons l'angle d'impacte
+  // ---------------------------------------------------------------
+  var lastT = null;
+  var simTime = 0;
+
+  // Steering orgànic: un procés d'impulsos aleatoris esmorteïts (tipus
+  // Ornstein-Uhlenbeck) que fa cimbrejar la trajectòria del cap en lloc
+  // de mantenir-la rectilínia i previsible entre rebot i rebot.
+  var ANG_IMPULSE = 3.4;   // força dels micro-impulsos aleatoris (rad/s²)
+  var ANG_DAMPING = 1.6;   // esmorteïment cap a la trajectòria recta
+  var MAX_ANGVEL  = 2.6;   // límit de gir (rad/s)
+
+  function step(dt){
+    simTime += dt;
+
+    // -- 1) steering: la direcció "respira" de manera contínua i orgànica
+    angVel += (Math.random() * 2 - 1) * ANG_IMPULSE * dt;
+    angVel -= angVel * ANG_DAMPING * dt;
+    angVel = clampNum(angVel, -MAX_ANGVEL, MAX_ANGVEL);
+    moveAngle += angVel * dt;
+
+    // -- 2) petit pols de velocitat, com si la cadena passés per les
+    //       dents d'un pinyó (engrenatge), en lloc d'anar a ritme fix
+    var speedNow = SPEED * (1 + 0.07 * Math.sin(simTime * 3.1));
+
+    head.vx = speedNow * Math.cos(moveAngle);
+    head.vy = speedNow * Math.sin(moveAngle);
+
+    var m = margin();
+    var nx = head.x + head.vx * dt;
+    var ny = head.y + head.vy * dt;
+
+    // Rebot especular a cada paret: es capgira només la component
+    // perpendicular a la vora, de manera que l'angle de sortida
+    // sempre és igual a l'angle d'incidència (com una bola de billar).
+    var bounced = false;
+    if (nx < m){ nx = m; head.vx = Math.abs(head.vx); bounced = true; }
+    else if (nx > W - m){ nx = W - m; head.vx = -Math.abs(head.vx); bounced = true; }
+
+    if (ny < m){ ny = m; head.vy = Math.abs(head.vy); bounced = true; }
+    else if (ny > H - m){ ny = H - m; head.vy = -Math.abs(head.vy); bounced = true; }
+
+    if (bounced){
+      // el steering continua a partir de la nova direcció reflectida
+      moveAngle = Math.atan2(head.vy, head.vx);
+      angVel *= 0.4; // el rebot "absorbeix" part del gir acumulat
+    }
+
+    head.x = nx; head.y = ny;
+    pos[0].x = head.x; pos[0].y = head.y; // el cap és l'àncora cinemàtica
+
+    // Boles: cauen per gravetat i poden desplaçar puntualment algun tram
+    updateBalls(dt);
+
+    // -- 3) Verlet per a la resta del cos: cada baula manté la seva
+    //       pròpia inèrcia (posició actual - posició anterior)
+    var damping = 0.985;
+    for (var i = 1; i < LINKS; i++){
+      var p = pos[i], pp = prevPos[i];
+      var vx = (p.x - pp.x) * damping;
+      var vy = (p.y - pp.y) * damping;
+      pp.x = p.x; pp.y = p.y;
+      p.x += vx; p.y += vy;
+    }
+
+    // -- 4) Relaxació iterativa: rigidesa de les baules + autocol·lisió
+    //       + contenció dins la pantalla, tot resolt a la vegada com un
+    //       sistema físic sòlid (no un simple recorregut precalculat)
+    var ITER = 6;
+    for (var it = 0; it < ITER; it++){
+      for (i = 0; i < LINKS - 1; i++){
+        solveDistance(pos[i], pos[i+1], LS.len, i === 0);
+      }
+      solveSelfCollision();
+      for (i = 1; i < LINKS; i++) clampPoint(pos[i]);
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Render: cada baula amb relleu metàl·lic (gradients + ombres)
+  // ---------------------------------------------------------------
+  function drawChain(){
+    ctx.clearRect(0, 0, W, H);
+
+    // Les baules ara són el resultat directe de la simulació física
+    // (Verlet + rigidesa + autocol·lisió), no d'un rastre precalculat.
+    var pts = pos;
+    var i;
+
+    // ombra de contacte de tota la cadena (dona sensació de pes sobre el pla)
+    ctx.save();
+    ctx.filter = 'blur(6px)';
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = LS.plateOuterH * 0.9;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y + 3);
+    for (i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y + 3);
+    ctx.stroke();
+    ctx.restore();
+
+    // dibuixem cada tram (plaques) entre baula i baula
+    for (i = 0; i < pts.length - 1; i++){
+      drawPlate(pts[i], pts[i+1], i % 2 === 0);
+    }
+
+    // dibuixem els corrons (rollers) sobre les articulacions
+    for (i = 0; i < pts.length; i++){
+      drawRoller(pts[i]);
+    }
+
+    // Ull LED del cap (verd) i de la cua (vermell) — a l'inrevés del
+    // model de referència, on el cap portava el vermell i la cua el verd.
+    drawLED(pts[0], '34,197,94');                 // verd — cap
+    drawLED(pts[pts.length - 1], '239,68,68');     // vermell — cua
+
+    // Boles d'acer per sobre de la cadena
+    for (i = 0; i < balls.length; i++) drawBall(balls[i]);
+  }
+
+  function drawLED(p, rgb){
+    var r = LS.rollerR * 1.9;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // halo lluminós
+    var glow = ctx.createRadialGradient(0, 0, r*0.1, 0, 0, r);
+    glow.addColorStop(0.00, 'rgba(' + rgb + ',1)');
+    glow.addColorStop(0.45, 'rgba(' + rgb + ',0.55)');
+    glow.addColorStop(1.00, 'rgba(' + rgb + ',0)');
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = glow;
+    ctx.fill();
+
+    // nucli brillant
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawPlate(p0, p1, outer){
+    var dx = p1.x - p0.x, dy = p1.y - p0.y;
+    var ang = Math.atan2(dy, dx);
+    var midx = (p0.x + p1.x) / 2, midy = (p0.y + p1.y) / 2;
+    var len = Math.hypot(dx, dy) * 1.06;
+    var h = outer ? LS.plateOuterH : LS.plateInnerH;
+
+    ctx.save();
+    ctx.translate(midx, midy);
+    ctx.rotate(ang);
+
+    var r = h * 0.5;
+    var x0 = -len/2, x1 = len/2;
+
+    // ombra projectada de la placa (relleu)
+    ctx.save();
+    ctx.translate(0, h*0.16);
+    ctx.globalAlpha = 0.30;
+    roundedCapsule(x0, -r, x1, r, r);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.restore();
+
+    // cos metàl·lic amb gradient perpendicular (llum superior-esquerra)
+    var grad = ctx.createLinearGradient(0, -r, 0, r);
+    if (outer){
+      grad.addColorStop(0.00, '#f4f6f8');
+      grad.addColorStop(0.20, '#cfd4d8');
+      grad.addColorStop(0.50, '#7d848b');
+      grad.addColorStop(0.80, '#4b4f54');
+      grad.addColorStop(1.00, '#25272a');
+    } else {
+      grad.addColorStop(0.00, '#e3e6e8');
+      grad.addColorStop(0.25, '#b7bcc1');
+      grad.addColorStop(0.55, '#686d73');
+      grad.addColorStop(0.85, '#3a3d41');
+      grad.addColorStop(1.00, '#1c1e20');
+    }
+    roundedCapsule(x0, -r, x1, r, r);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // vora fosca (biselat)
+    ctx.lineWidth = Math.max(0.6, h*0.045);
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.stroke();
+
+    // línia de llum superior (aresta brillant, dona el relleu 3D)
+    ctx.beginPath();
+    ctx.moveTo(x0 + r*0.6, -r*0.62);
+    ctx.lineTo(x1 - r*0.6, -r*0.62);
+    ctx.lineWidth = Math.max(0.5, h*0.09);
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function roundedCapsule(x0,y0,x1,y1,r){
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1 - r, y0);
+    ctx.arc(x1 - r, (y0+y1)/2, r, -Math.PI/2, Math.PI/2);
+    ctx.lineTo(x0 + r, y1);
+    ctx.arc(x0 + r, (y0+y1)/2, r, Math.PI/2, -Math.PI/2);
+    ctx.closePath();
+  }
+
+  function drawRoller(p){
+    var r = LS.rollerR;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // ombra de base
+    ctx.beginPath();
+    ctx.arc(0.6, r*0.28, r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fill();
+
+    // cos cilíndric del corró: gradient radial per simular volum
+    var g = ctx.createRadialGradient(-r*0.35, -r*0.4, r*0.15, 0, 0, r*1.05);
+    g.addColorStop(0.00, '#fbfcfd');
+    g.addColorStop(0.35, '#c7ccd0');
+    g.addColorStop(0.70, '#6b7075');
+    g.addColorStop(1.00, '#2b2d2f');
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = Math.max(0.6, r*0.12);
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.stroke();
+
+    // forat central del passador (rebló)
+    ctx.beginPath();
+    ctx.arc(0, 0, r*0.38, 0, Math.PI*2);
+    var g2 = ctx.createRadialGradient(-r*0.12,-r*0.12,r*0.03, 0,0, r*0.4);
+    g2.addColorStop(0, '#3a3c3e');
+    g2.addColorStop(1, '#0a0a0b');
+    ctx.fillStyle = g2;
+    ctx.fill();
+
+    // punt de llum (brillantor metàl·lica)
+    ctx.beginPath();
+    ctx.arc(-r*0.32, -r*0.36, r*0.18, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------
+  // Bucle principal
+  // ---------------------------------------------------------------
+  function frame(t){
+    if (lastT === null) lastT = t;
+    var dt = Math.min(0.033, (t - lastT) / 1000);
+    lastT = t;
+
+    step(dt);
+    drawChain();
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
