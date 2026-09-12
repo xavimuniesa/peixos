@@ -147,7 +147,8 @@
     margin: 4px auto 0;
     position: relative;
     z-index: 2;
-    perspective: 1400px;
+    /* Perspectiva perquè el 3D es vegi amb profunditat */
+    perspective: 1600px;
   }
   .calendari-wrap svg{ width:100%; height:auto; display:block; }
 
@@ -165,6 +166,32 @@
     from { transform: rotateY(0deg); }
     to   { transform: rotateY(360deg); }
   }
+
+  /* ===== EL COS DEL CILINDRE (el volum 3D) ===== */
+  /* Ara està DARRERE la cara frontal i DAVANT la posterior.
+     Les capes són discos daurats sencers, com a la brúixola que funcionava. */
+  .cos-cilindre{
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    pointer-events: none;
+    /* Sense z-index: queda entremig de les cares frontal i posterior gràcies al translateZ */
+  }
+  .cos-cilindre .capa-volum{
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    /* Disc daurat massís amb degradat radial, com a la brúixola */
+    background: radial-gradient(circle at 40% 36%, 
+      #fff6db 0%, 
+      #f0c65c 22%, 
+      #d4af37 45%, 
+      #b8860b 70%, 
+      #6b4c05 100%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
+  }
+
+  /* Les cares frontal i posterior: ara amb translateZ per situar-les als extrems del cilindre */
   .cara-davant, .cara-darrere{
     position: absolute;
     inset: 0;
@@ -172,30 +199,16 @@
     backface-visibility: hidden;
     box-shadow: 0 0 0 5px #8a6d1f, 0 0 0 9px #4a3510;
   }
+  .cara-davant{
+    /* Endavant: davant de totes les capes del cilindre */
+    transform: translateZ(14px);
+  }
   .cara-davant svg{ width:100%; height:100%; }
   .cara-darrere{
-    transform: rotateY(180deg);
+    /* Enrere: darrere de totes les capes del cilindre */
+    transform: rotateY(180deg) translateZ(14px);
     background:
       radial-gradient(circle at 32% 28%, #fff6db 0%, #f0c65c 32%, #c9a227 62%, #6e5416 100%);
-  }
-
-  /* ===== El cos del cilindre (volum 3D) ===== */
-  /* És un ANELL gruixut, no un disc ple. Així el centre queda transparent
-     i no tapa mai l'anvers. Només es veu el gruix quan gira. */
-  .cos-cilindre{
-    position: absolute;
-    inset: 0;
-    transform-style: preserve-3d;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .cos-cilindre .capa-volum{
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    /* Només la vora és opaca: el centre és transparent */
-    -webkit-mask-image: radial-gradient(circle, transparent 88%, black 89%);
-    mask-image: radial-gradient(circle, transparent 88%, black 89%);
   }
 
   .lectura{
@@ -333,7 +346,7 @@
       <div class="columna-dre">
         <div class="calendari-wrap">
           <div class="calendari-flip" id="calendariFlip">
-            <!-- El cos del cilindre amb volum 3D (anell, no disc ple) -->
+            <!-- El cos del cilindre amb volum 3D (discos daurats) -->
             <div class="cos-cilindre" id="cosCilindre"></div>
 
             <div class="cara-davant">
@@ -373,14 +386,14 @@
   function polarY(cy, r, angDeg){ return cy - r * Math.cos(angDeg * Math.PI/180); }
 
   // ==================== El cos del cilindre amb volum ====================
-  // És un ANELL gruixut, no un disc ple: només la vora és opaca.
-  // Així el centre queda transparent i no tapa mai l'anvers.
+  // Discos daurats sencers apilats entre -14px i +14px (darrere de la cara frontal
+  // que està a +14px, i davant de la posterior que està a -14px).
   (function generaVolumCilindre(){
     const contenidor = document.getElementById('cosCilindre');
     if (!contenidor) return;
 
-    const totalCapes = 12;
-    const gruixTotal = 22;
+    const totalCapes = 24;
+    const gruixTotal = 28;   // de -14px a +14px
 
     for (let i = 0; i < totalCapes; i++) {
       const capa = document.createElement('div');
@@ -391,15 +404,7 @@
       capa.style.position = 'absolute';
       capa.style.inset = '0';
       capa.style.borderRadius = '50%';
-      capa.style.transform = `translateZ(${zPos}px)`;
-
-      // Degradat radial: només la vora exterior és daurat opac
-      capa.style.background = `radial-gradient(circle at 50% 50%, 
-        transparent 0%, 
-        transparent 82%, 
-        #f0c65c 88%, 
-        #c9a227 94%, 
-        #8a6d1f 100%)`;
+      capa.style.transform = `translateZ(${zPos.toFixed(2)}px)`;
 
       contenidor.appendChild(capa);
     }
@@ -568,7 +573,6 @@
     const ang = i*30;
     const rx = polarX(CX,228,ang), ry = polarY(CY,228,ang);
     const g = el('g', {transform: `translate(${rx}, ${ry}) rotate(${ang}) scale(1, ${estiramentRoman})`});
-    // Ombra (dona efecte de gravat/relleu sobre la banda de vori)
     const ombra = el('text', {
       x: 0.6, y: 5.5,
       fill:'#5c4416', opacity:'0.45', 'font-size':'23', 'font-weight':'600', 'letter-spacing':'1.2',
@@ -590,7 +594,6 @@
   // Perla articulada: viatja per la vora entre l'anell antic i l'anell romà, marcant l'hora en format 24h
   const perla24 = el('g', {id:'perla24'});
   perla24.appendChild(el('ellipse', {cx:1.4, cy:2.3, rx:10, ry:7.6, fill:'#000000', opacity:'0.35'}));
-  // Anell (part de darrere, passa per darrere de l'esfera)
   perla24.appendChild(el('ellipse', {
     cx:0, cy:0, rx:19, ry:5.6, fill:'none', stroke:'#bfe8e2', 'stroke-width':1.6, opacity:'0.55',
     transform:'rotate(-18)'
@@ -598,7 +601,6 @@
   perla24.appendChild(el('circle', {cx:0, cy:0, r:11, fill:'none', stroke:'#8a6d1f', 'stroke-width':1.5}));
   perla24.appendChild(el('circle', {cx:0, cy:0, r:10.5, fill:'url(#perlaBanda)', stroke:'#0a2e29', 'stroke-width':0.6, filter:'url(#relleuPetit)'}));
   perla24.appendChild(el('circle', {cx:-3, cy:-3.3, r:2.3, fill:'#ffffff', opacity:'0.8'}));
-  // Anell (part de davant, passa per davant de l'esfera)
   perla24.appendChild(el('path', {
     d:'M -19,0 A 19,5.6 0 0,1 19,0', fill:'none', stroke:'#eafcfa', 'stroke-width':1.8, opacity:'0.9',
     transform:'rotate(-18)'
@@ -625,34 +627,32 @@
   const zodiGrup = el('g', {id:'zodiGrup'});
   zodiGrup.appendChild(el('circle', {cx:CX, cy:CY, r:195, fill:'url(#orBanda)', filter:'url(#relleuAnell)'}));
   zodiGrup.appendChild(el('circle', {cx:CX, cy:CY, r:165, fill:'var(--pedra)', style:'fill:#100c08'}));
-  // Icones pròpies dels signes (traç vectorial, no emoticones) — Àries..Peixos, mateix ordre que fronteresZodiac
   const iconesZodiac = [
     [ {d:"M -6,-7 C -8,-5 -7,-2 -5,-3 L -1,6"},
-      {d:"M 6,-7 C 8,-5 7,-2 5,-3 L 1,6"} ], // Àries
+      {d:"M 6,-7 C 8,-5 7,-2 5,-3 L 1,6"} ],
     [ {d:"M -4,-1 C -6,-6 -2,-8 0,-4"}, {d:"M 4,-1 C 6,-6 2,-8 0,-4"},
-      {circ:true, cx:0, cy:4, r:4} ], // Taure
-    [ {d:"M -6,-7 L 6,-7"}, {d:"M -6,7 L 6,7"}, {d:"M -3,-7 L -3,7"}, {d:"M 3,-7 L 3,7"} ], // Bessons
+      {circ:true, cx:0, cy:4, r:4} ],
+    [ {d:"M -6,-7 L 6,-7"}, {d:"M -6,7 L 6,7"}, {d:"M -3,-7 L -3,7"}, {d:"M 3,-7 L 3,7"} ],
     [ {circ:true, cx:-3.2, cy:-3.2, r:3}, {circ:true, cx:3.2, cy:3.2, r:3},
-      {d:"M -0.4,-2.4 Q 2,-1 1.6,2.2"}, {d:"M 0.4,2.4 Q -2,1 -1.6,-2.2"} ], // Cranc
-    [ {circ:true, cx:-4, cy:2, r:3.2}, {d:"M -1,3 C 3,3 3,8 7,8.5"} ], // Lleó
+      {d:"M -0.4,-2.4 Q 2,-1 1.6,2.2"}, {d:"M 0.4,2.4 Q -2,1 -1.6,-2.2"} ],
+    [ {circ:true, cx:-4, cy:2, r:3.2}, {d:"M -1,3 C 3,3 3,8 7,8.5"} ],
     [ {d:"M -8,-7 L -8,7"}, {d:"M -8,-7 C -8,-7 -5.5,7 -3,-7"}, {d:"M -3,-7 C -3,-7 -0.5,7 2,-7"},
-      {d:"M 2,-7 L 2,5"}, {circ:true, cx:4.3, cy:5, r:2.3} ], // Verge
+      {d:"M 2,-7 L 2,5"}, {circ:true, cx:4.3, cy:5, r:2.3} ],
     [ {d:"M 0,-9 L 0,7"}, {circ:true, cx:0, cy:-9, r:1.1},
       {d:"M -8,-6.5 L 8,-6.5"},
       {d:"M -8,-6.5 L -10,1"}, {d:"M -8,-6.5 L -6,1"}, {d:"M -10,1 Q -8,3.3 -6,1"},
       {d:"M 8,-6.5 L 10,1"}, {d:"M 8,-6.5 L 6,1"}, {d:"M 10,1 Q 8,3.3 6,1"},
-      {d:"M -5,9 L 5,9"} ], // Balança
+      {d:"M -5,9 L 5,9"} ],
     [ {d:"M -8,-7 L -8,7"}, {d:"M -8,-7 C -8,-7 -5.5,7 -3,-7"}, {d:"M -3,-7 C -3,-7 -0.5,7 2,-7"},
-      {d:"M 2,-7 L 2,4 L 6,4"}, {d:"M 6,4 L 4,1"}, {d:"M 6,4 L 4,7"} ], // Escorpí
-    [ {d:"M -6,7 L 7,-6"}, {d:"M 7,-6 L 1,-6"}, {d:"M 7,-6 L 7,0"}, {d:"M -2,4 L 3,-1"} ], // Sagitari
-    [ {d:"M -6,-7 L -1,4 C 0,6 2,6.5 3,5.5 C 4,4.5 3.5,3 2.3,3.3 C 1.5,3.5 1.6,4.5 2.5,4.5"} ], // Capricorn
-    [ {d:"M -8,-2 L -5,-5 L -2,-2 L 1,-5 L 4,-2 L 7,-5"}, {d:"M -8,4 L -5,1 L -2,4 L 1,1 L 4,4 L 7,1"} ], // Aquari
-    [ {d:"M -3,-7 Q -9,0 -3,7"}, {d:"M 3,-7 Q 9,0 3,7"}, {d:"M -6,0 L 6,0"} ] // Peixos
+      {d:"M 2,-7 L 2,4 L 6,4"}, {d:"M 6,4 L 4,1"}, {d:"M 6,4 L 4,7"} ],
+    [ {d:"M -6,7 L 7,-6"}, {d:"M 7,-6 L 1,-6"}, {d:"M 7,-6 L 7,0"}, {d:"M -2,4 L 3,-1"} ],
+    [ {d:"M -6,-7 L -1,4 C 0,6 2,6.5 3,5.5 C 4,4.5 3.5,3 2.3,3.3 C 1.5,3.5 1.6,4.5 2.5,4.5"} ],
+    [ {d:"M -8,-2 L -5,-5 L -2,-2 L 1,-5 L 4,-2 L 7,-5"}, {d:"M -8,4 L -5,1 L -2,4 L 1,1 L 4,4 L 7,1"} ],
+    [ {d:"M -3,-7 Q -9,0 -3,7"}, {d:"M 3,-7 Q 9,0 3,7"}, {d:"M -6,0 L 6,0"} ]
   ];
   const zodiTextEls = [];
   iconesZodiac.forEach((icona,i)=>{
     const ang = i*30;
-    // separadors
     zodiGrup.appendChild(el('line', {
       x1: polarX(CX,195,ang-15), y1: polarY(CY,195,ang-15),
       x2: polarX(CX,165,ang-15), y2: polarY(CY,165,ang-15),
@@ -675,7 +675,6 @@
   });
   svg.appendChild(zodiGrup);
 
-  // punter fix del zodíac (marca "sol actual")
   const puntaZodiac = el('g', {transform: `translate(${CX}, ${CY-180}) scale(0.9, 1.1)`});
   puntaZodiac.appendChild(el('path', {
     d: fletxaFerroPath,
@@ -694,7 +693,6 @@
   // ---------- Disc central: la fase lunar real, a mida completa ----------
   svg.appendChild(el('circle', {cx:CX, cy:CY, r:165, fill:'url(#ceil)'}));
 
-  // estrelles (es veuen a la banda fosca de la lluna)
   const estels = el('g', {fill:'#f2d98a'});
   const rngSeed = 42;
   function pseudoRand(seed){ let x = Math.sin(seed)*10000; return x - Math.floor(x); }
@@ -708,8 +706,6 @@
   }
   svg.appendChild(estels);
 
-  // Cometa Halley: travessa l'interior d'aquesta esfera (per darrere de la part il·luminada
-  // de la lluna) cada 76 segons, en homenatge als 76 anys del seu període orbital.
   const cometaLlunaGrad = el('linearGradient', {id:'cometaCuaBanda', x1:'100%', y1:'0%', x2:'0%', y2:'0%'});
   cometaLlunaGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fff8ea', 'stop-opacity':'0.9'}));
   cometaLlunaGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#fff8ea', 'stop-opacity':'0'}));
@@ -741,12 +737,10 @@
     return p;
   }
 
-  // busca de les hores (sol)
   const busquaHora = fletxa('busquaHora', 172, 9, 'url(#orBanda)');
   svg.appendChild(busquaHora);
   const solPunta = el('g', {id:'solPunta'});
   solPunta.appendChild(el('circle', {cx:0.9, cy:1.1, r:9.5, fill:'#5c3d0a', opacity:'0.4'}));
-  // Raigs ondulats (com flames), alternant llargada per a un aire més orgànic
   for(let i=0;i<14;i++){
     const a = i*(360/14);
     const llarg = (i%2===0) ? 17 : 14;
@@ -757,7 +751,6 @@
     }));
   }
   solPunta.appendChild(el('circle', {cx:0, cy:0, r:9.5, fill:'url(#solBanda)', stroke:'#8a6d1f', 'stroke-width':1, filter:'url(#relleuPetit)'}));
-  // Rostre
   const solCara = el('g', {stroke:'#5c3d0a', 'stroke-width':0.6, fill:'none', 'stroke-linecap':'round'});
   solCara.appendChild(el('path', {d:'M -3.6,-1.2 Q -2.8,-2.4 -1.6,-1.4'}));
   solCara.appendChild(el('path', {d:'M 3.6,-1.2 Q 2.8,-2.4 1.6,-1.4'}));
@@ -768,7 +761,6 @@
   solPunta.appendChild(solCara);
   svg.appendChild(solPunta);
 
-  // busca dels minuts (lluna)
   const busquaMinut = fletxa('busquaMinut', 236, 7, '#cdd6e6');
   svg.appendChild(busquaMinut);
   const lunaPunta = el('g', {id:'lunaPunta'});
@@ -777,14 +769,12 @@
   lunaPunta.appendChild(lunaLit);
   svg.appendChild(lunaPunta);
 
-  // busca dels segons
   const busquaSegon = el('line', {
     id:'busquaSegon', x1:CX, y1:CY+22, x2:CX, y2:CY-258,
     stroke:'#8a1f1f', 'stroke-width':1.6, 'stroke-linecap':'round'
   });
   svg.appendChild(busquaSegon);
 
-  // eix central
   svg.appendChild(el('circle', {cx:CX, cy:CY, r:14, fill:'url(#nucli)', stroke:'#4a3a10', 'stroke-width':1.5, filter:'url(#relleuPetit)'}));
   svg.appendChild(el('circle', {cx:CX, cy:CY, r:4, fill:'#5c1616'}));
 
@@ -793,7 +783,6 @@
   const CCX=150, CCY=150;
   cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:148, fill:'url(#orBanda)', filter:'url(#relleuAnell)'}));
 
-  // Reblons al voltant de la vora del calendari
   const reblonsCalGrup = el('g', {});
   for(let i=0;i<24;i++){
     const a = i*15;
@@ -824,7 +813,6 @@
     calGrup.appendChild(t);
   });
   calGrup.appendChild(el('circle', {cx:CCX, cy:CCY, r:96, fill:'url(#ceil)'}));
-  // Camp d'estels ambientals, molt tènues, perquè la constel·lació hi destaqui per contrast
   const estelsAmbientCal = el('g', {fill:'#f2d98a'});
   for(let i=0;i<18;i++){
     const a = pseudoRand(i*11.7+31)*360;
@@ -869,7 +857,6 @@
     return Math.floor(diff / 86400000);
   }
 
-  // Dona amplada fixa a cada xifra (evita que l'hora "balancegi" segons quins dígits surten)
   function formataHoraAmplaFixa(text){
     return text.split('').map(ch=>{
       if (ch === ':') return `<span class="separador-hora">:</span>`;
@@ -1205,4 +1192,4 @@
 })();
 </script>
 </body>
-</html>
+</html>0
