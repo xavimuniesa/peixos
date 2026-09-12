@@ -180,18 +180,19 @@
   }
 
   /* ===== NOU: El cos del cilindre (volum 3D) ===== */
+  /* Ara està DARRERE de la cara frontal, no al davant. Així no la tapa mai. */
   .cos-cilindre{
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
     pointer-events: none;
-    z-index: 1;
+    z-index: 0; /* Per sota de .cara-davant (que no té z-index explícit però va després al DOM) */
   }
   .cos-cilindre .capa-volum{
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
   }
 
   .lectura{
@@ -329,7 +330,7 @@
       <div class="columna-dre">
         <div class="calendari-wrap">
           <div class="calendari-flip" id="calendariFlip">
-            <!-- NOU: El cos del cilindre amb volum 3D -->
+            <!-- NOU: El cos del cilindre amb volum 3D, DARRERE de l'anvers -->
             <div class="cos-cilindre" id="cosCilindre"></div>
 
             <div class="cara-davant">
@@ -369,25 +370,25 @@
   function polarY(cy, r, angDeg){ return cy - r * Math.cos(angDeg * Math.PI/180); }
 
   // ==================== NOU: Generar el cos del cilindre amb volum ====================
+  // Aquestes capes queden DARRERE de la cara frontal i formen el gruix del cilindre.
+  // Quan el calendari gira, es veuen de perfil i creen l'efecte de moneda massissa.
   (function generaVolumCilindre(){
     const contenidor = document.getElementById('cosCilindre');
     if (!contenidor) return;
 
-    const totalCapes = 24;        // Nombre de discos apilats
-    const gruixTotal = 34;        // Profunditat total en px (de -17 a +17)
-    const radi = '50%';
+    const totalCapes = 12;        // Nombre de discos apilats
+    const gruixTotal = 22;        // Profunditat total en px (de -11 a +11)
 
     for (let i = 0; i < totalCapes; i++) {
       const capa = document.createElement('div');
       capa.className = 'capa-volum';
 
-      // Posició Z de cada capa (de -17px a +17px)
+      // Posició Z de cada capa (de -11px a +11px)
       const zPos = -gruixTotal/2 + (i * (gruixTotal / (totalCapes - 1)));
 
-      // Estil de cada disc
       capa.style.position = 'absolute';
       capa.style.inset = '0';
-      capa.style.borderRadius = radi;
+      capa.style.borderRadius = '50%';
       capa.style.transform = `translateZ(${zPos}px)`;
 
       // Degradat radial que simula el metall polit
@@ -398,8 +399,7 @@
         #8a6d1f 85%, 
         #4a3510 100%)`;
 
-      // Ombra interior per donar profunditat
-      capa.style.boxShadow = 'inset 0 0 12px rgba(0,0,0,0.7)';
+      capa.style.boxShadow = 'inset 0 0 8px rgba(0,0,0,0.6)';
 
       contenidor.appendChild(capa);
     }
