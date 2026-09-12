@@ -147,12 +147,10 @@
     margin: 4px auto 0;
     position: relative;
     z-index: 2;
-    /* Perspectiva perquè el 3D es vegi amb profunditat */
     perspective: 1600px;
   }
   .calendari-wrap svg{ width:100%; height:auto; display:block; }
 
-  /* Gir de moneda / rellotge de butxaca: cada hora en punt (i una vegada de mostra en carregar) */
   .calendari-flip{
     position: relative;
     width: 100%;
@@ -167,21 +165,16 @@
     to   { transform: rotateY(360deg); }
   }
 
-  /* ===== EL COS DEL CILINDRE (el volum 3D) ===== */
-  /* Ara està DARRERE la cara frontal i DAVANT la posterior.
-     Les capes són discos daurats sencers, com a la brúixola que funcionava. */
   .cos-cilindre{
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
     pointer-events: none;
-    /* Sense z-index: queda entremig de les cares frontal i posterior gràcies al translateZ */
   }
   .cos-cilindre .capa-volum{
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    /* Disc daurat massís amb degradat radial, com a la brúixola */
     background: radial-gradient(circle at 40% 36%, 
       #fff6db 0%, 
       #f0c65c 22%, 
@@ -191,21 +184,22 @@
     box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
   }
 
-  /* Les cares frontal i posterior: ara amb translateZ per situar-les als extrems del cilindre */
+  /* ===== CARES SENSE ANELLS FOSCOS EXTERIORS ===== */
+  /* He eliminat els dos anells daurats del box-shadow. 
+     Ara només hi ha una ombra subtil per donar profunditat, sense cap vora afegida. */
   .cara-davant, .cara-darrere{
     position: absolute;
     inset: 0;
     border-radius: 50%;
     backface-visibility: hidden;
-    box-shadow: 0 0 0 5px #8a6d1f, 0 0 0 9px #4a3510;
+    /* Només una ombra suau, sense anells daurats al voltant */
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
   }
   .cara-davant{
-    /* Endavant: davant de totes les capes del cilindre */
     transform: translateZ(14px);
   }
   .cara-davant svg{ width:100%; height:100%; }
   .cara-darrere{
-    /* Enrere: darrere de totes les capes del cilindre */
     transform: rotateY(180deg) translateZ(14px);
     background:
       radial-gradient(circle at 32% 28%, #fff6db 0%, #f0c65c 32%, #c9a227 62%, #6e5416 100%);
@@ -346,7 +340,6 @@
       <div class="columna-dre">
         <div class="calendari-wrap">
           <div class="calendari-flip" id="calendariFlip">
-            <!-- El cos del cilindre amb volum 3D (discos daurats) -->
             <div class="cos-cilindre" id="cosCilindre"></div>
 
             <div class="cara-davant">
@@ -386,14 +379,12 @@
   function polarY(cy, r, angDeg){ return cy - r * Math.cos(angDeg * Math.PI/180); }
 
   // ==================== El cos del cilindre amb volum ====================
-  // Discos daurats sencers apilats entre -14px i +14px (darrere de la cara frontal
-  // que està a +14px, i davant de la posterior que està a -14px).
   (function generaVolumCilindre(){
     const contenidor = document.getElementById('cosCilindre');
     if (!contenidor) return;
 
     const totalCapes = 24;
-    const gruixTotal = 28;   // de -14px a +14px
+    const gruixTotal = 28;
 
     for (let i = 0; i < totalCapes; i++) {
       const capa = document.createElement('div');
@@ -792,7 +783,10 @@
     }));
   }
   cal.appendChild(reblonsCalGrup);
-  cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:138, fill:'#0c0c0c'}));
+  
+  // ***** ELIMINAT: cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:138, fill:'#0c0c0c'})); *****
+  // Ja no hi ha l'anell negre entre la vora daurada i el disc estelat.
+  // Ara el fons estel·lar arriba fins a la vora daurada directament.
 
   const calGrup = el('g', {id:'calGrup'});
   const mesos = ['GEN','FEB','MAR','ABR','MAI','JUN','JUL','AGO','SET','OCT','NOV','DES'];
@@ -1192,4 +1186,4 @@
 })();
 </script>
 </body>
-</html>0
+</html>
