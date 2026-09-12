@@ -2,865 +2,1232 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>Cadena de bicicleta — serp mecànica</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orloj — Rellotge astronòmic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-0:#0b0c0e;
-    --bg-1:#16181b;
-    --steel-hi:#eef1f3;
-    --steel-mid:#9aa1a8;
-    --steel-lo:#3c4045;
-    --steel-shadow:#0e1012;
-    --brass:#caa25a;
+    --nit: #0a1330;
+    --nit2: #142452;
+    --pedra: #211a13;
+    --pedra2: #16110c;
+    --or: #d4af37;
+    --or-clar: #f2d98a;
+    --or-fosc: #8a6d1f;
+    --or-viu: #f0c65c;
+    --ivori: #f2e8d0;
+    --vermell: #7a1f1f;
+    --arg: #c9d2e0;
   }
+
+  *{ box-sizing: border-box; }
+
   html,body{
-    margin:0; padding:0; width:100%; height:100%;
-    background:var(--bg-0);
-    overflow:hidden;
-    touch-action:none;
-    -webkit-user-select:none; user-select:none;
-  }
-  #stage{
-    position:fixed; inset:0;
-    width:100vw; height:100dvh;
+    margin:0;
+    min-height:100%;
     background:
-      radial-gradient(120% 90% at 50% 8%, var(--bg-1) 0%, var(--bg-0) 62%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+      radial-gradient(ellipse at 12% 8%, rgba(255,140,45,0.16) 0%, transparent 28%),
+      radial-gradient(ellipse at 88% 8%, rgba(255,140,45,0.16) 0%, transparent 28%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 2px, transparent 2px, transparent 58px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.13) 0px, rgba(0,0,0,0.13) 2px, transparent 2px, transparent 84px),
+      radial-gradient(ellipse at 50% -10%, #4a3c28 0%, transparent 55%),
+      linear-gradient(160deg, #574c3d 0%, #382f24 55%, #211c15 100%);
+    color: var(--ivori);
+    font-family: 'Cormorant Garamond', serif;
   }
-  canvas{
+
+  body{
+    height: 100dvh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(20px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(20px, env(safe-area-inset-left));
+  }
+
+  .banderolaTitol{
     display:block;
-    width:100%; height:100%;
+    width: min(72%, 340px);
+    margin: 0 auto;
+    overflow: visible;
+  }
+
+  .marc{
+    width:100%;
+    max-width: 1260px;
+    border-radius: 14px;
+    border: 3px solid #8a6d1f;
+    background:
+      radial-gradient(ellipse 260px 340px at 18% 12%, rgba(110,140,215,0.20), transparent 60%),
+      radial-gradient(ellipse 300px 380px at 78% 22%, rgba(85,115,200,0.17), transparent 58%),
+      radial-gradient(ellipse 280px 340px at 38% 62%, rgba(70,100,190,0.16), transparent 58%),
+      radial-gradient(ellipse 320px 400px at 88% 78%, rgba(100,130,210,0.14), transparent 58%),
+      radial-gradient(ellipse 220px 300px at 8% 88%, rgba(60,90,180,0.15), transparent 58%),
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.07), transparent 60%),
+      linear-gradient(160deg, #10173a 0%, #080c22 55%, #050714 100%);
+    box-shadow:
+      0 0 0 1px #4a3510,
+      0 0 0 7px #241a10,
+      0 0 0 8px #6b5228,
+      inset 0 0 50px rgba(0,0,0,0.55),
+      0 25px 70px rgba(0,0,0,0.65);
+    padding: clamp(18px, 2.6vw, 34px) clamp(24px, 3.4vw, 46px);
+    position: relative;
+  }
+
+  .contingut{
+    display:flex;
+    align-items:center;
+    gap: clamp(20px, 3.5vw, 48px);
+  }
+  .columna-esq{
+    flex: 1 1 58%;
+    min-width: 0;
+    text-align:center;
+  }
+  .columna-dre{
+    flex: 1 1 38%;
+    min-width: 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  @media (max-width: 780px){
+    .contingut{ flex-direction:column; }
+    .columna-esq, .columna-dre{ flex: 1 1 auto; width:100%; }
+  }
+
+  header{
+    text-align:center;
+    margin-bottom: 4px;
+  }
+  h1{
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-weight: 400;
+    font-size: clamp(32px, 4.4vw, 52px);
+    margin: 4px 0 2px;
+    color: var(--or-clar);
+    text-shadow: 0 0 18px rgba(212,175,55,0.35), -1.5px -1.5px 0px rgba(255,250,230,0.45), 1.5px 1.5px 2px rgba(0,0,0,0.7);
+    letter-spacing: 1px;
+  }
+  .subtitol{
+    font-family: 'Cinzel', serif;
+    font-size: clamp(10px, 1.3vw, 13px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--or-viu);
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(240,198,92,0.35), -1px -1px 0 rgba(255,250,230,0.4), 1px 1px 1.5px rgba(0,0,0,0.65);
+  }
+  .subtitol-secundari{
+    font-family: 'Cinzel', serif;
+    font-size: clamp(7px, 0.85vw, 9px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--or-fosc);
+    font-weight: 600;
+    text-shadow: -1px -1px 0 rgba(255,250,230,0.35), 1px 1px 1.5px rgba(0,0,0,0.6);
+  }
+
+  .disc-wrap{
+    width: min(100%, 660px, 58vh);
+    margin: 14px auto 0;
+    display:block;
+  }
+  .disc-wrap svg{ width:100%; height:auto; display:block; overflow:visible; }
+
+  .calendari-wrap{
+    width: min(85%, 400px, 34vh);
+    margin: 4px auto 0;
+    position: relative;
+    z-index: 2;
+    perspective: 1400px;
+  }
+  .calendari-wrap svg{ width:100%; height:auto; display:block; }
+
+  /* Gir de moneda / rellotge de butxaca: cada hora en punt (i una vegada de mostra en carregar) */
+  .calendari-flip{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    transform-style: preserve-3d;
+  }
+  .calendari-flip.girant{
+    animation: orlojGirCalendari 7s cubic-bezier(.45,.05,.55,.95);
+  }
+  @keyframes orlojGirCalendari{
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+  .cara-davant, .cara-darrere{
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    backface-visibility: hidden;
+    box-shadow: 0 0 0 5px #8a6d1f, 0 0 0 9px #4a3510;
+  }
+  .cara-davant svg{ width:100%; height:100%; }
+  .cara-darrere{
+    transform: rotateY(180deg);
+    background:
+      radial-gradient(circle at 32% 28%, #fff6db 0%, #f0c65c 32%, #c9a227 62%, #6e5416 100%);
+  }
+
+  /* ===== NOU: El cos del cilindre (volum 3D) ===== */
+  .cos-cilindre{
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cos-cilindre .capa-volum{
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  }
+
+  .lectura{
+    text-align:center;
+    margin-top: 22px;
+    font-family:'Cinzel', serif;
+  }
+  .hora-digital{
+    font-size: clamp(32px, 3.8vw, 46px);
+    letter-spacing: 0;
+    color: var(--or-clar);
+    text-shadow: 0 0 12px rgba(212,175,55,0.3), -1.5px -1.5px 0 rgba(255,250,230,0.4), 1.5px 1.5px 2px rgba(0,0,0,0.7);
+  }
+  .hora-digital .xifra{
+    display: inline-block;
+    width: 0.62em;
+    text-align: center;
+  }
+  .hora-digital .separador-hora{
+    display: inline-block;
+    width: 0.32em;
+    text-align: center;
+  }
+  .data-digital{
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(17px, 1.9vw, 22px);
+    color: var(--arg);
+    margin-top: 3px;
+    text-shadow: -1px -1px 0 rgba(255,250,230,0.3), 1px 1px 1.5px rgba(0,0,0,0.5);
+  }
+  .luna-linia{
+    margin-top: 9px;
+    font-size: clamp(13px, 1.5vw, 16px);
+    letter-spacing: 1.5px;
+    color: var(--or-viu);
+    font-weight: 600;
+    text-transform: uppercase;
+    text-shadow: -1px -1px 0 rgba(255,250,230,0.35), 1px 1px 1.5px rgba(0,0,0,0.6);
+  }
+
+  .ambient-linia{
+    margin-top: 5px;
+    font-size: clamp(11px, 1.3vw, 14px);
+    letter-spacing: 1.2px;
+    color: var(--or-viu);
+    text-transform: uppercase;
+    opacity: 0.9;
+    text-shadow: -0.8px -0.8px 0 rgba(255,250,230,0.3), 0.8px 0.8px 1.2px rgba(0,0,0,0.55);
+  }
+  .ambient-linia .separador-punt{
+    color: var(--or-fosc);
+    margin: 0 5px;
+  }
+
+  .separador{
+    width: 70%;
+    max-width: 260px;
+    height: 1px;
+    margin: 20px auto;
+    background: linear-gradient(90deg, transparent, var(--or-fosc), transparent);
+  }
+
+  .lema{
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(14px, 1.5vw, 17px);
+    color: #8b7a5e;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  text{ font-family:'Cinzel', serif; user-select:none; }
+  .num-antic{ font-family:'UnifrakturMaguntia', cursive; }
+
+  @media (prefers-reduced-motion: reduce){
+    * { transition: none !important; }
   }
 </style>
 </head>
 <body>
-<div id="stage">
-  <canvas id="c"></canvas>
-</div>
+
+  <div class="marc">
+    <div class="contingut">
+      <div class="columna-esq">
+        <header>
+          <div class="subtitol">Praga · MCDX</div>
+          <svg class="banderolaTitol" viewBox="0 0 440 140">
+            <defs>
+              <linearGradient id="fustaPlaca" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#9c7548"/>
+                <stop offset="45%" stop-color="#7a5a35"/>
+                <stop offset="100%" stop-color="#543d20"/>
+              </linearGradient>
+              <linearGradient id="metallPlaca" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#d8d8d8"/>
+                <stop offset="45%" stop-color="#9a9a9a"/>
+                <stop offset="100%" stop-color="#5c5c5c"/>
+              </linearGradient>
+              <radialGradient id="rebloPlaca" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#e8e8e8"/>
+                <stop offset="45%" stop-color="#9a9a9a"/>
+                <stop offset="100%" stop-color="#4a4a4a"/>
+              </radialGradient>
+              <filter id="texturaFustaPlaca" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="turbulence" baseFrequency="0.008 0.22" numOctaves="4" seed="4" result="veta"/>
+                <feColorMatrix in="veta" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.6 0.6 0.6 0 0" result="vetaAlpha"/>
+                <feComponentTransfer in="vetaAlpha" result="vetaSuau"><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+                <feComposite in="vetaSuau" in2="SourceGraphic" operator="in" result="vetaRetallada"/>
+                <feBlend in="SourceGraphic" in2="vetaRetallada" mode="multiply"/>
+              </filter>
+            </defs>
+            <path d="M 30,4 L 410,4 A 22,22 0 0,0 432,26 L 432,114 A 22,22 0 0,0 410,136 L 30,136 A 22,22 0 0,0 8,114 L 8,26 A 22,22 0 0,0 30,4 Z"
+              fill="url(#metallPlaca)" stroke="#3a3a3a" stroke-width="1.5"/>
+            <path d="M 32,12 L 408,12 A 18,18 0 0,0 426,28 L 426,112 A 18,18 0 0,0 408,128 L 32,128 A 18,18 0 0,0 14,112 L 14,28 A 18,18 0 0,0 32,12 Z"
+              fill="url(#fustaPlaca)" filter="url(#texturaFustaPlaca)"/>
+            <g fill="url(#rebloPlaca)" stroke="#2a2a2a" stroke-width="0.5">
+              <circle cx="30" cy="4" r="3.4"/><circle cx="130" cy="4" r="3.4"/><circle cx="220" cy="4" r="3.4"/><circle cx="310" cy="4" r="3.4"/><circle cx="410" cy="4" r="3.4"/>
+              <circle cx="30" cy="136" r="3.4"/><circle cx="130" cy="136" r="3.4"/><circle cx="220" cy="136" r="3.4"/><circle cx="310" cy="136" r="3.4"/><circle cx="410" cy="136" r="3.4"/>
+              <circle cx="8" cy="26" r="3.4"/><circle cx="8" cy="114" r="3.4"/><circle cx="432" cy="26" r="3.4"/><circle cx="432" cy="114" r="3.4"/>
+            </g>
+            <text x="220" y="70" text-anchor="middle" font-size="58" fill="#f2d98a"
+              style="font-family:'UnifrakturMaguntia', cursive; text-shadow: 0 0 18px rgba(212,175,55,0.35), -1.5px -1.5px 0px rgba(255,250,230,0.45), 1.5px 1.5px 2px rgba(0,0,0,0.7);">Orloj</text>
+            <text x="220" y="110" text-anchor="middle" font-family="'Cinzel', serif" font-weight="600" font-size="15" letter-spacing="2.2" fill="#e8c04a"
+              style="text-shadow: -1px -1px 0 rgba(255,250,230,0.4), 1px 1px 1.5px rgba(0,0,0,0.65);">HOMENATGE AL RELLOTGE ASTRONÒMIC</text>
+          </svg>
+        </header>
+
+        <div class="disc-wrap">
+          <svg id="astrolabi" viewBox="0 0 600 600"></svg>
+        </div>
+      </div>
+
+      <div class="columna-dre">
+        <div class="calendari-wrap">
+          <div class="calendari-flip" id="calendariFlip">
+            <!-- NOU: El cos del cilindre amb volum 3D -->
+            <div class="cos-cilindre" id="cosCilindre"></div>
+
+            <div class="cara-davant">
+              <svg id="calendari" viewBox="0 0 300 300"></svg>
+            </div>
+            <div class="cara-darrere"></div>
+          </div>
+        </div>
+
+        <div class="separador"></div>
+
+        <div class="lectura">
+          <div class="hora-digital" id="lecturaHora">--:--:--</div>
+          <div class="data-digital" id="lecturaData">—</div>
+          <div class="luna-linia" id="lecturaLluna">—</div>
+      <div class="ambient-linia"><span id="lecturaTemp">--°C</span><span class="separador-punt">·</span><span id="lecturaHum">--%</span><span class="separador-punt">·</span><span id="lecturaSensacio">--°C</span><span class="separador-punt">·</span><span id="lecturaAlt">-- m</span></div>
+      <div class="ambient-linia" id="lecturaLloc">—</div>
+        </div>
+
+        <div class="separador"></div>
+        <p class="lema">"Tempus fugit, sed astra manent"</p>
+      </div>
+    </div>
+  </div>
 
 <script>
 (function(){
-  "use strict";
+  const NS = "http://www.w3.org/2000/svg";
+  const CX = 300, CY = 300;
 
-  var canvas = document.getElementById('c');
-  var ctx = canvas.getContext('2d');
-  var DPR = Math.min(window.devicePixelRatio || 1, 2.5);
-
-  var W = 0, H = 0; // mida CSS (px lògics)
-
-  function resize(){
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width  = Math.round(W * DPR);
-    canvas.height = Math.round(H * DPR);
-    canvas.style.width  = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(DPR,0,0,DPR,0,0);
+  function el(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
   }
-  window.addEventListener('resize', resize);
-  window.addEventListener('orientationchange', function(){ setTimeout(resize, 60); });
-  resize();
+  function polarX(cx, r, angDeg){ return cx + r * Math.sin(angDeg * Math.PI/180); }
+  function polarY(cy, r, angDeg){ return cy - r * Math.cos(angDeg * Math.PI/180); }
 
-  // ---------------------------------------------------------------
-  // Paràmetres de la cadena
-  // ---------------------------------------------------------------
-  var LINKS = 44; // 56 - 12
+  // ==================== NOU: Generar el cos del cilindre amb volum ====================
+  (function generaVolumCilindre(){
+    const contenidor = document.getElementById('cosCilindre');
+    if (!contenidor) return;
 
-  // Mida de la baula proporcional a la pantalla (tauleta Redmi Pad SE ~ 1920x1200)
-  function linkSize(){
-    var base = Math.min(W, H);
-    var len = Math.max(16, Math.min(30, base * 0.024));
-    return {
-      len: len,                 // distància entre eixos de baula
-      rollerR: len * 0.34,      // radi del corró (roller)
-      plateOuterH: len * 0.66,  // alçada plaques exteriors
-      plateInnerH: len * 0.40   // alçada plaques interiors
-    };
-  }
-  var LS = linkSize();
-  window.addEventListener('resize', function(){ LS = linkSize(); });
+    const totalCapes = 24;        // Nombre de discos apilats
+    const gruixTotal = 34;        // Profunditat total en px (de -17 a +17)
+    const radi = '50%';
 
-  // Velocitat lineal del cap de la cadena (px/s), constant → l'energia es conserva als rebots
-  var SPEED = Math.min(W, H) * 0.34;
+    for (let i = 0; i < totalCapes; i++) {
+      const capa = document.createElement('div');
+      capa.className = 'capa-volum';
 
-  var margin = function(){ return LS.rollerR + 2; };
+      // Posició Z de cada capa (de -17px a +17px)
+      const zPos = -gruixTotal/2 + (i * (gruixTotal / (totalCapes - 1)));
 
-  // Radi de col·lisió de cada baula (per a l'autocol·lisió del cos)
-  var COLL_R = LS.plateOuterH * 0.5;
-  window.addEventListener('resize', function(){ COLL_R = LS.plateOuterH * 0.5; });
+      // Estil de cada disc
+      capa.style.position = 'absolute';
+      capa.style.inset = '0';
+      capa.style.borderRadius = radi;
+      capa.style.transform = `translateZ(${zPos}px)`;
 
-  function clampNum(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
-  function clampPoint(p){
-    var m = margin();
-    if (p.x < m) p.x = m; else if (p.x > W - m) p.x = W - m;
-    if (p.y < m) p.y = m; else if (p.y > H - m) p.y = H - m;
-  }
+      // Degradat radial que simula el metall polit
+      capa.style.background = `radial-gradient(circle at 38% 35%, 
+        #fff6db 0%, 
+        #f0c65c 25%, 
+        #c9a227 55%, 
+        #8a6d1f 85%, 
+        #4a3510 100%)`;
 
-  // Punt i direcció d'inici aleatoris a cada càrrega
-  var initX = margin() + Math.random() * (W - 2 * margin());
-  var initY = margin() + Math.random() * (H - 2 * margin());
-  var initAngle = Math.random() * Math.PI * 2;
+      // Ombra interior per donar profunditat
+      capa.style.boxShadow = 'inset 0 0 12px rgba(0,0,0,0.7)';
 
-  // Estat del cap: posició + vector velocitat (defineix l'angle d'incidència).
-  // El cap és l'única baula "cinemàtica": mana la direcció, la resta del
-  // cos la segueix per física real (Verlet), no per un rastre gravat.
-  var head = {
-    x: initX,
-    y: initY,
-    vx: SPEED * Math.cos(initAngle),
-    vy: SPEED * Math.sin(initAngle)
-  };
-  var moveAngle = initAngle;
-  var angVel = 0;
-
-  // --- Intercanvi de tractora entre el cap (índex 0) i la cua (última
-  // baula) cada ~1 minut. headIdx indica quina baula és ara la "cinemàtica"
-  // (la que mana la trajectòria); l'altra passa a ser un extrem normal,
-  // arrossegat per física com la resta del cos.
-  var headIdx = 0;
-
-  function otherEnd(){ return headIdx === 0 ? LINKS - 1 : 0; }
-
-  function swapHead(){
-    var oldHeadIdx = headIdx;
-    headIdx = otherEnd();
-    head.x = pos[headIdx].x;
-    head.y = pos[headIdx].y;
-
-    // La baula que deixa la tracció ha de començar en repòs, com una
-    // baula inanimada més, no amb una estrebada sobtada: mentre feia de
-    // tractora el seu prevPos mai s'actualitzava (el Verlet la saltava),
-    // així que sense això la primera inèrcia que "sentiria" es calcularia
-    // contra una posició vella d'ara fa 25-35 segons.
-    prevPos[oldHeadIdx].x = pos[oldHeadIdx].x;
-    prevPos[oldHeadIdx].y = pos[oldHeadIdx].y;
-  }
-
-  function scheduleNextSwap(){
-    var delay = 25000 + Math.random() * 10000; // ~30 s (25-35 s)
-    setTimeout(function(){ swapHead(); scheduleNextSwap(); }, delay);
-  }
-  scheduleNextSwap();
-
-  // Partícules del cos (índex 0 = cap). pos/prevPos → integració de Verlet,
-  // que dona inèrcia real: cada baula "sent" el pes i l'impuls de les veïnes
-  // en lloc de teletransportar-se seguint un camí precalculat.
-  //
-  // La forma inicial es genera en ziga-zaga (com una mànega plegada en
-  // capes), no en línia recta: així mai es travessa a si mateixa per
-  // construcció, independentment de la mida de pantalla o de quantes
-  // baules hi hagi — a diferència d'una línia recta llarga, que en
-  // retallar-se baula a baula contra les vores podia arraconar-ne
-  // diverses al mateix punt i generar un nus des del primer fotograma.
-  var pos = [], prevPos = [];
-  (function seedBody(){
-    var m = margin();
-    var maxCols = Math.max(4, Math.floor((W - 2 * m) / LS.len));
-    var rows = Math.ceil(LINKS / maxCols);
-    var blockW = (maxCols - 1) * LS.len;
-    var blockH = (rows - 1) * LS.len;
-
-    // Punt d'inici aleatori (dins de límits segurs), perquè no comenci
-    // sempre exactament al mateix racó de la pantalla.
-    var startX = m + Math.random() * Math.max(0, (W - 2 * m) - blockW);
-    var startY = m + Math.random() * Math.max(0, (H - 2 * m) - blockH);
-
-    var x = startX, y = startY, dir = 1, col = 0;
-
-    for (var i = 0; i < LINKS; i++){
-      pos.push({x: x, y: y});
-      prevPos.push({x: x, y: y});
-
-      if (col < maxCols - 1){
-        x += dir * LS.len;
-        col++;
-      } else {
-        y += LS.len; // plegar cap a la fila següent
-        dir *= -1;
-        col = 0;
-      }
+      contenidor.appendChild(capa);
     }
-    clampPoint(pos[0]); clampPoint(prevPos[0]);
-
-    // El cap arrenca exactament on comença la forma en ziga-zaga
-    head.x = pos[0].x; head.y = pos[0].y;
   })();
 
-  window.addEventListener('resize', function(){
-    for (var i = 0; i < LINKS; i++){ clampPoint(pos[i]); clampPoint(prevPos[i]); }
+  // Fletxa/punxa de relleu (inspirada en una punta de tanca de ferro forjat), amb la punta a l'origen (0,0)
+  const fletxaFerroPath = "M 0,0 L -4.5,-13 C -4.5,-16 -3,-17 -2,-18 C -6,-17 -11,-18 -13,-22 C -14,-24 -13,-25.5 -11,-25 C -8,-24.3 -5,-23 -3,-24.5 C -2.5,-27 -1,-29 0,-31 C 1,-29 2.5,-27 3,-24.5 C 5,-23 8,-24.3 11,-25 C 13,-25.5 14,-24 13,-22 C 11,-18 6,-17 2,-18 C 3,-17 4.5,-16 4.5,-13 L 0,0 Z";
+
+  const svg = document.getElementById('astrolabi');
+  svg.setAttribute('overflow','visible');
+
+  // ---------- DEFS ----------
+  const defs = el('defs', {});
+  const skyGrad = el('radialGradient', {id:'ceil', cx:'50%', cy:'42%', r:'75%'});
+  skyGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#1c2f66'}));
+  skyGrad.appendChild(el('stop', {offset:'55%', 'stop-color':'#101c45'}));
+  skyGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#060b1f'}));
+  defs.appendChild(skyGrad);
+
+  const goldGrad = el('linearGradient', {id:'orBanda', x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
+  goldGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#f3de9a'}));
+  goldGrad.appendChild(el('stop', {offset:'50%', 'stop-color':'#c9a227'}));
+  goldGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#8a6d1f'}));
+  defs.appendChild(goldGrad);
+
+  const ivoriGrad = el('linearGradient', {id:'ivoriBanda', x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
+  ivoriGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fbf6e6'}));
+  ivoriGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#e4d6ac'}));
+  defs.appendChild(ivoriGrad);
+
+  const hubGrad = el('radialGradient', {id:'nucli', cx:'35%', cy:'30%', r:'70%'});
+  hubGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#f6e6a6'}));
+  hubGrad.appendChild(el('stop', {offset:'60%', 'stop-color':'#c9a227'}));
+  hubGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#6e5416'}));
+  defs.appendChild(hubGrad);
+
+  const lunaGranGrad = el('radialGradient', {id:'lunaGranBanda', cx:'38%', cy:'32%', r:'75%'});
+  lunaGranGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#faf3d9'}));
+  lunaGranGrad.appendChild(el('stop', {offset:'60%', 'stop-color':'#e6d19f'}));
+  lunaGranGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#b99a5c'}));
+  defs.appendChild(lunaGranGrad);
+
+  const perlaGrad = el('radialGradient', {id:'perlaBanda', cx:'32%', cy:'28%', r:'75%'});
+  perlaGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#eafcfa'}));
+  perlaGrad.appendChild(el('stop', {offset:'30%', 'stop-color':'#4dd0c4'}));
+  perlaGrad.appendChild(el('stop', {offset:'70%', 'stop-color':'#159084'}));
+  perlaGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#063f38'}));
+  defs.appendChild(perlaGrad);
+
+  const ferroGrad = el('radialGradient', {id:'ferroBanda', cx:'32%', cy:'26%', r:'80%'});
+  ferroGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#ffb3c0'}));
+  ferroGrad.appendChild(el('stop', {offset:'30%', 'stop-color':'#c8102e'}));
+  ferroGrad.appendChild(el('stop', {offset:'65%', 'stop-color':'#7a0a1f'}));
+  ferroGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#2b0510'}));
+  defs.appendChild(ferroGrad);
+
+  const solGrad = el('radialGradient', {id:'solBanda', cx:'35%', cy:'32%', r:'70%'});
+  solGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fffadd'}));
+  solGrad.appendChild(el('stop', {offset:'45%', 'stop-color':'#f6d76a'}));
+  solGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#c9861a'}));
+  defs.appendChild(solGrad);
+
+  const lunaLitGrad = el('radialGradient', {id:'lunaLitBanda', cx:'32%', cy:'30%', r:'75%'});
+  lunaLitGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fffdf6'}));
+  lunaLitGrad.appendChild(el('stop', {offset:'55%', 'stop-color':'#e8e2c8'}));
+  lunaLitGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#b8ae8e'}));
+  defs.appendChild(lunaLitGrad);
+
+  const lunaDarkGrad = el('radialGradient', {id:'lunaDarkBanda', cx:'62%', cy:'68%', r:'75%'});
+  lunaDarkGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#3a4258'}));
+  lunaDarkGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#1a1e2c'}));
+  defs.appendChild(lunaDarkGrad);
+
+  const rebloGrad = el('radialGradient', {id:'rebloBanda', cx:'35%', cy:'30%', r:'70%'});
+  rebloGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fff8e0'}));
+  rebloGrad.appendChild(el('stop', {offset:'45%', 'stop-color':'#c9a227'}));
+  rebloGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#5c4416'}));
+  defs.appendChild(rebloGrad);
+
+  // ---------- Relleu metàl·lic envellit (textura + llum especular) ----------
+  const filtreTextura = el('filter', {id:'texturaMetall', x:'-20%', y:'-20%', width:'140%', height:'140%'});
+  filtreTextura.appendChild(el('feTurbulence', {type:'fractalNoise', baseFrequency:'0.7', numOctaves:'3', seed:'12', result:'soroll'}));
+  filtreTextura.appendChild(el('feColorMatrix', {in:'soroll', type:'matrix', values:'0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.5 0.5 0.5 0 0', result:'sorollAlpha'}));
+  const fCompTransfer = el('feComponentTransfer', {in:'sorollAlpha', result:'sorollSuau'});
+  fCompTransfer.appendChild(el('feFuncA', {type:'linear', slope:'0.18', intercept:'0'}));
+  filtreTextura.appendChild(fCompTransfer);
+  filtreTextura.appendChild(el('feComposite', {in:'sorollSuau', in2:'SourceGraphic', operator:'in', result:'sorollRetallat'}));
+  filtreTextura.appendChild(el('feBlend', {in:'SourceGraphic', in2:'sorollRetallat', mode:'multiply'}));
+  defs.appendChild(filtreTextura);
+
+  const filtreRelleu = el('filter', {id:'relleuAnell', x:'-20%', y:'-20%', width:'140%', height:'140%'});
+  filtreRelleu.appendChild(el('feGaussianBlur', {in:'SourceAlpha', stdDeviation:'2.5', result:'blur'}));
+  const fSpec = el('feSpecularLighting', {in:'blur', surfaceScale:'3', specularConstant:'0.9', specularExponent:'12', 'lighting-color':'#fff6db', result:'spec'});
+  fSpec.appendChild(el('fePointLight', {x:'150', y:'80', z:'180'}));
+  filtreRelleu.appendChild(fSpec);
+  filtreRelleu.appendChild(el('feComposite', {in:'spec', in2:'SourceAlpha', operator:'in', result:'specClip'}));
+  filtreRelleu.appendChild(el('feComposite', {in:'SourceGraphic', in2:'specClip', operator:'arithmetic', k1:'0', k2:'1', k3:'1', k4:'0'}));
+  defs.appendChild(filtreRelleu);
+
+  const filtreRelleuPetit = el('filter', {id:'relleuPetit', x:'-60%', y:'-60%', width:'220%', height:'220%'});
+  filtreRelleuPetit.appendChild(el('feGaussianBlur', {in:'SourceAlpha', stdDeviation:'0.8', result:'blur'}));
+  const fSpec2 = el('feSpecularLighting', {in:'blur', surfaceScale:'2', specularConstant:'0.9', specularExponent:'10', 'lighting-color':'#fff6db', result:'spec'});
+  fSpec2.appendChild(el('fePointLight', {x:'150', y:'80', z:'120'}));
+  filtreRelleuPetit.appendChild(fSpec2);
+  filtreRelleuPetit.appendChild(el('feComposite', {in:'spec', in2:'SourceAlpha', operator:'in', result:'specClip'}));
+  filtreRelleuPetit.appendChild(el('feComposite', {in:'SourceGraphic', in2:'specClip', operator:'arithmetic', k1:'0', k2:'1', k3:'1', k4:'0'}));
+  defs.appendChild(filtreRelleuPetit);
+
+  // ---------- Fusta noble mate (bisell exterior) ----------
+  const fustaGrad = el('linearGradient', {id:'fustaBanda', x1:'0%', y1:'0%', x2:'100%', y2:'100%'});
+  fustaGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#8a6239'}));
+  fustaGrad.appendChild(el('stop', {offset:'45%', 'stop-color':'#6b4423'}));
+  fustaGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#432a15'}));
+  defs.appendChild(fustaGrad);
+
+  const filtreFusta = el('filter', {id:'texturaFusta', x:'-20%', y:'-20%', width:'140%', height:'140%'});
+  filtreFusta.appendChild(el('feTurbulence', {type:'turbulence', baseFrequency:'0.006 0.22', numOctaves:'4', seed:'4', result:'veta'}));
+  filtreFusta.appendChild(el('feColorMatrix', {in:'veta', type:'matrix', values:'0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.6 0.6 0.6 0 0', result:'vetaAlpha'}));
+  const fCompTransferFusta = el('feComponentTransfer', {in:'vetaAlpha', result:'vetaSuau'});
+  fCompTransferFusta.appendChild(el('feFuncA', {type:'linear', slope:'0.45', intercept:'0'}));
+  filtreFusta.appendChild(fCompTransferFusta);
+  filtreFusta.appendChild(el('feComposite', {in:'vetaSuau', in2:'SourceGraphic', operator:'in', result:'vetaRetallada'}));
+  filtreFusta.appendChild(el('feBlend', {in:'SourceGraphic', in2:'vetaRetallada', mode:'multiply'}));
+  defs.appendChild(filtreFusta);
+
+  svg.appendChild(defs);
+
+  // ---------- Anells de fons ----------
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:294, fill:'none', stroke:'#5c4a1c', 'stroke-width':2}));
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:288, fill:'url(#fustaBanda)', filter:'url(#texturaFusta)'}));
+
+  // Reblons al voltant de la vora exterior
+  const reblonsGrup = el('g', {});
+  for(let i=0;i<36;i++){
+    const a = i*10;
+    const rx = polarX(CX,291,a), ry = polarY(CY,291,a);
+    reblonsGrup.appendChild(el('circle', {
+      cx:rx, cy:ry, r:2.2, fill:'url(#rebloBanda)', stroke:'#3a2a08', 'stroke-width':0.4, filter:'url(#relleuPetit)'
+    }));
+  }
+  svg.appendChild(reblonsGrup);
+
+  // Anell "temps antic" (numeració romana daurada sobre negre, ornamental)
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:280, fill:'#0c0c0c'}));
+  const anticGrup = el('g', {});
+  const numeralsAntics = ['I','II','III','IIII','V','VI','VII','VIII','IX','X','XI','XII',
+    'XIII','XIIII','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII','XXIIII'];
+  for (let i=1;i<=24;i++){
+    const ang = i*15;
+    const t = el('text', {
+      x: polarX(CX,267,ang), y: polarY(CY,267,ang),
+      fill:'#f0c65c', 'font-family':'Cinzel, serif', 'font-size':'12', 'font-weight':'700', 'letter-spacing':'-0.2', 'text-anchor':'middle',
+      transform:`rotate(${ang}, ${polarX(CX,267,ang)}, ${polarY(CY,267,ang)})`
+    });
+    t.textContent = numeralsAntics[i-1];
+    anticGrup.appendChild(t);
+  }
+  svg.appendChild(anticGrup);
+
+  // Anell romà (funcional — hores)
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:265, fill:'url(#ivoriBanda)', stroke:'#8a6d1f', 'stroke-width':1, filter:'url(#texturaMetall)'}));
+  const romans = ['XII','I','II','III','IIII','V','VI','VII','VIII','IX','X','XI'];
+  const romGrup = el('g', {});
+  const estiramentRoman = 1.45;
+  romans.forEach((r,i)=>{
+    const ang = i*30;
+    const rx = polarX(CX,228,ang), ry = polarY(CY,228,ang);
+    const g = el('g', {transform: `translate(${rx}, ${ry}) rotate(${ang}) scale(1, ${estiramentRoman})`});
+    // Ombra (dona efecte de gravat/relleu sobre la banda de vori)
+    const ombra = el('text', {
+      x: 0.6, y: 5.5,
+      fill:'#5c4416', opacity:'0.45', 'font-size':'23', 'font-weight':'600', 'letter-spacing':'1.2',
+      'text-anchor':'middle'
+    });
+    ombra.textContent = r;
+    g.appendChild(ombra);
+    const t = el('text', {
+      x: 0, y: 5,
+      fill:'#241a08', 'font-size':'23', 'font-weight':'600', 'letter-spacing':'1.2',
+      'text-anchor':'middle'
+    });
+    t.textContent = r;
+    g.appendChild(t);
+    romGrup.appendChild(g);
+  });
+  svg.appendChild(romGrup);
+
+  // Perla articulada: viatja per la vora entre l'anell antic i l'anell romà, marcant l'hora en format 24h
+  const perla24 = el('g', {id:'perla24'});
+  perla24.appendChild(el('ellipse', {cx:1.4, cy:2.3, rx:10, ry:7.6, fill:'#000000', opacity:'0.35'}));
+  // Anell (part de darrere, passa per darrere de l'esfera)
+  perla24.appendChild(el('ellipse', {
+    cx:0, cy:0, rx:19, ry:5.6, fill:'none', stroke:'#bfe8e2', 'stroke-width':1.6, opacity:'0.55',
+    transform:'rotate(-18)'
+  }));
+  perla24.appendChild(el('circle', {cx:0, cy:0, r:11, fill:'none', stroke:'#8a6d1f', 'stroke-width':1.5}));
+  perla24.appendChild(el('circle', {cx:0, cy:0, r:10.5, fill:'url(#perlaBanda)', stroke:'#0a2e29', 'stroke-width':0.6, filter:'url(#relleuPetit)'}));
+  perla24.appendChild(el('circle', {cx:-3, cy:-3.3, r:2.3, fill:'#ffffff', opacity:'0.8'}));
+  // Anell (part de davant, passa per davant de l'esfera)
+  perla24.appendChild(el('path', {
+    d:'M -19,0 A 19,5.6 0 0,1 19,0', fill:'none', stroke:'#eafcfa', 'stroke-width':1.8, opacity:'0.9',
+    transform:'rotate(-18)'
+  }));
+  svg.appendChild(perla24);
+
+  // Marques de minut
+  const ticksGrup = el('g', {stroke:'#3a2c10'});
+  for(let i=0;i<60;i++){
+    const ang = i*6;
+    const major = (i%5===0);
+    const r1 = 260, r2 = major? 250 : 254;
+    ticksGrup.appendChild(el('line', {
+      x1: polarX(CX,r1,ang), y1: polarY(CY,r1,ang),
+      x2: polarX(CX,r2,ang), y2: polarY(CY,r2,ang),
+      'stroke-width': major? 2 : 1
+    }));
+  }
+  svg.appendChild(ticksGrup);
+
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:195, fill:'none', stroke:'#6e5416', 'stroke-width':2}));
+
+  // ---------- Anell zodiacal (gira segons l'època de l'any) ----------
+  const zodiGrup = el('g', {id:'zodiGrup'});
+  zodiGrup.appendChild(el('circle', {cx:CX, cy:CY, r:195, fill:'url(#orBanda)', filter:'url(#relleuAnell)'}));
+  zodiGrup.appendChild(el('circle', {cx:CX, cy:CY, r:165, fill:'var(--pedra)', style:'fill:#100c08'}));
+  // Icones pròpies dels signes (traç vectorial, no emoticones) — Àries..Peixos, mateix ordre que fronteresZodiac
+  const iconesZodiac = [
+    [ {d:"M -6,-7 C -8,-5 -7,-2 -5,-3 L -1,6"},
+      {d:"M 6,-7 C 8,-5 7,-2 5,-3 L 1,6"} ], // Àries
+    [ {d:"M -4,-1 C -6,-6 -2,-8 0,-4"}, {d:"M 4,-1 C 6,-6 2,-8 0,-4"},
+      {circ:true, cx:0, cy:4, r:4} ], // Taure
+    [ {d:"M -6,-7 L 6,-7"}, {d:"M -6,7 L 6,7"}, {d:"M -3,-7 L -3,7"}, {d:"M 3,-7 L 3,7"} ], // Bessons
+    [ {circ:true, cx:-3.2, cy:-3.2, r:3}, {circ:true, cx:3.2, cy:3.2, r:3},
+      {d:"M -0.4,-2.4 Q 2,-1 1.6,2.2"}, {d:"M 0.4,2.4 Q -2,1 -1.6,-2.2"} ], // Cranc
+    [ {circ:true, cx:-4, cy:2, r:3.2}, {d:"M -1,3 C 3,3 3,8 7,8.5"} ], // Lleó
+    [ {d:"M -8,-7 L -8,7"}, {d:"M -8,-7 C -8,-7 -5.5,7 -3,-7"}, {d:"M -3,-7 C -3,-7 -0.5,7 2,-7"},
+      {d:"M 2,-7 L 2,5"}, {circ:true, cx:4.3, cy:5, r:2.3} ], // Verge
+    [ {d:"M 0,-9 L 0,7"}, {circ:true, cx:0, cy:-9, r:1.1},
+      {d:"M -8,-6.5 L 8,-6.5"},
+      {d:"M -8,-6.5 L -10,1"}, {d:"M -8,-6.5 L -6,1"}, {d:"M -10,1 Q -8,3.3 -6,1"},
+      {d:"M 8,-6.5 L 10,1"}, {d:"M 8,-6.5 L 6,1"}, {d:"M 10,1 Q 8,3.3 6,1"},
+      {d:"M -5,9 L 5,9"} ], // Balança
+    [ {d:"M -8,-7 L -8,7"}, {d:"M -8,-7 C -8,-7 -5.5,7 -3,-7"}, {d:"M -3,-7 C -3,-7 -0.5,7 2,-7"},
+      {d:"M 2,-7 L 2,4 L 6,4"}, {d:"M 6,4 L 4,1"}, {d:"M 6,4 L 4,7"} ], // Escorpí
+    [ {d:"M -6,7 L 7,-6"}, {d:"M 7,-6 L 1,-6"}, {d:"M 7,-6 L 7,0"}, {d:"M -2,4 L 3,-1"} ], // Sagitari
+    [ {d:"M -6,-7 L -1,4 C 0,6 2,6.5 3,5.5 C 4,4.5 3.5,3 2.3,3.3 C 1.5,3.5 1.6,4.5 2.5,4.5"} ], // Capricorn
+    [ {d:"M -8,-2 L -5,-5 L -2,-2 L 1,-5 L 4,-2 L 7,-5"}, {d:"M -8,4 L -5,1 L -2,4 L 1,1 L 4,4 L 7,1"} ], // Aquari
+    [ {d:"M -3,-7 Q -9,0 -3,7"}, {d:"M 3,-7 Q 9,0 3,7"}, {d:"M -6,0 L 6,0"} ] // Peixos
+  ];
+  const zodiTextEls = [];
+  iconesZodiac.forEach((icona,i)=>{
+    const ang = i*30;
+    // separadors
+    zodiGrup.appendChild(el('line', {
+      x1: polarX(CX,195,ang-15), y1: polarY(CY,195,ang-15),
+      x2: polarX(CX,165,ang-15), y2: polarY(CY,165,ang-15),
+      stroke:'#5c4a1c', 'stroke-width':1
+    }));
+    const tx = polarX(CX,180,ang), ty = polarY(CY,180,ang);
+    const g = el('g', {
+      transform: `translate(${tx}, ${ty}) rotate(${ang})`,
+      stroke:'#2a2005', 'stroke-width':1.7, fill:'none',
+      'stroke-linecap':'round', 'stroke-linejoin':'round'
+    });
+    icona.forEach(part=>{
+      if (part.circ){
+        g.appendChild(el('circle', {cx:part.cx, cy:part.cy, r:part.r}));
+      } else {
+        g.appendChild(el('path', {d:part.d}));
+      }
+    });
+    zodiGrup.appendChild(g);
+  });
+  svg.appendChild(zodiGrup);
+
+  // punter fix del zodíac (marca "sol actual")
+  const puntaZodiac = el('g', {transform: `translate(${CX}, ${CY-180}) scale(0.9, 1.1)`});
+  puntaZodiac.appendChild(el('path', {
+    d: fletxaFerroPath,
+    fill:'url(#ferroBanda)', stroke:'#360814', 'stroke-width':1, filter:'url(#relleuPetit)'
+  }));
+  puntaZodiac.appendChild(el('path', {
+    d: 'M 0,-2 L 0,-17',
+    fill:'none', stroke:'#ffe3ea', 'stroke-width':0.7, opacity:'0.7', 'stroke-linecap':'round'
+  }));
+  puntaZodiac.appendChild(el('path', {
+    d: 'M -3,-12 L 3,-12',
+    fill:'none', stroke:'#360814', 'stroke-width':0.6, opacity:'0.55', 'stroke-linecap':'round'
+  }));
+  svg.appendChild(puntaZodiac);
+
+  // ---------- Disc central: la fase lunar real, a mida completa ----------
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:165, fill:'url(#ceil)'}));
+
+  // estrelles (es veuen a la banda fosca de la lluna)
+  const estels = el('g', {fill:'#f2d98a'});
+  const rngSeed = 42;
+  function pseudoRand(seed){ let x = Math.sin(seed)*10000; return x - Math.floor(x); }
+  for(let i=0;i<40;i++){
+    const a = pseudoRand(i*3.1+1)*360;
+    const r = 20 + pseudoRand(i*7.7+2)*135;
+    const rad = 0.6 + pseudoRand(i*5.3+3)*1;
+    estels.appendChild(el('circle', {
+      cx: polarX(CX,r,a), cy: polarY(CY,r,a), r: rad.toFixed(2), opacity: (0.4+pseudoRand(i*2.1)*0.6).toFixed(2)
+    }));
+  }
+  svg.appendChild(estels);
+
+  // Cometa Halley: travessa l'interior d'aquesta esfera (per darrere de la part il·luminada
+  // de la lluna) cada 76 segons, en homenatge als 76 anys del seu període orbital.
+  const cometaLlunaGrad = el('linearGradient', {id:'cometaCuaBanda', x1:'100%', y1:'0%', x2:'0%', y2:'0%'});
+  cometaLlunaGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fff8ea', 'stop-opacity':'0.9'}));
+  cometaLlunaGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#fff8ea', 'stop-opacity':'0'}));
+  defs.appendChild(cometaLlunaGrad);
+
+  const cometaLluna = el('g', {id:'cometaLluna', style:'opacity:0;'});
+  const cometaOrient = el('g', {id:'cometaOrient'});
+  cometaOrient.appendChild(el('path', {d:'M 0,-1.6 L -58,0 L 0,1.6 Z', fill:'url(#cometaCuaBanda)'}));
+  cometaOrient.appendChild(el('path', {d:'M 0,-0.7 L -34,0 L 0,0.7 Z', fill:'#fff8ea', opacity:'0.85'}));
+  cometaOrient.appendChild(el('circle', {cx:'0', cy:'0', r:'5.5', fill:'#fff8ea', opacity:'0.28'}));
+  cometaOrient.appendChild(el('circle', {cx:'0', cy:'0', r:'3.2', fill:'#fff8ea'}));
+  cometaLluna.appendChild(cometaOrient);
+  svg.appendChild(cometaLluna);
+
+  const lunaGranGrup = el('g', {id:'lunaGranGrup', transform:`translate(${CX}, ${CY})`});
+  const lunaGranLit = el('path', {id:'lunaGranLit', fill:'url(#lunaGranBanda)'});
+  lunaGranGrup.appendChild(lunaGranLit);
+  svg.appendChild(lunaGranGrup);
+
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:165, fill:'none', stroke:'#8a6d1f', 'stroke-width':1.5}));
+
+  // ---------- Busques ----------
+  function fletxa(id, longitud, amplada, color){
+    const p = el('path', {
+      id:id,
+      d:`M ${CX},${CY+amplada*2.4} L ${CX-amplada/2},${CY} L ${CX-amplada/4},${CY-longitud} L ${CX+amplada/4},${CY-longitud} L ${CX+amplada/2},${CY} Z`,
+      fill:color, stroke:'#000', 'stroke-width':0.4, 'stroke-linejoin':'round'
+    });
+    return p;
+  }
+
+  // busca de les hores (sol)
+  const busquaHora = fletxa('busquaHora', 172, 9, 'url(#orBanda)');
+  svg.appendChild(busquaHora);
+  const solPunta = el('g', {id:'solPunta'});
+  solPunta.appendChild(el('circle', {cx:0.9, cy:1.1, r:9.5, fill:'#5c3d0a', opacity:'0.4'}));
+  // Raigs ondulats (com flames), alternant llargada per a un aire més orgànic
+  for(let i=0;i<14;i++){
+    const a = i*(360/14);
+    const llarg = (i%2===0) ? 17 : 14;
+    solPunta.appendChild(el('path', {
+      d:`M -1.2,-7 C -2.8,-10.5 -0.4,-12.5 -1.6,-${llarg} L 0,-${llarg-1.5} C 1.6,-12 2.8,-10 1.2,-7 Z`,
+      transform:`rotate(${a})`,
+      fill:'#f0c65c', stroke:'#c9861a', 'stroke-width':0.6, 'stroke-linejoin':'round'
+    }));
+  }
+  solPunta.appendChild(el('circle', {cx:0, cy:0, r:9.5, fill:'url(#solBanda)', stroke:'#8a6d1f', 'stroke-width':1, filter:'url(#relleuPetit)'}));
+  // Rostre
+  const solCara = el('g', {stroke:'#5c3d0a', 'stroke-width':0.6, fill:'none', 'stroke-linecap':'round'});
+  solCara.appendChild(el('path', {d:'M -3.6,-1.2 Q -2.8,-2.4 -1.6,-1.4'}));
+  solCara.appendChild(el('path', {d:'M 3.6,-1.2 Q 2.8,-2.4 1.6,-1.4'}));
+  solCara.appendChild(el('circle', {cx:-2.4, cy:-0.4, r:0.4, fill:'#5c3d0a', stroke:'none'}));
+  solCara.appendChild(el('circle', {cx:2.4, cy:-0.4, r:0.4, fill:'#5c3d0a', stroke:'none'}));
+  solCara.appendChild(el('path', {d:'M 0,0 L -0.5,1.8 L 0.3,2.1'}));
+  solCara.appendChild(el('path', {d:'M -2.1,3.7 Q 0,5 2.1,3.7'}));
+  solPunta.appendChild(solCara);
+  svg.appendChild(solPunta);
+
+  // busca dels minuts (lluna)
+  const busquaMinut = fletxa('busquaMinut', 236, 7, '#cdd6e6');
+  svg.appendChild(busquaMinut);
+  const lunaPunta = el('g', {id:'lunaPunta'});
+  lunaPunta.appendChild(el('circle', {cx:0, cy:0, r:12, fill:'url(#lunaDarkBanda)', stroke:'#8a97b8', 'stroke-width':1}));
+  const lunaLit = el('path', {id:'lunaLit', fill:'url(#lunaLitBanda)'});
+  lunaPunta.appendChild(lunaLit);
+  svg.appendChild(lunaPunta);
+
+  // busca dels segons
+  const busquaSegon = el('line', {
+    id:'busquaSegon', x1:CX, y1:CY+22, x2:CX, y2:CY-258,
+    stroke:'#8a1f1f', 'stroke-width':1.6, 'stroke-linecap':'round'
+  });
+  svg.appendChild(busquaSegon);
+
+  // eix central
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:14, fill:'url(#nucli)', stroke:'#4a3a10', 'stroke-width':1.5, filter:'url(#relleuPetit)'}));
+  svg.appendChild(el('circle', {cx:CX, cy:CY, r:4, fill:'#5c1616'}));
+
+  // ==================== CALENDARI ====================
+  const cal = document.getElementById('calendari');
+  const CCX=150, CCY=150;
+  cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:148, fill:'url(#orBanda)', filter:'url(#relleuAnell)'}));
+
+  // Reblons al voltant de la vora del calendari
+  const reblonsCalGrup = el('g', {});
+  for(let i=0;i<24;i++){
+    const a = i*15;
+    const rx = polarX(CCX,145,a), ry = polarY(CCY,145,a);
+    reblonsCalGrup.appendChild(el('circle', {
+      cx:rx, cy:ry, r:1.6, fill:'url(#rebloBanda)', stroke:'#3a2a08', 'stroke-width':0.3, filter:'url(#relleuPetit)'
+    }));
+  }
+  cal.appendChild(reblonsCalGrup);
+  cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:138, fill:'#0c0c0c'}));
+
+  const calGrup = el('g', {id:'calGrup'});
+  const mesos = ['GEN','FEB','MAR','ABR','MAI','JUN','JUL','AGO','SET','OCT','NOV','DES'];
+  mesos.forEach((m,i)=>{
+    const ang = i*30;
+    calGrup.appendChild(el('line', {
+      x1: polarX(CCX,138,ang-15), y1: polarY(CCY,138,ang-15),
+      x2: polarX(CCX,96,ang-15), y2: polarY(CCY,96,ang-15),
+      stroke:'#5c4a1c', 'stroke-width':0.8
+    }));
+    const tx = polarX(CCX,117,ang), ty = polarY(CCY,117,ang);
+    const t = el('text', {
+      x: tx, y: ty+4,
+      fill:'#f2d98a', 'font-size':'11', 'font-weight':'700', 'text-anchor':'middle', 'letter-spacing':'1',
+      transform: `rotate(${ang}, ${tx}, ${ty})`
+    });
+    t.textContent = m;
+    calGrup.appendChild(t);
+  });
+  calGrup.appendChild(el('circle', {cx:CCX, cy:CCY, r:96, fill:'url(#ceil)'}));
+  // Camp d'estels ambientals, molt tènues, perquè la constel·lació hi destaqui per contrast
+  const estelsAmbientCal = el('g', {fill:'#f2d98a'});
+  for(let i=0;i<18;i++){
+    const a = pseudoRand(i*11.7+31)*360;
+    const r = 10 + pseudoRand(i*5.3+17)*82;
+    estelsAmbientCal.appendChild(el('circle', {
+      cx: polarX(CCX,r,a), cy: polarY(CCY,r,a), r: 0.5, opacity: (0.2+pseudoRand(i*3.7)*0.2).toFixed(2)
+    }));
+  }
+  calGrup.appendChild(estelsAmbientCal);
+  const estelsCal = el('g', {id:'estelsCal'});
+  calGrup.appendChild(estelsCal);
+  const diaSetmanaText = el('text', {id:'diaSetmanaAbrev', x:CCX, y:CCY+22, 'text-anchor':'middle', 'font-size':'19', 'font-weight':'700', 'letter-spacing':'2', fill:'#f0c65c'});
+  calGrup.appendChild(diaSetmanaText);
+  const diaText = el('text', {id:'diaNum', x:CCX, y:CCY+76, 'text-anchor':'middle', 'font-size':'52', fill:'#f2d98a'});
+  calGrup.appendChild(diaText);
+  cal.appendChild(calGrup);
+
+  cal.appendChild(el('circle', {cx:CCX, cy:CCY, r:138, fill:'none', stroke:'#8a6d1f', 'stroke-width':1}));
+  const puntaMes = el('g', {transform: `translate(${CCX}, ${CCY-117}) scale(0.55, 1.0)`});
+  puntaMes.appendChild(el('path', {
+    d: fletxaFerroPath,
+    fill:'url(#ferroBanda)', stroke:'#360814', 'stroke-width':1, filter:'url(#relleuPetit)'
+  }));
+  puntaMes.appendChild(el('path', {
+    d: 'M 0,-2 L 0,-17',
+    fill:'none', stroke:'#ffe3ea', 'stroke-width':0.7, opacity:'0.7', 'stroke-linecap':'round'
+  }));
+  puntaMes.appendChild(el('path', {
+    d: 'M -3,-12 L 3,-12',
+    fill:'none', stroke:'#360814', 'stroke-width':0.6, opacity:'0.55', 'stroke-linecap':'round'
+  }));
+  cal.appendChild(puntaMes);
+
+  // ==================== LÒGICA ====================
+  const diesSetmana = ['diumenge','dilluns','dimarts','dimecres','dijous','divendres','dissabte'];
+  const abrevSetmana = ['DG','DL','DT','DC','DJ','DV','DS'];
+  const nomsMesos = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+
+  function diaDeLany(d){
+    const inici = new Date(d.getFullYear(),0,0);
+    const diff = d - inici;
+    return Math.floor(diff / 86400000);
+  }
+
+  // Dona amplada fixa a cada xifra (evita que l'hora "balancegi" segons quins dígits surten)
+  function formataHoraAmplaFixa(text){
+    return text.split('').map(ch=>{
+      if (ch === ':') return `<span class="separador-hora">:</span>`;
+      return `<span class="xifra">${ch}</span>`;
+    }).join('');
+  }
+
+  function faseLunar(d){
+    // Referència: lluna nova real i propera (2026-08-12 17:38 UTC, eclipsi solar total).
+    // Fer servir una referència propera enlloc d'una de fa 25 anys evita que l'error
+    // orbital acumulat (l'òrbita lunar no és perfectament periòdica) desviï el resultat.
+    // Convé refrescar aquesta data cada pocs anys perquè es mantingui precisa.
+    const refNouLluna = Date.UTC(2026,7,12,17,38,0);
+    const sinodic = 29.530588853;
+    const dies = (d.getTime() - refNouLluna) / 86400000;
+    let fase = (dies % sinodic) / sinodic;
+    if (fase < 0) fase += 1;
+    return fase; // 0=nova, 0.5=plena
+  }
+
+  function nomFaseLunar(fase){
+    if (fase < 0.02 || fase > 0.98) return 'Lluna nova';
+    if (fase < 0.24) return 'Lluna creixent';
+    if (fase < 0.26) return 'Quart creixent';
+    if (fase < 0.49) return 'Gibosa creixent';
+    if (fase < 0.51) return 'Lluna plena';
+    if (fase < 0.74) return 'Gibosa minvant';
+    if (fase < 0.76) return 'Quart minvant';
+    return 'Lluna minvant';
+  }
+
+  function pathLluna(r, fase){
+    // fase 0..1, 0=nova, 0.5=plena — retorna la part il·luminada.
+    // El sentit del traç del terminador ha de dependre de si estem al tram
+    // falcat (creixent/minvant, resta àrea) o gibós (afegeix àrea cap a plena),
+    // no només de si fase<0.5 — altrament la forma "rebota" cap enrere en
+    // lloc de seguir creixent fins a plena.
+    const theta = fase * 2 * Math.PI;
+    const rx = r * Math.cos(theta);
+    const sweepOuter = fase < 0.5 ? 1 : 0;
+    const sweepInner = rx < 0 ? sweepOuter : (1 - sweepOuter);
+    return `M 0,${-r} A ${r},${r} 0 0,${sweepOuter} 0,${r} A ${Math.abs(rx).toFixed(2)},${r} 0 0,${sweepInner} 0,${-r} Z`;
+  }
+
+  // Fronteres reals (dia de l'any, no bisest) de cada signe zodiacal i de cada mes,
+  // per evitar l'error de repartir-los en trams uniformes de 30.4 dies.
+  const fronteresZodiac = [80,110,141,172,204,235,266,296,326,356,385,415,445];
+  function angleZodiacActual(doy){
+    let doyAdj = doy < 80 ? doy + 365 : doy;
+    let i = 11;
+    for (let k=0;k<12;k++){
+      if (doyAdj >= fronteresZodiac[k] && doyAdj < fronteresZodiac[k+1]){ i = k; break; }
+    }
+    const fraccio = (doyAdj - fronteresZodiac[i]) / (fronteresZodiac[i+1] - fronteresZodiac[i]);
+    return (i - 0.5 + fraccio) * 30;
+  }
+  function indexZodiacActual(doy){
+    let doyAdj = doy < 80 ? doy + 365 : doy;
+    let i = 11;
+    for (let k=0;k<12;k++){
+      if (doyAdj >= fronteresZodiac[k] && doyAdj < fronteresZodiac[k+1]){ i = k; break; }
+    }
+    return i;
+  }
+
+  // Patrons estilitzats (no astromètricament exactes) de les 12 constel·lacions zodiacals,
+  // en coordenades locals relatives al centre del disc del calendari.
+  const constelacions = [
+    [[-20,-10,1.3],[0,-15,1],[15,-8,0.8],[25,0,0.6]], // Àries
+    [[-15,-15,1.5],[0,-5,1.8],[10,5,1],[20,10,0.8],[-5,15,0.9],[5,-25,0.7]], // Taure
+    [[-20,-20,1.2],[-15,0,1],[-10,20,0.8],[15,-22,1.3],[18,-2,1],[20,18,0.8]], // Bessons
+    [[-10,-8,0.8],[5,-12,0.7],[15,0,0.9],[0,10,0.6],[-15,12,0.7]], // Cranc
+    [[-25,-15,1.4],[-15,-25,1],[0,-22,0.9],[10,-15,0.8],[15,0,1.6],[5,15,1],[-10,20,0.8]], // Lleó
+    [[-20,-20,1.5],[0,-10,0.9],[15,0,1],[5,15,1.7],[-10,25,0.8],[-25,10,0.7]], // Verge
+    [[-15,-10,1.2],[15,-10,1.1],[10,15,0.9],[-10,15,0.9]], // Balança
+    [[-25,-20,1.3],[-15,-10,1],[-5,0,1.5],[5,8,1],[12,18,0.9],[18,26,0.8],[22,32,1.1]], // Escorpí
+    [[-15,-15,1],[5,-18,1.1],[20,-12,0.9],[22,5,1],[5,8,1.4],[-10,5,0.8],[-5,-5,0.9]], // Sagitari
+    [[-20,-15,1.2],[5,-20,1],[20,-5,1.1],[10,15,0.9],[-15,10,0.8]], // Capricorn
+    [[-20,-20,1.1],[0,-15,0.9],[15,-5,1],[0,10,0.8],[-15,20,0.9],[15,20,0.7]], // Aquari
+    [[-25,-5,1],[-15,10,0.8],[0,18,0.9],[15,10,0.8],[25,-5,1],[5,-10,0.7],[-5,-15,0.6]] // Peixos
+  ];
+
+  const fronteresMes = [1,32,60,91,121,152,182,213,244,274,305,335,366];
+  function angleMesActual(doy){
+    let m = 11;
+    for (let k=0;k<12;k++){
+      if (doy >= fronteresMes[k] && doy < fronteresMes[k+1]){ m = k; break; }
+    }
+    const fraccio = (doy - fronteresMes[m]) / (fronteresMes[m+1] - fronteresMes[m]);
+    return (m - 0.5 + fraccio) * 30;
+  }
+
+  let zodiacActualitzat = false;
+  let calendariActualitzat = false;
+
+  function actualitza(){
+    const ara = new Date();
+    const h = ara.getHours() % 12;
+    const m = ara.getMinutes();
+    const s = ara.getSeconds();
+
+    const angHora = h*30 + m*0.5;
+    const angMinut = m*6 + s*0.1;
+    const angSegon = s*6;
+
+    busquaHora.setAttribute('transform', `rotate(${angHora}, ${CX}, ${CY})`);
+    document.getElementById('solPunta').setAttribute('transform',
+      `translate(${polarX(CX,172,angHora)}, ${polarY(CY,172,angHora)})`);
+
+    busquaMinut.setAttribute('transform', `rotate(${angMinut}, ${CX}, ${CY})`);
+    document.getElementById('lunaPunta').setAttribute('transform',
+      `translate(${polarX(CX,236,angMinut)}, ${polarY(CY,236,angMinut)})`);
+
+    busquaSegon.setAttribute('transform', `rotate(${angSegon}, ${CX}, ${CY})`);
+
+    // Perla 24h: cavalca la vora exterior del rellotge, l'anell antic té el "24" (=0h) a dalt i avança 15° per hora
+    const ang24 = (ara.getHours() + m/60 + s/3600) * 15;
+    document.getElementById('perla24').setAttribute('transform',
+      `translate(${polarX(CX,294,ang24)}, ${polarY(CY,294,ang24)})`);
+
+    const hh = String(ara.getHours()).padStart(2,'0');
+    const mm = String(m).padStart(2,'0');
+    const ss = String(s).padStart(2,'0');
+    document.getElementById('lecturaHora').innerHTML = formataHoraAmplaFixa(`${hh}:${mm}:${ss}`);
+
+    const diaSetmana = diesSetmana[ara.getDay()];
+    const diaMes = ara.getDate();
+    const mes = nomsMesos[ara.getMonth()];
+    const any = ara.getFullYear();
+    const diaCap = diaSetmana.charAt(0).toUpperCase()+diaSetmana.slice(1);
+    document.getElementById('lecturaData').textContent = `${diaCap}, ${diaMes} de ${mes} de ${any}`;
+
+    const fase = faseLunar(ara);
+    document.getElementById('lecturaLluna').textContent = nomFaseLunar(fase);
+    lunaLit.setAttribute('d', pathLluna(12, fase));
+    lunaGranLit.setAttribute('d', pathLluna(165, fase));
+
+    if (!zodiacActualitzat){
+      const doy = diaDeLany(ara);
+      const angleZ = angleZodiacActual(doy);
+      zodiGrup.setAttribute('transform', `rotate(${-angleZ}, ${CX}, ${CY})`);
+      zodiacActualitzat = true;
+    }
+
+    if (!calendariActualitzat){
+      const doy = diaDeLany(ara);
+      const angleM = angleMesActual(doy);
+      calGrup.setAttribute('transform', `rotate(${-angleM}, ${CCX}, ${CCY})`);
+      diaText.setAttribute('transform', `rotate(${angleM}, ${CCX}, ${CCY})`);
+      diaText.textContent = diaMes;
+      diaSetmanaText.setAttribute('transform', `rotate(${angleM}, ${CCX}, ${CCY})`);
+      diaSetmanaText.textContent = abrevSetmana[ara.getDay()];
+      estelsCal.setAttribute('transform', `rotate(${angleM}, ${CCX}, ${CCY})`);
+
+      // Constel·lació zodiacal del moment, simulada amb estels, apujada per no
+      // xocar amb la data, i amb un lleuger resplendor perquè destaqui de l'estelada de fons.
+      const idxSigne = indexZodiacActual(doy);
+      const desplacY = -52;
+      constelacions[idxSigne].forEach(estrella=>{
+        const ex = CCX + estrella[0], ey = CCY + estrella[1] + desplacY;
+        estelsCal.appendChild(el('circle', {cx:ex, cy:ey, r: estrella[2]*2.3, fill:'#fff6db', opacity:'0.22'}));
+        estelsCal.appendChild(el('circle', {cx:ex, cy:ey, r: estrella[2], fill:'#fff6db', opacity:'0.95'}));
+      });
+
+      calendariActualitzat = true;
+    }
+  }
+
+  actualitza();
+  setInterval(actualitza, 1000);
+
+  // ---------- Gir de la 2a esfera (com un rellotge de butxaca) cada hora en punt ----------
+  // Comença 7 segons abans de l'hora i el gir dura exactament 7 segons, així que
+  // acaba justet quan comença la nova hora — i llavors sona la campana.
+  let audioCtxOrloj = null;
+  function obtenirAudioCtx(){
+    if (!audioCtxOrloj){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtxOrloj = new AC();
+    }
+    if (audioCtxOrloj.state === 'suspended') audioCtxOrloj.resume();
+    return audioCtxOrloj;
+  }
+  ['click','touchstart'].forEach(ev=>{
+    document.addEventListener(ev, ()=>{ obtenirAudioCtx(); }, {once:true, passive:true});
   });
 
-  // Restricció de distància rígida entre dues baules consecutives: ni
-  // s'estiren ni es comprimeixen, com els perns d'una cadena real.
-  // fixedWhich: null (cap fixat, es reparteix per igual), 'a' o 'b'.
-  function solveDistance(a, b, restLen, fixedWhich){
-    var dx = b.x - a.x, dy = b.y - a.y;
-    var dist = Math.hypot(dx, dy) || 0.0001;
-    var diff = (dist - restLen) / dist;
-    if (fixedWhich === 'a'){
-      b.x -= dx * diff;
-      b.y -= dy * diff;
-    } else if (fixedWhich === 'b'){
-      a.x += dx * diff;
-      a.y += dy * diff;
+  function reprodueixCampana(){
+    const ctx = obtenirAudioCtx();
+    if (!ctx) return;
+    const ara = ctx.currentTime;
+    const parcials = [220, 331, 442, 556, 665]; // fonamental + harmònics no exactes, com una campana real
+    const guanys    = [0.55, 0.32, 0.20, 0.12, 0.07];
+    parcials.forEach((freq,i)=>{
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, ara);
+      gain.gain.linearRampToValueAtTime(guanys[i], ara + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0008, ara + 3.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ara);
+      osc.stop(ara + 3.3);
+    });
+  }
+
+  const calendariFlipEl = document.getElementById('calendariFlip');
+  let girEnCurs = false;
+  if (calendariFlipEl){
+    calendariFlipEl.addEventListener('animationend', () => {
+      girEnCurs = false;
+      reprodueixCampana();
+    });
+  }
+
+  function llancaGirCalendari(){
+    // Protecció: si ja hi ha un gir en marxa, no en comencem un altre a sobre
+    // (evitaria que l'animació es reiniciés a mitja volta i s'allargués més de 7s).
+    if (!calendariFlipEl || girEnCurs) return;
+    girEnCurs = true;
+    calendariFlipEl.classList.remove('girant');
+    void calendariFlipEl.offsetWidth; // força el reflow per poder reiniciar l'animació
+    calendariFlipEl.classList.add('girant');
+  }
+
+  const inicPaginaMs = performance.now();
+  let primerGirFet = false;
+  let girSegonActual = null;
+  function comprovaGirCalendari(ara){
+    if (!primerGirFet && performance.now() - inicPaginaMs >= 7000){
+      primerGirFet = true;
+      llancaGirCalendari();
+    }
+    const s = ara.getSeconds();
+    const m = ara.getMinutes();
+    // Només al minut 59 (l'últim minut abans de cada hora en punt), no cada minut
+    if (m === 59 && s === 53){
+      if (girSegonActual !== 53){
+        girSegonActual = 53;
+        llancaGirCalendari();
+      }
     } else {
-      var ox = dx * diff * 0.5, oy = dy * diff * 0.5;
-      a.x += ox; a.y += oy;
-      b.x -= ox; b.y -= oy;
+      girSegonActual = null;
     }
   }
 
-  // Autocol·lisió: cap parell de TRAMS no consecutius pot ocupar el
-  // mateix espai — es compara la distància més curta entre trams sencers
-  // (no només els centres de les baules), perquè cap diagonal "salti"
-  // per sobre d'una altra en zones on la cadena s'enrotlla molt densa.
-  function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
-
-  function closestSegSeg(p1, p2, p3, p4){
-    var d1x = p2.x - p1.x, d1y = p2.y - p1.y;
-    var d2x = p4.x - p3.x, d2y = p4.y - p3.y;
-    var rx = p1.x - p3.x, ry = p1.y - p3.y;
-    var a = d1x*d1x + d1y*d1y;
-    var e = d2x*d2x + d2y*d2y;
-    var f = d2x*rx + d2y*ry;
-    var s, t;
-
-    if (a <= 1e-9 && e <= 1e-9){
-      s = 0; t = 0;
-    } else if (a <= 1e-9){
-      s = 0; t = clamp01(f / e);
-    } else {
-      var c = d1x*rx + d1y*ry;
-      if (e <= 1e-9){
-        t = 0; s = clamp01(-c / a);
-      } else {
-        var b = d1x*d2x + d1y*d2y;
-        var denom = a*e - b*b;
-        s = (denom !== 0) ? clamp01((b*f - c*e) / denom) : 0;
-        t = (b*s + f) / e;
-        if (t < 0){ t = 0; s = clamp01(-c / a); }
-        else if (t > 1){ t = 1; s = clamp01((b - c) / a); }
-      }
-    }
-
-    return {
-      ax: p1.x + d1x*s, ay: p1.y + d1y*s,
-      bx: p3.x + d2x*t, by: p3.y + d2y*t,
-      s: s, t: t
-    };
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    setInterval(()=> comprovaGirCalendari(new Date()), 1000);
   }
 
-  function solveSelfCollision(){
-    var minD = COLL_R * 2;
-    var minD2 = minD * minD;
-    var headSeg = (headIdx === 0) ? 0 : LINKS - 2;
-    for (var i = 0; i < LINKS - 1; i++){
-      var a1 = pos[i], a2 = pos[i+1];
-      for (var j = i + 2; j < LINKS - 1; j++){
-        var b1 = pos[j], b2 = pos[j+1];
-        var cp = closestSegSeg(a1, a2, b1, b2);
-        var dx = cp.bx - cp.ax, dy = cp.by - cp.ay;
-        var d2 = dx*dx + dy*dy;
-        if (d2 < minD2 && d2 > 0.000001){
-          var d = Math.sqrt(d2);
-          var push = (minD - d) / d;
-          var ox = dx * push * 0.5, oy = dy * push * 0.5;
-          var wa1 = 1 - cp.s, wa2 = cp.s;
-          var wb1 = 1 - cp.t, wb2 = cp.t;
-          if (i === headSeg){
-            // la tractora no cedeix la seva trajectòria: absorbeix l'altre tram
-            b1.x += ox * 2 * wb1; b1.y += oy * 2 * wb1;
-            b2.x += ox * 2 * wb2; b2.y += oy * 2 * wb2;
-          } else if (j === headSeg){
-            a1.x -= ox * 2 * wa1; a1.y -= oy * 2 * wa1;
-            a2.x -= ox * 2 * wa2; a2.y -= oy * 2 * wa2;
-          } else {
-            a1.x -= ox * wa1; a1.y -= oy * wa1;
-            a2.x -= ox * wa2; a2.y -= oy * wa2;
-            b1.x += ox * wb1; b1.y += oy * wb1;
-            b2.x += ox * wb2; b2.y += oy * wb2;
+  // ---------- Cometa Halley: creua l'interior de l'esfera lunar cada 76s ----------
+  function llancaCometaLluna(){
+    const cometaEl = document.getElementById('cometaLluna');
+    const orientEl = document.getElementById('cometaOrient');
+    if (!cometaEl || !orientEl) return;
+    const angle1 = Math.random()*360;
+    const angle2 = angle1 + 100 + Math.random()*160; // corda aleatòria, no sempre un diàmetre
+    const r = 163; // dins del disc lunar (r=165), evitant l'anell zodiacal que es dibuixa per sobre
+    const x0 = polarX(CX, r, angle1), y0 = polarY(CY, r, angle1);
+    const x1 = polarX(CX, r, angle2), y1 = polarY(CY, r, angle2);
+    const angleViatge = Math.atan2(y1-y0, x1-x0) * 180/Math.PI;
+    const durada = 3200 + Math.random()*1400; // ms
+
+    orientEl.setAttribute('transform', `rotate(${angleViatge})`);
+    cometaEl.style.opacity = '0';
+
+    const inici = performance.now();
+    function pas(araMs){
+      const t = Math.min(1, (araMs - inici) / durada);
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + (y1 - y0) * t;
+      cometaEl.setAttribute('transform', `translate(${x}, ${y})`);
+      let opacitat = 1;
+      if (t < 0.08) opacitat = t / 0.08;
+      else if (t > 0.9) opacitat = (1 - t) / 0.1;
+      cometaEl.style.opacity = opacitat.toFixed(2);
+      if (t < 1) requestAnimationFrame(pas);
+    }
+    requestAnimationFrame(pas);
+  }
+
+  function programaCometaLluna(){
+    const espera = 76000 + (Math.random()*2000 - 1000); // ~76s (±1s perquè no sigui robòtic)
+    setTimeout(()=>{ llancaCometaLluna(); programaCometaLluna(); }, espera);
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const primeraEspera = 4000 + Math.random()*1000; // primera aparició als 4-5s de carregar
+    setTimeout(()=>{ llancaCometaLluna(); programaCometaLluna(); }, primeraEspera);
+  }
+
+  // ---------- Ambient: temperatura i altitud reals (Open-Meteo) ----------
+  function actualitzaAmbient(){
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(async (pos)=>{
+      const { latitude, longitude } = pos.coords;
+
+      // Promise.allSettled: si un dels tres serveis falla o triga, els altres
+      // dos segueixen actualitzant-se amb normalitat (no es perd la connectivitat).
+      const [rTemp, rElev, rLloc] = await Promise.allSettled([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature`),
+        fetch(`https://api.open-meteo.com/v1/elevation?latitude=${latitude}&longitude=${longitude}`),
+        fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=ca`)
+      ]);
+
+      try {
+        if (rTemp.status === 'fulfilled'){
+          const dTemp = await rTemp.value.json();
+          const temp = (dTemp && dTemp.current) ? dTemp.current.temperature_2m : null;
+          const sensacio = (dTemp && dTemp.current) ? dTemp.current.apparent_temperature : null;
+          const hum = (dTemp && dTemp.current) ? dTemp.current.relative_humidity_2m : null;
+          if (temp !== null && temp !== undefined){
+            document.getElementById('lecturaTemp').textContent = `${temp.toFixed(1).replace('.', ',')}°C`;
+          }
+          if (hum !== null && hum !== undefined){
+            document.getElementById('lecturaHum').textContent = `${Math.round(hum)}%`;
+          }
+          if (sensacio !== null && sensacio !== undefined){
+            document.getElementById('lecturaSensacio').textContent = `${sensacio.toFixed(1).replace('.', ',')}°C`;
           }
         }
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------
-  // Boles d'acer que cauen per gravetat i interfereixen amb la cadena.
-  // Sempre n'hi ha exactament TARGET_BALLS en joc: la que va aterrar
-  // primer desapareix (i en cau una de nova per substituir-la) just
-  // quan ja n'han aterrat 4 més — així el cicle és continu.
-  // ---------------------------------------------------------------
-  var GRAVITY = Math.min(W, H) * 0.9;
-  window.addEventListener('resize', function(){ GRAVITY = Math.min(W, H) * 0.9; });
-
-  var balls = [];
-  var landedOrder = [];
-  var TARGET_BALLS = 5;
-
-  function ballRadius(){ return LS.len * 0.75; }
-
-  function makeBall(delay){
-    var r = ballRadius();
-    return {
-      x: r + Math.random() * (W - 2 * r),
-      y: -r * 2,
-      vx: 0, vy: 0, r: r,
-      grounded: false,
-      delay: delay || 0
-    };
-  }
-
-  function removeAndReplaceBall(bi){
-    var b = balls[bi];
-    balls.splice(bi, 1);
-    var oi = landedOrder.indexOf(b);
-    if (oi !== -1) landedOrder.splice(oi, 1);
-    balls.push(makeBall(0.4 + Math.random() * 0.6));
-  }
-
-  (function seedBalls(){
-    // Les 5 primeres cauen esglaonades, una darrere l'altra, no totes de cop.
-    for (var i = 0; i < TARGET_BALLS; i++) balls.push(makeBall(i * 0.9));
-  })();
-
-  function closestPointOnSegment(px, py, a, b){
-    var dx = b.x - a.x, dy = b.y - a.y;
-    var len2 = dx*dx + dy*dy || 1e-9;
-    var t = ((px - a.x) * dx + (py - a.y) * dy) / len2;
-    t = t < 0 ? 0 : (t > 1 ? 1 : t);
-    return { x: a.x + dx * t, y: a.y + dy * t, t: t };
-  }
-
-  // Suma una velocitat d'impuls (px/s) a una baula concreta, que es
-  // decaurà tota sola fotograma a fotograma (vegeu step()). Això és el
-  // que fa que un cop de bola torci de veritat les baules implicades i
-  // que la sacsejada recorri i flexioni la cadena, en lloc de corregir-se
-  // a l'instant amb un simple desplaçament puntual.
-  function applyImpulse(idx, vx, vy, weight){
-    if (idx < 0 || idx >= LINKS) return;
-    if (idx === headIdx) return; // la tractora té la seva pròpia gestió
-    var p = pos[idx];
-    p.ix = (p.ix || 0) + vx * weight;
-    p.iy = (p.iy || 0) + vy * weight;
-  }
-
-  // Resol la col·lisió d'UNA bola contra tota la cadena (un sol pas).
-  function resolveBallChain(ball, linkRadius){
-    var minDist = ball.r + linkRadius;
-    for (var i = 0; i < LINKS - 1; i++){
-      var p1 = pos[i], p2 = pos[i+1];
-      var cp = closestPointOnSegment(ball.x, ball.y, p1, p2);
-      var dx = ball.x - cp.x, dy = ball.y - cp.y;
-      var dist = Math.hypot(dx, dy) || 0.0001;
-
-      if (dist < minDist){
-        var nx = dx / dist, ny = dy / dist;
-        var overlap = minDist - dist;
-
-        ball.x += nx * overlap * 0.6;
-        ball.y += ny * overlap * 0.6;
-
-        // Xoc entre dos sòlids: la bola perd bona part de la velocitat
-        // d'impacte en lloc de rebotar elàsticament.
-        var vDotN = ball.vx * nx + ball.vy * ny;
-        var impactSpeed = 0;
-        if (vDotN < 0){
-          impactSpeed = -vDotN;
-          ball.vx -= 1.05 * vDotN * nx;
-          ball.vy -= 1.05 * vDotN * ny;
-        }
-
-        // La tractora no cedeix la seva trajectòria, igual que a
-        // l'autocol·lisió del cos.
-        var w1 = (i === headIdx) ? 0 : (1 - cp.t);
-        var w2 = (i + 1 === headIdx) ? 0 : cp.t;
-        p1.x -= nx * overlap * 0.5 * w1; p1.y -= ny * overlap * 0.5 * w1;
-        p2.x -= nx * overlap * 0.5 * w2; p2.y -= ny * overlap * 0.5 * w2;
-
-        // Com més lluny queda el punt de contacte respecte la tractora
-        // (en recorregut al llarg de la cadena), més es nota la reacció
-        // — igual que una corda penjant es belluga més cap a la punta
-        // lliure que a prop de la mà que la sosté.
-        var chainDist = Math.abs(i - headIdx);
-        var farFactor = 0.25 + 0.9 * (chainDist / (LINKS - 1));
-
-        // Impuls físic: es concentra al punt exacte de contacte i cau molt
-        // de pressa amb la distància, perquè es vegi com una torsió creïble
-        // (un xoc entre sòlids), no una sacsejada elàstica exagerada.
-        var TRANSFER = 0.4 * farFactor;
-        applyImpulse(i,     -nx * impactSpeed * TRANSFER, -ny * impactSpeed * TRANSFER, 1);
-        applyImpulse(i + 1, -nx * impactSpeed * TRANSFER, -ny * impactSpeed * TRANSFER, 1);
-        applyImpulse(i - 1, -nx * impactSpeed * TRANSFER, -ny * impactSpeed * TRANSFER, 0.25);
-        applyImpulse(i + 2, -nx * impactSpeed * TRANSFER, -ny * impactSpeed * TRANSFER, 0.25);
-      }
-    }
-  }
-
-  function updateBalls(dt){
-    if (balls.length === 0) return;
-    var linkRadius = COLL_R;
-
-    for (var bi = balls.length - 1; bi >= 0; bi--){
-      var ball = balls[bi];
-
-      // Encara no li toca caure: descomptem el retard i prou.
-      if (ball.delay > 0){ ball.delay -= dt; continue; }
-
-      // Se sub-divideix el pas en trossos petits: si no, a velocitats
-      // altes (caiguda llarga per gravetat) la bola podia recórrer més
-      // distància que el gruix de la cadena en un sol fotograma i
-      // "saltar-se-la" sense detectar el contacte.
-      var SUBSTEPS = 4;
-      var sdt = dt / SUBSTEPS;
-      for (var s = 0; s < SUBSTEPS; s++){
-        ball.vy += GRAVITY * sdt;
-        ball.x += ball.vx * sdt;
-        ball.y += ball.vy * sdt;
-
-        if (ball.x - ball.r < 0){ ball.x = ball.r; ball.vx = Math.abs(ball.vx) * 0.5; }
-        else if (ball.x + ball.r > W){ ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx) * 0.5; }
-
-        if (ball.y + ball.r > H){
-          ball.y = H - ball.r;
-          ball.vy = -Math.abs(ball.vy) * 0.35;
-          ball.vx *= 0.85;
-          if (!ball.grounded){ ball.grounded = true; landedOrder.push(ball); }
-        }
-
-        resolveBallChain(ball, linkRadius);
+      } catch(err){
+        console.warn("Orloj: no s'ha pogut obtenir la temperatura/humitat", err);
       }
 
-      if (ball.y - ball.r > H + 200) removeAndReplaceBall(bi);
-    }
-
-    // La que va aterrar primer desapareix (i es reposa) just quan ja
-    // n'han aterrat 4 més — així sempre hi ha 5 boles en joc.
-    while (landedOrder.length > 4){
-      var oldest = landedOrder[0];
-      var idx = balls.indexOf(oldest);
-      if (idx !== -1) removeAndReplaceBall(idx);
-      else landedOrder.shift();
-    }
-
-    // Col·lisió bola-bola: reboten realment entre elles (les que encara
-    // estan esperant el seu torn per caure no hi compten).
-    var REST = 0.85;
-    for (var a2 = 0; a2 < balls.length; a2++){
-      if (balls[a2].delay > 0) continue;
-      for (var b2 = a2 + 1; b2 < balls.length; b2++){
-        if (balls[b2].delay > 0) continue;
-        var ba = balls[a2], bb = balls[b2];
-        var dx2 = bb.x - ba.x, dy2 = bb.y - ba.y;
-        var dist2 = Math.hypot(dx2, dy2) || 0.0001;
-        var minD = ba.r + bb.r;
-        if (dist2 < minD){
-          var nx2 = dx2 / dist2, ny2 = dy2 / dist2;
-          var ov2 = minD - dist2;
-          ba.x -= nx2 * ov2 * 0.5; ba.y -= ny2 * ov2 * 0.5;
-          bb.x += nx2 * ov2 * 0.5; bb.y += ny2 * ov2 * 0.5;
-
-          var avn = ba.vx * nx2 + ba.vy * ny2;
-          var bvn = bb.vx * nx2 + bb.vy * ny2;
-          if (bvn < avn){
-            ba.vx += (bvn - avn) * nx2 * REST; ba.vy += (bvn - avn) * ny2 * REST;
-            bb.vx += (avn - bvn) * nx2 * REST; bb.vy += (avn - bvn) * ny2 * REST;
+      try {
+        if (rElev.status === 'fulfilled'){
+          const dElev = await rElev.value.json();
+          const elev = (dElev && dElev.elevation) ? dElev.elevation[0] : null;
+          if (elev !== null && elev !== undefined){
+            document.getElementById('lecturaAlt').textContent = `${Math.round(elev)} m`;
           }
         }
-      }
-    }
-  }
-
-  function drawBall(ball){
-    ctx.save();
-    ctx.translate(ball.x, ball.y);
-
-    var g = ctx.createRadialGradient(-ball.r*0.3, -ball.r*0.35, ball.r*0.1, 0, 0, ball.r);
-    g.addColorStop(0, '#f8fafc');
-    g.addColorStop(0.35, '#cbd5e1');
-    g.addColorStop(0.7, '#64748b');
-    g.addColorStop(1, '#1e293b');
-
-    ctx.beginPath();
-    ctx.arc(0, 0, ball.r, 0, Math.PI*2);
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.lineWidth = Math.max(1, ball.r*0.06);
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(-ball.r*0.35, -ball.r*0.4, ball.r*0.2, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  // ---------------------------------------------------------------
-  // Física: moviment del cap + rebot segons l'angle d'impacte
-  // ---------------------------------------------------------------
-  var lastT = null;
-  var simTime = 0;
-
-  // Steering orgànic: un procés d'impulsos aleatoris esmorteïts (tipus
-  // Ornstein-Uhlenbeck) que fa cimbrejar la trajectòria del cap en lloc
-  // de mantenir-la rectilínia i previsible entre rebot i rebot.
-  var ANG_IMPULSE = 3.4;   // força dels micro-impulsos aleatoris (rad/s²)
-  var ANG_DAMPING = 1.6;   // esmorteïment cap a la trajectòria recta
-  var MAX_ANGVEL  = 2.6;   // límit de gir (rad/s)
-
-  function step(dt){
-    simTime += dt;
-
-    // -- 1) steering: la direcció "respira" de manera contínua i orgànica
-    angVel += (Math.random() * 2 - 1) * ANG_IMPULSE * dt;
-    angVel -= angVel * ANG_DAMPING * dt;
-    angVel = clampNum(angVel, -MAX_ANGVEL, MAX_ANGVEL);
-    moveAngle += angVel * dt;
-
-    // -- 2) petit pols de velocitat, com si la cadena passés per les
-    //       dents d'un pinyó (engrenatge), en lloc d'anar a ritme fix
-    var speedNow = SPEED * (1 + 0.07 * Math.sin(simTime * 3.1));
-
-    head.vx = speedNow * Math.cos(moveAngle);
-    head.vy = speedNow * Math.sin(moveAngle);
-
-    var m = margin();
-    var nx = head.x + head.vx * dt;
-    var ny = head.y + head.vy * dt;
-
-    // Rebot especular a cada paret: es capgira només la component
-    // perpendicular a la vora, de manera que l'angle de sortida
-    // sempre és igual a l'angle d'incidència (com una bola de billar).
-    var bounced = false;
-    if (nx < m){ nx = m; head.vx = Math.abs(head.vx); bounced = true; }
-    else if (nx > W - m){ nx = W - m; head.vx = -Math.abs(head.vx); bounced = true; }
-
-    if (ny < m){ ny = m; head.vy = Math.abs(head.vy); bounced = true; }
-    else if (ny > H - m){ ny = H - m; head.vy = -Math.abs(head.vy); bounced = true; }
-
-    if (bounced){
-      // el steering continua a partir de la nova direcció reflectida
-      moveAngle = Math.atan2(head.vy, head.vx);
-      angVel *= 0.4; // el rebot "absorbeix" part del gir acumulat
-    }
-
-    head.x = nx; head.y = ny;
-    pos[headIdx].x = head.x; pos[headIdx].y = head.y; // la tractora és l'àncora cinemàtica
-
-    // -- 3) Verlet per a la resta del cos: cada baula manté la seva
-    //       pròpia inèrcia (posició actual - posició anterior)
-    var damping = 0.985;
-    for (var i = 0; i < LINKS; i++){
-      if (i === headIdx) continue;
-      var p = pos[i], pp = prevPos[i];
-      var vx = (p.x - pp.x) * damping;
-      var vy = (p.y - pp.y) * damping;
-      pp.x = p.x; pp.y = p.y;
-      p.x += vx; p.y += vy;
-    }
-
-    // Boles: cauen per gravetat i poden desplaçar puntualment algun tram.
-    // Es resol DESPRÉS de la inèrcia (Verlet), no abans — si no, el
-    // desplaçament que provoca la bola es tornava a comptar com a
-    // velocitat pròpia de la baula al fotograma següent, i l'efecte
-    // quedava doblat (per això semblava una repulsió, no un cop).
-    updateBalls(dt);
-
-    // -- 4) Relaxació iterativa: rigidesa de les baules + autocol·lisió
-    //       + contenció dins la pantalla, tot resolt a la vegada com un
-    //       sistema físic sòlid (no un simple recorregut precalculat)
-    var ITER = 10;
-    var MAX_BEND = Math.PI * 0.72; // ~130°: una mica més de marge de seguretat
-    for (var it = 0; it < ITER; it++){
-      for (i = 0; i < LINKS - 1; i++){
-        var fw = (i === headIdx) ? 'a' : ((i + 1 === headIdx) ? 'b' : null);
-        solveDistance(pos[i], pos[i+1], LS.len, fw);
+      } catch(err){
+        console.warn("Orloj: no s'ha pogut obtenir l'altitud", err);
       }
 
-      // Límit de flexió, propagat en la direcció que s'allunya de la
-      // tractora (igual que la resta de la relaxació).
-      if (headIdx === 0){
-        for (i = 1; i < LINKS - 1; i++){
-          var a1x = pos[i].x - pos[i-1].x, a1y = pos[i].y - pos[i-1].y;
-          var a2x = pos[i+1].x - pos[i].x, a2y = pos[i+1].y - pos[i].y;
-          var ang1 = Math.atan2(a1y, a1x), ang2 = Math.atan2(a2y, a2x);
-          var diff = ang2 - ang1;
-          while (diff < -Math.PI) diff += Math.PI * 2;
-          while (diff > Math.PI) diff -= Math.PI * 2;
-          if (Math.abs(diff) > MAX_BEND){
-            var t2 = ang1 + Math.sign(diff) * MAX_BEND;
-            pos[i+1].x = pos[i].x + Math.cos(t2) * LS.len;
-            pos[i+1].y = pos[i].y + Math.sin(t2) * LS.len;
+      try {
+        if (rLloc.status === 'fulfilled'){
+          const dLloc = await rLloc.value.json();
+          const poblacio = (dLloc && (dLloc.city || dLloc.locality || dLloc.principalSubdivision)) || null;
+          if (poblacio){
+            document.getElementById('lecturaLloc').textContent = poblacio;
           }
         }
-      } else {
-        for (i = LINKS - 2; i > 0; i--){
-          var b1x = pos[i].x - pos[i+1].x, b1y = pos[i].y - pos[i+1].y;
-          var b2x = pos[i-1].x - pos[i].x, b2y = pos[i-1].y - pos[i].y;
-          var bng1 = Math.atan2(b1y, b1x), bng2 = Math.atan2(b2y, b2x);
-          var bdiff = bng2 - bng1;
-          while (bdiff < -Math.PI) bdiff += Math.PI * 2;
-          while (bdiff > Math.PI) bdiff -= Math.PI * 2;
-          if (Math.abs(bdiff) > MAX_BEND){
-            var t3 = bng1 + Math.sign(bdiff) * MAX_BEND;
-            pos[i-1].x = pos[i].x + Math.cos(t3) * LS.len;
-            pos[i-1].y = pos[i].y + Math.sin(t3) * LS.len;
-          }
-        }
+      } catch(err){
+        console.warn("Orloj: no s'ha pogut obtenir la població", err);
       }
 
-      solveSelfCollision();
-      for (i = 0; i < LINKS; i++){ if (i !== headIdx) clampPoint(pos[i]); }
-    }
-
-    // -- 5) Aplicar l'impuls acumulat (cops de bola) per sobre de la forma
-    //       de la cadena, i deixar-lo esvair tot sol.
-    var IMPULSE_DECAY = Math.pow(0.06, dt);
-    for (i = 0; i < LINKS; i++){
-      if (i === headIdx) continue;
-      var pi = pos[i];
-      if (pi.ix || pi.iy){
-        pi.x += pi.ix * dt;
-        pi.y += pi.iy * dt;
-        pi.ix *= IMPULSE_DECAY;
-        pi.iy *= IMPULSE_DECAY;
-      }
-    }
-    // Diverses passades de seguretat: un impuls sobtat pot desplaçar un
-    // tram més enllà del que una sola passada sap desfer, i és just aquí
-    // on es formaven els nusos que es travessaven.
-    for (i = 0; i < LINKS - 1; i++){
-      var fw2 = (i === headIdx) ? 'a' : ((i + 1 === headIdx) ? 'b' : null);
-      solveDistance(pos[i], pos[i+1], LS.len, fw2);
-    }
-    solveSelfCollision();
-    solveSelfCollision();
-    solveSelfCollision();
+    }, (err)=>{
+      console.warn('Orloj: geolocalització no disponible', err);
+    }, { enableHighAccuracy:false, timeout:8000, maximumAge:600000 });
   }
 
-  // ---------------------------------------------------------------
-  // Render: cada baula amb relleu metàl·lic (gradients + ombres)
-  // ---------------------------------------------------------------
-  function drawChain(){
-    ctx.clearRect(0, 0, W, H);
-
-    // Les baules ara són el resultat directe de la simulació física
-    // (Verlet + rigidesa + autocol·lisió), no d'un rastre precalculat.
-    var pts = pos;
-    var i;
-
-    // ombra de contacte de tota la cadena (dona sensació de pes sobre el pla)
-    ctx.save();
-    ctx.filter = 'blur(6px)';
-    ctx.globalAlpha = 0.35;
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = LS.plateOuterH * 0.9;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y + 3);
-    for (i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y + 3);
-    ctx.stroke();
-    ctx.restore();
-
-    // dibuixem cada tram (plaques) entre baula i baula
-    for (i = 0; i < pts.length - 1; i++){
-      drawPlate(pts[i], pts[i+1], i % 2 === 0);
-    }
-
-    // dibuixem els corrons (rollers) sobre les articulacions
-    for (i = 0; i < pts.length; i++){
-      drawRoller(pts[i]);
-    }
-
-    // Ull LED: verd a la baula tractora (la que mana ara), vermell a l'altra.
-    drawLED(pts[headIdx], '34,197,94');
-    drawLED(pts[otherEnd()], '239,68,68');
-
-    // Boles d'acer per sobre de la cadena
-    for (i = 0; i < balls.length; i++) drawBall(balls[i]);
-  }
-
-  function drawLED(p, rgb){
-    var r = LS.rollerR * 1.9;
-
-    ctx.save();
-    ctx.translate(p.x, p.y);
-
-    // halo lluminós
-    var glow = ctx.createRadialGradient(0, 0, r*0.1, 0, 0, r);
-    glow.addColorStop(0.00, 'rgba(' + rgb + ',1)');
-    glow.addColorStop(0.45, 'rgba(' + rgb + ',0.55)');
-    glow.addColorStop(1.00, 'rgba(' + rgb + ',0)');
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fillStyle = glow;
-    ctx.fill();
-
-    // nucli brillant
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  function drawPlate(p0, p1, outer){
-    var dx = p1.x - p0.x, dy = p1.y - p0.y;
-    var ang = Math.atan2(dy, dx);
-    var midx = (p0.x + p1.x) / 2, midy = (p0.y + p1.y) / 2;
-    var len = Math.hypot(dx, dy) * 1.06;
-    var h = outer ? LS.plateOuterH : LS.plateInnerH;
-
-    ctx.save();
-    ctx.translate(midx, midy);
-    ctx.rotate(ang);
-
-    var r = h * 0.5;
-    var x0 = -len/2, x1 = len/2;
-
-    // ombra projectada de la placa (relleu)
-    ctx.save();
-    ctx.translate(0, h*0.16);
-    ctx.globalAlpha = 0.30;
-    roundedCapsule(x0, -r, x1, r, r);
-    ctx.fillStyle = '#000';
-    ctx.fill();
-    ctx.restore();
-
-    // cos metàl·lic amb gradient perpendicular (llum superior-esquerra)
-    var grad = ctx.createLinearGradient(0, -r, 0, r);
-    if (outer){
-      grad.addColorStop(0.00, '#f4f6f8');
-      grad.addColorStop(0.20, '#cfd4d8');
-      grad.addColorStop(0.50, '#7d848b');
-      grad.addColorStop(0.80, '#4b4f54');
-      grad.addColorStop(1.00, '#25272a');
-    } else {
-      grad.addColorStop(0.00, '#e3e6e8');
-      grad.addColorStop(0.25, '#b7bcc1');
-      grad.addColorStop(0.55, '#686d73');
-      grad.addColorStop(0.85, '#3a3d41');
-      grad.addColorStop(1.00, '#1c1e20');
-    }
-    roundedCapsule(x0, -r, x1, r, r);
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // vora fosca (biselat)
-    ctx.lineWidth = Math.max(0.6, h*0.045);
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-    ctx.stroke();
-
-    // línia de llum superior (aresta brillant, dona el relleu 3D)
-    ctx.beginPath();
-    ctx.moveTo(x0 + r*0.6, -r*0.62);
-    ctx.lineTo(x1 - r*0.6, -r*0.62);
-    ctx.lineWidth = Math.max(0.5, h*0.09);
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  function roundedCapsule(x0,y0,x1,y1,r){
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1 - r, y0);
-    ctx.arc(x1 - r, (y0+y1)/2, r, -Math.PI/2, Math.PI/2);
-    ctx.lineTo(x0 + r, y1);
-    ctx.arc(x0 + r, (y0+y1)/2, r, Math.PI/2, -Math.PI/2);
-    ctx.closePath();
-  }
-
-  function drawRoller(p){
-    var r = LS.rollerR;
-
-    ctx.save();
-    ctx.translate(p.x, p.y);
-
-    // ombra de base
-    ctx.beginPath();
-    ctx.arc(0.6, r*0.28, r, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.fill();
-
-    // cos cilíndric del corró: gradient radial per simular volum
-    var g = ctx.createRadialGradient(-r*0.35, -r*0.4, r*0.15, 0, 0, r*1.05);
-    g.addColorStop(0.00, '#fbfcfd');
-    g.addColorStop(0.35, '#c7ccd0');
-    g.addColorStop(0.70, '#6b7075');
-    g.addColorStop(1.00, '#2b2d2f');
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI*2);
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.lineWidth = Math.max(0.6, r*0.12);
-    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    ctx.stroke();
-
-    // forat central del passador (rebló)
-    ctx.beginPath();
-    ctx.arc(0, 0, r*0.38, 0, Math.PI*2);
-    var g2 = ctx.createRadialGradient(-r*0.12,-r*0.12,r*0.03, 0,0, r*0.4);
-    g2.addColorStop(0, '#3a3c3e');
-    g2.addColorStop(1, '#0a0a0b');
-    ctx.fillStyle = g2;
-    ctx.fill();
-
-    // punt de llum (brillantor metàl·lica)
-    ctx.beginPath();
-    ctx.arc(-r*0.32, -r*0.36, r*0.18, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  // ---------------------------------------------------------------
-  // Relaxació inicial: la línia recta acabada de crear es "retalla"
-  // baula a baula perquè no surti de pantalla, i això pot arraconar
-  // diverses baules al mateix punt (un petit nus abans de començar).
-  // Es resol d'entrada, en repòs, perquè el primer fotograma que es
-  // dibuixa ja surti net.
-  // ---------------------------------------------------------------
-  (function relaxInitialBody(){
-    for (var w = 0; w < 20; w++){
-      for (var i = 0; i < LINKS - 1; i++){
-        var fw = (i === headIdx) ? 'a' : ((i + 1 === headIdx) ? 'b' : null);
-        solveDistance(pos[i], pos[i+1], LS.len, fw);
-      }
-      solveSelfCollision();
-      for (i = 0; i < LINKS; i++){ if (i !== headIdx) clampPoint(pos[i]); }
-    }
-    // Es reinicia prevPos a la posició ja relaxada, perquè el primer
-    // fotograma no interpreti tot aquest ajust com una ràfega de velocitat.
-    for (var j = 0; j < LINKS; j++){ prevPos[j].x = pos[j].x; prevPos[j].y = pos[j].y; }
-  })();
-
-  // ---------------------------------------------------------------
-  // Bucle principal
-  // ---------------------------------------------------------------
-  function frame(t){
-    if (lastT === null) lastT = t;
-    var dt = Math.min(0.033, (t - lastT) / 1000);
-    lastT = t;
-
-    step(dt);
-    drawChain();
-
-    requestAnimationFrame(frame);
-  }
-
-  requestAnimationFrame(frame);
+  actualitzaAmbient();
+  setInterval(actualitzaAmbient, 15*60*1000);
 })();
 </script>
 </body>
