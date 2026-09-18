@@ -159,18 +159,12 @@
                         <stop offset="60%" stop-color="#1c2127"/>
                         <stop offset="100%" stop-color="#0d1013"/>
                     </radialGradient>
-
-                    <!-- Definició Marcador de Fletxa per a l'agulla de segons -->
-                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#e63946" />
-                    </marker>
                 </defs>
 
                 <!-- Corretja superior i inferior -->
                 <g fill="#181a1c" stroke="#0d0e10" stroke-width="1">
                     <path d="M 145 0 L 255 0 L 245 80 L 155 80 Z" />
                     <path d="M 155 320 L 245 320 L 255 400 L 145 400 Z" />
-                    <!-- Forats corretja -->
                     <rect x="175" y="15" width="50" height="10" rx="5" fill="#070b19"/>
                     <rect x="175" y="35" width="50" height="10" rx="5" fill="#070b19"/>
                     <rect x="175" y="55" width="50" height="10" rx="5" fill="#070b19"/>
@@ -202,9 +196,8 @@
                 <!-- Esfera interior -->
                 <circle cx="200" cy="200" r="132" fill="url(#dialGrad)" stroke="#111" stroke-width="4" />
 
-                <!-- MARQUES DE MINUTS I HORES (FLIEGER TYPE A) -->
+                <!-- MARQUES DE MINUTS I HORES -->
                 <g stroke="#ffffff" stroke-width="3" stroke-linecap="round">
-                    <!-- Marques principals cada 5 minuts (30º) -->
                     <line x1="200" y1="74" x2="200" y2="88" />
                     <line x1="263" y1="91" x2="256" y2="103" />
                     <line x1="309" y1="137" x2="297" y2="144" />
@@ -222,32 +215,35 @@
                 <!-- Sub-marques fines de minuts -->
                 <circle cx="200" cy="200" r="122" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="1 5.38" opacity="0.7" />
 
-                <!-- TRIANGLE AMB DOS PUNTS A LES 12H (Flieger Classic) -->
+                <!-- TRIANGLE AMB DOS PUNTS A LES 12H -->
                 <g fill="#ffffff">
                     <polygon points="200,80 190,98 210,98" />
                     <circle cx="183" cy="84" r="3" />
                     <circle cx="217" cy="84" r="3" />
                 </g>
 
-                <!-- MARCADOR DE DUES BARS A LES 11H -->
-                <rect x="139" y="90" width="4" height="16" fill="#fff" transform="rotate(-30 141 98)" />
-                <rect x="145" y="87" width="4" height="16" fill="#fff" transform="rotate(-30 147 95)" />
+                <!-- BATÓ DOBLE A LES 11H -->
+                <g fill="#ffffff">
+                    <rect x="138" y="87" width="4" height="16" transform="rotate(-30 140 95)" />
+                    <rect x="144" y="83" width="4" height="16" transform="rotate(-30 146 91)" />
+                </g>
 
-                <!-- NÚMEROS FLIEGER (Grans i clars) -->
-                <g fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="28" text-anchor="middle" dominant-baseline="central">
-                    <text x="250" y="128">2</text>
-                    <text x="150" y="128">10</text>
-                    <text x="272" y="200"> </text> <!-- Reservat per a la data -->
-                    <text x="126" y="200">9</text>
-                    <text x="252" y="268">4</text>
-                    <text x="148" y="268">8</text>
-                    <text x="200" y="288">6</text>
-                    <text x="210" y="280">5</text>
-                    <text x="190" y="280">7</text>
+                <!-- NÚMEROS DE L'ESFERA COL·LOCATS AMB EXACTITUD -->
+                <g fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="26" text-anchor="middle" dominant-baseline="central">
+                    <text x="250" y="113">1</text>
+                    <text x="287" y="150">2</text>
+                    <!-- 3h reservat per a la data -->
+                    <text x="287" y="250">4</text>
+                    <text x="250" y="287">5</text>
+                    <text x="200" y="300">6</text>
+                    <text x="150" y="287">7</text>
+                    <text x="113" y="250">8</text>
+                    <text x="100" y="200">9</text>
+                    <text x="113" y="150">10</text>
                 </g>
 
                 <!-- TEXT DIA I DATA (Ex. VEN 18) -->
-                <text id="dateText" x="255" y="201" fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="20" text-anchor="middle" dominant-baseline="central">VEN 18</text>
+                <text id="dateText" x="252" y="201" fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="20" text-anchor="middle" dominant-baseline="central">VEN 18</text>
 
                 <!-- AGULLA DE LES HORES -->
                 <g id="hourHand">
@@ -261,13 +257,10 @@
                     <path d="M 198 195 L 199 100 L 201 100 L 202 195 Z" fill="#1c2127"/>
                 </g>
 
-                <!-- AGULLA DELS SEGONS (VERMELLA FINA I AMB PUNTA DE FLETXA) -->
+                <!-- AGULLA DELS SEGONS (VERMELLA FINA AMB FLETXA EN PUNTA) -->
                 <g id="secondHand">
-                    <!-- Cos de l'agulla fina vermella -->
                     <line x1="200" y1="225" x2="200" y2="82" stroke="#e63946" stroke-width="1.8" stroke-linecap="round"/>
-                    <!-- Punta de fletxa vermella al final -->
-                    <polygon points="200,72 194,82 206,82" fill="#e63946"/>
-                    <!-- Contrapès circular vermell -->
+                    <polygon points="200,70 194,82 206,82" fill="#e63946"/>
                     <circle cx="200" cy="220" r="4" fill="#e63946"/>
                 </g>
 
@@ -286,7 +279,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- ACTUALITZACIÓ DEL RELLOTGE I AGULLES ---
             const hourHand = document.getElementById('hourHand');
             const minuteHand = document.getElementById('minuteHand');
             const secondHand = document.getElementById('secondHand');
@@ -300,15 +292,14 @@
                 const minutes = now.getMinutes() + seconds / 60;
                 const hours = (now.getHours() % 12) + minutes / 60;
 
-                const secondDeg = seconds * 6;  // 360 / 60
-                const minuteDeg = minutes * 6;  // 360 / 60
-                const hourDeg = hours * 30;     // 360 / 12
+                const secondDeg = seconds * 6;
+                const minuteDeg = minutes * 6;
+                const hourDeg = hours * 30;
 
                 secondHand.setAttribute('transform', `rotate(${secondDeg}, 200, 200)`);
                 minuteHand.setAttribute('transform', `rotate(${minuteDeg}, 200, 200)`);
                 hourHand.setAttribute('transform', `rotate(${hourDeg}, 200, 200)`);
 
-                // Text del dia/data
                 const dayName = daysOfWeek[now.getDay()];
                 const dayNum = now.getDate();
                 dateText.textContent = `${dayName} ${dayNum}`;
@@ -318,7 +309,7 @@
 
             requestAnimationFrame(updateClock);
 
-            // --- CALENDARI MENSUAL ---
+            // CALENDARI MENSUAL
             const monthYearEl = document.getElementById('monthYear');
             const gridEl = document.getElementById('calendarGrid');
             
