@@ -8,10 +8,7 @@
         :root {
             --dark-blue: #070b19;
             --burgundy: #800020;
-            --bronze-dark: #4a3318;
             --bronze-light: #d4af7a;
-            --dial-bg: #0f1112;
-            --luminous: #b3e0ff;
             --text-color: #e0e0e0;
         }
 
@@ -22,7 +19,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--dark-blue);
             min-height: 100vh;
             display: flex;
@@ -33,7 +30,6 @@
             color: var(--text-color);
         }
 
-        /* Textura de vellut blau fosc */
         body::before {
             content: "";
             position: absolute;
@@ -52,32 +48,33 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3rem;
-            padding: 2rem;
+            gap: 2.5rem;
+            padding: 1.5rem;
             width: 100%;
             max-width: 1100px;
         }
 
-        /* --- RELLOTGE --- */
+        /* --- RELLOTGE RESPONSIVE --- */
         .watch-wrapper {
             width: 100%;
-            max-width: 380px;
-            filter: drop-shadow(0 25px 35px rgba(0,0,0,0.9));
+            max-width: 420px;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.85));
         }
 
         .watch-svg {
             width: 100%;
             height: auto;
+            display: block;
         }
 
         /* --- CALENDARI MENSUAL --- */
         .calendar-wrapper {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(205, 168, 122, 0.3);
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(212, 175, 122, 0.3);
             border-radius: 16px;
             padding: 1.5rem;
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             backdrop-filter: blur(12px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
         }
@@ -101,7 +98,7 @@
         .calendar-grid .day-name {
             font-weight: 700;
             color: var(--bronze-light);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             padding-bottom: 0.5rem;
             text-transform: uppercase;
         }
@@ -109,7 +106,7 @@
         .calendar-grid .day {
             padding: 0.6rem 0;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.85);
             transition: all 0.2s ease;
         }
@@ -130,23 +127,13 @@
             transform: scale(1.05);
         }
 
-        /* --- RESPONSIVE --- */
         @media (min-width: 850px) {
             .container {
                 flex-direction: row;
                 justify-content: center;
-                align-items: flex-start;
-                gap: 4rem;
-                padding: 4rem;
-            }
-            
-            .watch-wrapper {
-                max-width: 420px;
-            }
-
-            .calendar-wrapper {
-                max-width: 400px;
-                margin-top: 2rem;
+                align-items: center;
+                gap: 3.5rem;
+                padding: 3rem;
             }
         }
     </style>
@@ -158,181 +145,196 @@
         <div class="watch-wrapper">
             <svg class="watch-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <!-- Gradient bronze desgastat -->
-                    <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#5c3f22" />
-                        <stop offset="25%" stop-color="#b88d5c" />
-                        <stop offset="50%" stop-color="#4a3318" />
-                        <stop offset="75%" stop-color="#d4af7a" />
-                        <stop offset="100%" stop-color="#2a1a0a" />
+                    <!-- Gradient Bisell Bronzat / Metallic -->
+                    <linearGradient id="bezelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#8c7355"/>
+                        <stop offset="30%" stop-color="#c5a072"/>
+                        <stop offset="50%" stop-color="#69533c"/>
+                        <stop offset="75%" stop-color="#d4af7a"/>
+                        <stop offset="100%" stop-color="#3d2e1e"/>
                     </linearGradient>
-                    
-                    <!-- Gradient esfera -->
-                    <radialGradient id="dialGradient" cx="50%" cy="50%" r="50%">
-                        <stop offset="70%" stop-color="#141618" />
-                        <stop offset="100%" stop-color="#050505" />
+
+                    <!-- Textura Esfera -->
+                    <radialGradient id="dialGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="60%" stop-color="#1c2127"/>
+                        <stop offset="100%" stop-color="#0d1013"/>
                     </radialGradient>
 
-                    <!-- Efecte de lluminositat -->
-                    <filter id="glow">
-                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
-                        <feMerge>
-                            <feMergeNode in="coloredBlur"/>
-                            <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                    </filter>
-                    
-                    <!-- Camí per al text del bezel -->
-                    <path id="bezelPathLeft" d="M 80,200 A 120,120 0 0,1 120,90" fill="none" />
+                    <!-- Definició Marcador de Fletxa per a l'agulla de segons -->
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#e63946" />
+                    </marker>
                 </defs>
 
-                <!-- Corretja de cautxú amb forats -->
-                <g fill="#111" stroke="#222" stroke-width="2">
-                    <path d="M 145 0 L 255 0 L 245 100 L 155 100 Z" />
-                    <path d="M 155 300 L 245 300 L 255 400 L 145 400 Z" />
-                    <!-- Forats -->
-                    <rect x="170" y="20" width="60" height="12" rx="6" fill="#050505" stroke="none"/>
-                    <rect x="170" y="45" width="60" height="12" rx="6" fill="#050505" stroke="none"/>
-                    <rect x="170" y="70" width="60" height="12" rx="6" fill="#050505" stroke="none"/>
-                    <rect x="170" y="330" width="60" height="12" rx="6" fill="#050505" stroke="none"/>
-                    <rect x="170" y="355" width="60" height="12" rx="6" fill="#050505" stroke="none"/>
+                <!-- Corretja superior i inferior -->
+                <g fill="#181a1c" stroke="#0d0e10" stroke-width="1">
+                    <path d="M 145 0 L 255 0 L 245 80 L 155 80 Z" />
+                    <path d="M 155 320 L 245 320 L 255 400 L 145 400 Z" />
+                    <!-- Forats corretja -->
+                    <rect x="175" y="15" width="50" height="10" rx="5" fill="#070b19"/>
+                    <rect x="175" y="35" width="50" height="10" rx="5" fill="#070b19"/>
+                    <rect x="175" y="55" width="50" height="10" rx="5" fill="#070b19"/>
+                    <rect x="175" y="335" width="50" height="10" rx="5" fill="#070b19"/>
+                    <rect x="175" y="355" width="50" height="10" rx="5" fill="#070b19"/>
+                    <rect x="175" y="375" width="50" height="10" rx="5" fill="#070b19"/>
                 </g>
 
-                <!-- Caixa exterior (Bezel) de bronze -->
-                <circle cx="200" cy="200" r="155" fill="url(#bronzeGradient)" stroke="#1a1005" stroke-width="4" />
-                
-                <!-- Anell interior del bezel -->
-                <circle cx="200" cy="200" r="138" fill="#1a1a1a" />
-                <circle cx="200" cy="200" r="138" fill="none" stroke="#2a1a0a" stroke-width="8" />
+                <!-- Bisell Exterior Bronzat -->
+                <circle cx="200" cy="200" r="160" fill="url(#bezelGrad)" stroke="#221810" stroke-width="2" />
+                <circle cx="200" cy="200" r="136" fill="none" stroke="#2a2015" stroke-width="3" />
 
-                <!-- Text del bezel (LIGHT, UP-MENU, DOWN) -->
-                <text fill="#2a1a0a" font-family="Arial, sans-serif" font-weight="bold" font-size="10" letter-spacing="2">
-                    <textPath href="#bezelPathLeft" startOffset="10%">LIGHT</textPath>
-                    <textPath href="#bezelPathLeft" startOffset="40%">UP-MENU</textPath>
-                    <textPath href="#bezelPathLeft" startOffset="75%">DOWN</textPath>
-                </text>
-
-                <!-- Cargols del bezel -->
-                <g fill="#1a1005">
-                    <!-- Cargol superior -->
-                    <circle cx="200" cy="50" r="8" />
-                    <line x1="194" y1="50" x2="206" y2="50" stroke="#6b4c2a" stroke-width="2" />
-                    <!-- Cargol dret -->
-                    <circle cx="350" cy="200" r="8" />
-                    <line x1="350" y1="194" x2="350" y2="206" stroke="#6b4c2a" stroke-width="2" />
-                    <!-- Cargol inferior -->
-                    <circle cx="200" cy="350" r="8" />
-                    <line x1="194" y1="350" x2="206" y2="350" stroke="#6b4c2a" stroke-width="2" />
-                    <!-- Cargol esquerre -->
-                    <circle cx="50" cy="200" r="8" />
-                    <line x1="50" y1="194" x2="50" y2="206" stroke="#6b4c2a" stroke-width="2" />
+                <!-- Textos gravats al bisell -->
+                <g fill="#4a3b2c" font-family="Arial, sans-serif" font-weight="900" font-size="9" letter-spacing="1">
+                    <text x="68" y="172" transform="rotate(-65 68 172)">LIGHT</text>
+                    <text x="60" y="205" transform="rotate(-90 60 205)">UP-MENU</text>
+                    <text x="68" y="238" transform="rotate(-115 68 238)">DOWN</text>
                 </g>
 
-                <!-- Esfera (Dial) -->
-                <circle cx="200" cy="200" r="118" fill="url(#dialGradient)" />
+                <!-- Cargols del bisell -->
+                <g fill="#5c4a38" stroke="#2a1f15" stroke-width="1">
+                    <circle cx="82" cy="115" r="5" />
+                    <circle cx="318" cy="115" r="5" />
+                    <circle cx="318" cy="285" r="5" />
+                    <circle cx="82" cy="285" r="5" />
+                    <circle cx="200" cy="50" r="4" />
+                </g>
 
-                <!-- Pista de minuts (Ticks) -->
-                <circle cx="200" cy="200" r="108" fill="none" stroke="#ffffff" stroke-width="8" stroke-dasharray="2 6.85" />
+                <!-- Esfera interior -->
+                <circle cx="200" cy="200" r="132" fill="url(#dialGrad)" stroke="#111" stroke-width="4" />
 
-                <!-- Marques de les hores (Batons) -->
-                <!-- 12, 3, 6, 9 són més gruixudes o especials -->
+                <!-- MARQUES DE MINUTS I HORES (FLIEGER TYPE A) -->
+                <g stroke="#ffffff" stroke-width="3" stroke-linecap="round">
+                    <!-- Marques principals cada 5 minuts (30º) -->
+                    <line x1="200" y1="74" x2="200" y2="88" />
+                    <line x1="263" y1="91" x2="256" y2="103" />
+                    <line x1="309" y1="137" x2="297" y2="144" />
+                    <line x1="326" y1="200" x2="312" y2="200" />
+                    <line x1="309" y1="263" x2="297" y2="256" />
+                    <line x1="263" y1="309" x2="256" y2="297" />
+                    <line x1="200" y1="326" x2="200" y2="312" />
+                    <line x1="137" y1="309" x2="144" y2="297" />
+                    <line x1="91" y1="263" x2="103" y2="256" />
+                    <line x1="74" y1="200" x2="88" y2="200" />
+                    <line x1="91" y1="137" x2="103" y2="144" />
+                    <line x1="137" y1="91" x2="144" y2="103" />
+                </g>
+
+                <!-- Sub-marques fines de minuts -->
+                <circle cx="200" cy="200" r="122" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="1 5.38" opacity="0.7" />
+
+                <!-- TRIANGLE AMB DOS PUNTS A LES 12H (Flieger Classic) -->
                 <g fill="#ffffff">
-                    <!-- Triangle a les 12 -->
-                    <polygon points="182,100 218,100 200,125" />
-                    
-                    <!-- Batons per a la resta d'hores -->
-                    <!-- 1, 2, 4, 5, 7, 8, 10, 11 -->
-                    <rect x="250" y="107" width="8" height="24" transform="rotate(30, 254, 119)" />
-                    <rect x="285" y="145" width="8" height="24" transform="rotate(60, 289, 157)" />
-                    
-                    <rect x="285" y="231" width="8" height="24" transform="rotate(-60, 289, 243)" />
-                    <rect x="250" y="269" width="8" height="24" transform="rotate(-30, 254, 281)" />
-                    
-                    <rect x="142" y="269" width="8" height="24" transform="rotate(30, 146, 281)" />
-                    <rect x="107" y="231" width="8" height="24" transform="rotate(60, 111, 243)" />
-                    
-                    <rect x="107" y="145" width="8" height="24" transform="rotate(-60, 111, 157)" />
-                    <rect x="142" y="107" width="8" height="24" transform="rotate(-30, 146, 119)" />
+                    <polygon points="200,80 190,98 210,98" />
+                    <circle cx="183" cy="84" r="3" />
+                    <circle cx="217" cy="84" r="3" />
                 </g>
 
-                <!-- Números (1 a 12) estil militar -->
-                <g fill="#ffffff" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="34" text-anchor="middle" dominant-baseline="central">
-                    <text x="200" y="148">12</text>
-                    <text x="255" y="158">1</text>
-                    <text x="290" y="205">2</text>
-                    <text x="278" y="268">3</text>
-                    <text x="238" y="305">4</text>
-                    <text x="200" y="315">5</text>
-                    <text x="162" y="305">6</text>
-                    <text x="122" y="268">7</text>
-                    <text x="110" y="205">8</text>
-                    <text x="145" y="158">9</text>
-                    <text x="118" y="165">10</text>
-                    <text x="150" y="130">11</text>
+                <!-- MARCADOR DE DUES BARS A LES 11H -->
+                <rect x="139" y="90" width="4" height="16" fill="#fff" transform="rotate(-30 141 98)" />
+                <rect x="145" y="87" width="4" height="16" fill="#fff" transform="rotate(-30 147 95)" />
+
+                <!-- NÚMEROS FLIEGER (Grans i clars) -->
+                <g fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="28" text-anchor="middle" dominant-baseline="central">
+                    <text x="250" y="128">2</text>
+                    <text x="150" y="128">10</text>
+                    <text x="272" y="200"> </text> <!-- Reservat per a la data -->
+                    <text x="126" y="200">9</text>
+                    <text x="252" y="268">4</text>
+                    <text x="148" y="268">8</text>
+                    <text x="200" y="288">6</text>
+                    <text x="210" y="280">5</text>
+                    <text x="190" y="280">7</text>
                 </g>
 
-                <!-- Text "VEN 18" -->
-                <text x="245" y="225" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="22" text-anchor="middle">VEN 18</text>
+                <!-- TEXT DIA I DATA (Ex. VEN 18) -->
+                <text id="dateText" x="255" y="201" fill="#ffffff" font-family="-apple-system, Arial, sans-serif" font-weight="bold" font-size="20" text-anchor="middle" dominant-baseline="central">VEN 18</text>
 
-                <!-- Agulles (Hands) -->
-                <!-- Agulla de les hores (aprox a les 10) -->
-                <g transform="rotate(-55, 200, 200)">
-                    <!-- Forma d'espasa -->
-                    <polygon points="188,200 212,200 206,120 194,120" fill="var(--luminous)" filter="url(#glow)"/>
-                    <!-- Nucli fosc -->
-                    <polygon points="195,195 205,195 202,130 198,130" fill="#1a1a1a" />
+                <!-- AGULLA DE LES HORES -->
+                <g id="hourHand">
+                    <path d="M 194 200 L 197 125 C 197 120, 203 120, 203 125 L 206 200 Z" fill="#ffffff"/>
+                    <path d="M 197 195 L 199 135 L 201 135 L 203 195 Z" fill="#1c2127"/>
                 </g>
 
-                <!-- Agulla dels minuts (aprox a les 2) -->
-                <g transform="rotate(65, 200, 200)">
-                    <polygon points="190,200 210,200 205,95 195,95" fill="var(--luminous)" filter="url(#glow)"/>
-                    <polygon points="196,195 204,195 202,105 198,105" fill="#1a1a1a" />
+                <!-- AGULLA DELS MINUTS -->
+                <g id="minuteHand">
+                    <path d="M 195 200 L 198 90 C 198 85, 202 85, 202 90 L 205 200 Z" fill="#ffffff"/>
+                    <path d="M 198 195 L 199 100 L 201 100 L 202 195 Z" fill="#1c2127"/>
                 </g>
 
-                <!-- Agulla dels segons (aprox a les 7) -->
-                <g transform="rotate(215, 200, 200)">
-                    <line x1="200" y1="240" x2="200" y2="90" stroke="var(--luminous)" stroke-width="2" filter="url(#glow)"/>
-                    <!-- Contrapès -->
-                    <circle cx="200" cy="235" r="5" fill="var(--luminous)" />
+                <!-- AGULLA DELS SEGONS (VERMELLA FINA I AMB PUNTA DE FLETXA) -->
+                <g id="secondHand">
+                    <!-- Cos de l'agulla fina vermella -->
+                    <line x1="200" y1="225" x2="200" y2="82" stroke="#e63946" stroke-width="1.8" stroke-linecap="round"/>
+                    <!-- Punta de fletxa vermella al final -->
+                    <polygon points="200,72 194,82 206,82" fill="#e63946"/>
+                    <!-- Contrapès circular vermell -->
+                    <circle cx="200" cy="220" r="4" fill="#e63946"/>
                 </g>
 
-                <!-- Pivot central -->
-                <circle cx="200" cy="200" r="7" fill="#1a1a1a" stroke="var(--luminous)" stroke-width="2" />
+                <!-- PIVOT CENTRAL -->
+                <circle cx="200" cy="200" r="6" fill="#ffffff" />
+                <circle cx="200" cy="200" r="3" fill="#111111" />
             </svg>
         </div>
 
         <!-- CALENDARI MENSUAL -->
         <div class="calendar-wrapper">
             <div class="calendar-header" id="monthYear"></div>
-            <div class="calendar-grid" id="calendarGrid">
-                <!-- Els dies s'injectaran amb JS -->
-            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- ACTUALITZACIÓ DEL RELLOTGE I AGULLES ---
+            const hourHand = document.getElementById('hourHand');
+            const minuteHand = document.getElementById('minuteHand');
+            const secondHand = document.getElementById('secondHand');
+            const dateText = document.getElementById('dateText');
+
+            const daysOfWeek = ["DIUM", "DILL", "DIM", "DIMC", "DIJ", "VEN", "DISS"];
+
+            function updateClock() {
+                const now = new Date();
+                const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+                const minutes = now.getMinutes() + seconds / 60;
+                const hours = (now.getHours() % 12) + minutes / 60;
+
+                const secondDeg = seconds * 6;  // 360 / 60
+                const minuteDeg = minutes * 6;  // 360 / 60
+                const hourDeg = hours * 30;     // 360 / 12
+
+                secondHand.setAttribute('transform', `rotate(${secondDeg}, 200, 200)`);
+                minuteHand.setAttribute('transform', `rotate(${minuteDeg}, 200, 200)`);
+                hourHand.setAttribute('transform', `rotate(${hourDeg}, 200, 200)`);
+
+                // Text del dia/data
+                const dayName = daysOfWeek[now.getDay()];
+                const dayNum = now.getDate();
+                dateText.textContent = `${dayName} ${dayNum}`;
+
+                requestAnimationFrame(updateClock);
+            }
+
+            requestAnimationFrame(updateClock);
+
+            // --- CALENDARI MENSUAL ---
             const monthYearEl = document.getElementById('monthYear');
             const gridEl = document.getElementById('calendarGrid');
             
             const today = new Date();
             const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth(); // 0-11
+            const currentMonth = today.getMonth();
             const currentDate = today.getDate();
 
-            // Noms dels mesos en català
             const monthNames = [
                 "Gener", "Febrer", "Març", "Abril", "Maig", "Juny",
                 "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"
             ];
-
-            // Noms dels dies de la setmana (Començant per Dilluns)
             const dayNames = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
 
-            // Mostrar capçalera
             monthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-            // Crear capçaleres dels dies
             dayNames.forEach(day => {
                 const dayHeader = document.createElement('div');
                 dayHeader.classList.add('day-name');
@@ -340,28 +342,21 @@
                 gridEl.appendChild(dayHeader);
             });
 
-            // Obtenir el primer dia del mes
             let firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            // Ajustar perquè Dilluns sigui 0 i Diumenge sigui 6 (estàndard europeu)
             let offset = firstDay === 0 ? 6 : firstDay - 1;
-
-            // Obtenir el nombre de dies del mes
             let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-            // Afegir cel·les buides per als dies abans del dia 1
             for (let i = 0; i < offset; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.classList.add('day', 'empty');
                 gridEl.appendChild(emptyCell);
             }
 
-            // Afegir els dies del mes
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayCell = document.createElement('div');
                 dayCell.classList.add('day');
                 dayCell.textContent = day;
 
-                // Marcar el dia actual en curs
                 if (day === currentDate) {
                     dayCell.classList.add('active');
                 }
