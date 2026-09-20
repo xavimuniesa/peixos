@@ -2,47 +2,42 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escut heràldic 3D — donec perficiam</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rellotge de Pèndol 3D — Catalunya · Donec Perficiam</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
     height: 100dvh;
     width: 100vw;
-    background: radial-gradient(ellipse at 50% 30%, #1a2340 0%, #0a1024 45%, #030509 100%);
+    background: radial-gradient(ellipse at 50% 35%, #16203a 0%, #080e20 55%, #02030a 100%);
     overflow: hidden;
-    font-family: 'Cinzel', serif;
     display: flex;
     justify-content: center;
     align-items: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: Georgia, serif;
   }
 
   .scene {
-    width: min(95vw, 90vh);
-    aspect-ratio: 5 / 7;
-    perspective: 1600px;
+    width: min(90vw, 78vh);
+    aspect-ratio: 1024 / 1536;
+    perspective: 2000px;
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
   }
 
   /* Contenidor que gira */
-  .shield-3d {
+  .flip-3d {
     width: 100%;
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    animation: girar 7s linear infinite;
+    transition: transform 5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
     transform: rotateY(0deg);
-  }
-
-  @keyframes girar {
-    0%   { transform: rotateY(0deg); }
-    100% { transform: rotateY(360deg); }
   }
 
   /* Contenidor de les capes de volum */
@@ -58,409 +53,328 @@
     position: absolute;
     inset: 0;
     clip-path: url(#shieldClip);
-    background: radial-gradient(ellipse at 42% 35%, 
-      #fff4c4 0%, 
-      #f0c65c 22%, 
-      #d4af37 45%, 
-      #b8860b 68%, 
-      #6b4c05 88%, 
+    background: radial-gradient(ellipse at 42% 38%,
+      #fff4c4 0%,
+      #f0c65c 20%,
+      #d4af37 45%,
+      #b8860b 68%,
+      #6b4c05 88%,
       #3a2705 100%);
   }
 
-  /* Cara frontal: l'escut detallat */
-  .face-front {
+  /* Cares (anvers i revers) */
+  .face {
     position: absolute;
     inset: 0;
-    transform: translateZ(17px);
     backface-visibility: hidden;
+    clip-path: url(#shieldClip);
     display: flex;
     justify-content: center;
     align-items: center;
-    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6));
+    overflow: hidden;
   }
-  .face-front svg {
+
+  .face img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+    pointer-events: none;
+  }
+
+  /* Anvers: rellotge */
+  .face-front {
+    transform: translateZ(18px);
+  }
+
+  /* Revers: escut (girat 180°) */
+  .face-back {
+    transform: rotateY(180deg) translateZ(18px);
+  }
+
+  /* Contenidor del rellotge que gira les busques */
+  .clock-overlay {
+    position: absolute;
+    /* Centrat sobre l'esfera del rellotge — ajustat per a la imatge donada */
+    top: 25.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56%;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .clock-overlay svg {
     width: 100%;
     height: 100%;
     display: block;
     overflow: visible;
   }
 
-  /* Cara posterior: metall daurat sòlid */
-  .face-back {
-    position: absolute;
-    inset: 0;
-    transform: rotateY(180deg) translateZ(17px);
-    backface-visibility: hidden;
-    clip-path: url(#shieldClip);
-    background: radial-gradient(ellipse at 40% 30%, 
-      #fff4c4 0%, 
-      #f0c65c 25%, 
-      #c9a227 55%, 
-      #8a6d1f 80%, 
-      #4a3510 100%);
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+  .agulla {
+    transform-origin: 100px 100px;
+    transition: transform 0.2s cubic-bezier(0.4, 2.4, 0.6, 1);
+  }
+  .agulla-segons {
+    transition: transform 0.15s cubic-bezier(0.4, 2.4, 0.6, 1);
   }
 
-  /* Reflex suau al revers perquè no sigui pla */
-  .face-back::after {
-    content: '';
-    position: absolute;
-    inset: 12%;
-    clip-path: url(#shieldClip);
-    background: radial-gradient(ellipse at 60% 40%, rgba(255,255,255,0.25), transparent 60%);
-    opacity: 0.5;
+  /* Indicador per saber si està girant */
+  .flip-3d.girant {
+    pointer-events: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .shield-3d { animation: none; }
+    .flip-3d { transition: none; }
   }
 </style>
 </head>
 <body>
 
-<!-- Clip-path de la forma de l'escut (inclou la cinta superior) -->
-<svg width="0" height="0" style="position:absolute">
+<!-- Clip-path amb la silueta de l'escut (cinta + cos punxegut + ornament superior) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <clipPath id="shieldClip" clipPathUnits="objectBoundingBox">
       <path d="
-        M 0.10,0.02
-        L 0.90,0.02
-        L 0.90,0.55
-        C 0.90,0.78 0.75,0.92 0.50,0.97
-        C 0.25,0.92 0.10,0.78 0.10,0.55
+        M 0.42,0.00
+        L 0.58,0.00
+        L 0.58,0.03
+        L 0.62,0.04
+        L 0.62,0.07
+        L 0.58,0.09
+        L 0.58,0.12
+        L 0.85,0.13
+        L 0.90,0.17
+        L 0.92,0.22
+        L 0.92,0.55
+        C 0.92,0.78 0.78,0.92 0.50,0.98
+        C 0.22,0.92 0.08,0.78 0.08,0.55
+        L 0.08,0.22
+        L 0.10,0.17
+        L 0.15,0.13
+        L 0.42,0.12
+        L 0.42,0.09
+        L 0.38,0.07
+        L 0.38,0.04
+        L 0.42,0.03
         Z" />
     </clipPath>
   </defs>
 </svg>
 
-<div class="scene">
-  <div class="shield-3d" id="shield3d">
+<div class="scene" id="scene">
+  <div class="flip-3d" id="flip3d">
     <!-- Capes de volum (generades per JS) -->
     <div class="vol-container" id="volContainer"></div>
 
-    <!-- Cara frontal: l'escut complet -->
-    <div class="face-front">
-      <svg viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <!-- Gradients daurats -->
-          <linearGradient id="orVora" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#f8e6a0"/>
-            <stop offset="35%" stop-color="#e6c46a"/>
-            <stop offset="65%" stop-color="#b8860b"/>
-            <stop offset="100%" stop-color="#5a3d08"/>
-          </linearGradient>
-
-          <radialGradient id="orRelleu" cx="38%" cy="32%" r="70%">
-            <stop offset="0%" stop-color="#fff6d0"/>
-            <stop offset="45%" stop-color="#e6c46a"/>
-            <stop offset="80%" stop-color="#a87d15"/>
-            <stop offset="100%" stop-color="#5a3d08"/>
-          </radialGradient>
-
-          <linearGradient id="orSenyera" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#f8dc6e"/>
-            <stop offset="50%" stop-color="#e0b93a"/>
-            <stop offset="100%" stop-color="#a87d15"/>
-          </linearGradient>
-
-          <linearGradient id="blauFosc" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#2a4a8a"/>
-            <stop offset="55%" stop-color="#142d5e"/>
-            <stop offset="100%" stop-color="#0a1a3a"/>
-          </linearGradient>
-
-          <radialGradient id="solCara" cx="42%" cy="38%" r="65%">
-            <stop offset="0%" stop-color="#fff8d0"/>
-            <stop offset="60%" stop-color="#e6c46a"/>
-            <stop offset="100%" stop-color="#8a6d1f"/>
-          </radialGradient>
-
-          <radialGradient id="llunaCara" cx="38%" cy="35%" r="75%">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="55%" stop-color="#d8d8e0"/>
-            <stop offset="100%" stop-color="#8a8a98"/>
-          </radialGradient>
-
-          <radialGradient id="ivori" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="100%" stop-color="#e8e0cc"/>
-          </radialGradient>
-
-          <!-- Filtre de textura metàl·lica -->
-          <filter id="texturaOr" x="-10%" y="-10%" width="120%" height="120%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="soroll"/>
-            <feColorMatrix in="soroll" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.4 0.4 0.4 0 0" result="sorollA"/>
-            <feComposite in="sorollA" in2="SourceGraphic" operator="in" result="sorollRetallat"/>
-            <feBlend in="SourceGraphic" in2="sorollRetallat" mode="multiply"/>
-          </filter>
-
-          <!-- Clip intern per retallar els continguts dins l'escut -->
-          <clipPath id="interiorEscut">
-            <path d="M 62,72 L 338,72 L 338,300 C 338,405 275,478 200,512 C 125,478 62,405 62,300 Z"/>
-          </clipPath>
-        </defs>
-
-        <!-- ====== FONS (per si les capes no tapen alguna zona) ====== -->
-        <rect x="0" y="0" width="400" height="560" fill="transparent"/>
-
-        <!-- ====== CONTINGUT INTERN DE L'ESCUT ====== -->
-        <g clip-path="url(#interiorEscut)">
-
-          <!-- Fons base fosc -->
-          <rect x="60" y="70" width="280" height="450" fill="#0a0a0a"/>
-
-          <!-- ====== QUADRANT SUPERIOR ESQUERRA: Creu de Sant Jordi ====== -->
-          <rect x="62" y="72" width="118" height="108" fill="url(#ivori)"/>
-          <rect x="92" y="72" width="30" height="108" fill="#c8102e"/>
-          <rect x="62" y="102" width="118" height="30" fill="#c8102e"/>
-          <!-- Rivets daurats a la creu -->
-          <circle cx="107" cy="87" r="3" fill="url(#orRelleu)" stroke="#4a3510" stroke-width="0.5"/>
-          <circle cx="107" cy="132" r="3" fill="url(#orRelleu)" stroke="#4a3510" stroke-width="0.5"/>
-
-          <!-- ====== QUADRANT SUPERIOR CENTRAL: Senyera amb estrella ====== -->
-          <rect x="180" y="72" width="92" height="108" fill="url(#orSenyera)"/>
-          <!-- Barres vermelles -->
-          <rect x="180" y="85" width="92" height="11" fill="#c8102e"/>
-          <rect x="180" y="107" width="92" height="11" fill="#c8102e"/>
-          <rect x="180" y="129" width="92" height="11" fill="#c8102e"/>
-          <rect x="180" y="151" width="92" height="11" fill="#c8102e"/>
-          <!-- Estrella blanca sobre fons blau (corona d'Aragó) -->
-          <rect x="180" y="72" width="92" height="22" fill="#1a3a6b"/>
-          <polygon points="226,76 229,85 239,85 231,91 234,100 226,95 218,100 221,91 213,85 223,85" 
-                   fill="#ffffff" stroke="#4a3510" stroke-width="0.4"/>
-
-          <!-- ====== QUADRANT SUPERIOR DRETA: Sol amb rostre ====== -->
-          <rect x="272" y="72" width="66" height="108" fill="url(#blauFosc)"/>
-          <!-- Sol -->
-          <g transform="translate(305, 126)">
-            <!-- Raigs (16 puntes) -->
-            <g fill="#e0b93a" stroke="#8a6d1f" stroke-width="0.4">
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(0)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(22.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(45)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(67.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(90)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(112.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(135)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(157.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(180)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(202.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(225)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(247.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(270)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(292.5)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(315)"/>
-              <polygon points="0,-42 -3,-30 3,-30" transform="rotate(337.5)"/>
-            </g>
-            <!-- Disc solar -->
-            <circle r="22" fill="url(#solCara)" stroke="#6b4c05" stroke-width="1"/>
-            <!-- Rostre humà -->
-            <g stroke="#6b4c05" stroke-width="1.2" fill="none" stroke-linecap="round">
-              <!-- celles -->
-              <path d="M -10,-6 Q -6,-9 -2,-7"/>
-              <path d="M 10,-6 Q 6,-9 2,-7"/>
-              <!-- ulls -->
-              <ellipse cx="-6" cy="-2" rx="1.6" ry="2.2" fill="#4a3510" stroke="none"/>
-              <ellipse cx="6" cy="-2" rx="1.6" ry="2.2" fill="#4a3510" stroke="none"/>
-              <!-- nas -->
-              <path d="M 0,-2 L -0.8,4 L 1,4.5"/>
-              <!-- boca -->
-              <path d="M -4,8 Q 0,11 4,8"/>
-              <!-- celles reforç -->
-              <path d="M -9,7 Q -4,9 0,7" stroke-width="0.6"/>
-            </g>
+    <!-- Anvers: rellotge -->
+    <div class="face face-front">
+      <img src="rellotge.png" alt="Rellotge de pèndol Catalunya">
+      <!-- Superposició SVG amb les busques funcionals -->
+      <div class="clock-overlay">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Agulla de les hores -->
+          <g class="agulla agulla-hores" id="agullaHores">
+            <line x1="100" y1="100" x2="100" y2="55"
+                  stroke="#1a0f05" stroke-width="3.2" stroke-linecap="round"/>
+            <circle cx="100" cy="55" r="2.5" fill="#1a0f05"/>
           </g>
-
-          <!-- ====== QUADRANT MIG ESQUERRA: Senyera amb maça ====== -->
-          <rect x="62" y="180" width="180" height="202" fill="url(#orSenyera)"/>
-          <!-- Barres vermelles de la Senyera -->
-          <rect x="62" y="198" width="180" height="16" fill="#c8102e"/>
-          <rect x="62" y="230" width="180" height="16" fill="#c8102e"/>
-          <rect x="62" y="262" width="180" height="16" fill="#c8102e"/>
-          <rect x="62" y="294" width="180" height="16" fill="#c8102e"/>
-          <rect x="62" y="326" width="180" height="16" fill="#c8102e"/>
-          <rect x="62" y="358" width="180" height="16" fill="#c8102e"/>
-
-          <!-- Maça / flagell (arma) -->
-          <g transform="translate(150, 280) rotate(-35)">
-            <!-- Mànec -->
-            <rect x="-4" y="0" width="8" height="70" fill="url(#orVora)" stroke="#3a2705" stroke-width="0.6"/>
-            <!-- Anells del mànec -->
-            <rect x="-5" y="15" width="10" height="2" fill="#8a6d1f"/>
-            <rect x="-5" y="35" width="10" height="2" fill="#8a6d1f"/>
-            <rect x="-5" y="55" width="10" height="2" fill="#8a6d1f"/>
-            <!-- Cap esfèric amb pues -->
-            <circle cx="0" cy="-8" r="14" fill="url(#orRelleu)" stroke="#3a2705" stroke-width="0.8"/>
-            <!-- Pues radials -->
-            <g fill="url(#orVora)" stroke="#3a2705" stroke-width="0.5">
-              <polygon points="0,-38 -3,-26 3,-26"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(45)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(90)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(135)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(180)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(225)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(270)"/>
-              <polygon points="0,-38 -3,-26 3,-26" transform="rotate(315)"/>
-            </g>
-            <circle cx="0" cy="-8" r="4" fill="#8a6d1f" stroke="#3a2705" stroke-width="0.5"/>
+          <!-- Agulla dels minuts -->
+          <g class="agulla agulla-minuts" id="agullaMinuts">
+            <line x1="100" y1="100" x2="100" y2="35"
+                  stroke="#1a0f05" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="100" cy="35" r="2" fill="#1a0f05"/>
           </g>
-
-          <!-- ====== QUADRANT MIG DRETA: Lluna amb rostre i estrelles ====== -->
-          <rect x="242" y="180" width="96" height="202" fill="url(#blauFosc)"/>
-
-          <!-- Estrelles de 4 puntes -->
-          <g fill="url(#orRelleu)" stroke="#6b4c05" stroke-width="0.4">
-            <polygon points="272,218 274,226 282,228 274,230 272,238 270,230 262,228 270,226"/>
-            <polygon points="308,258 310,266 318,268 310,270 308,278 306,270 298,268 306,266"/>
-            <polygon points="258,308 260,316 268,318 260,320 258,328 256,320 248,318 256,316"/>
-            <polygon points="308,332 310,340 318,342 310,344 308,352 306,344 298,342 306,340"/>
-          </g>
-
-          <!-- Lluna amb rostre -->
-          <g transform="translate(292, 300)">
-            <!-- Disc lunar -->
-            <circle r="30" fill="url(#llunaCara)" stroke="#4a3510" stroke-width="0.8"/>
-            <!-- Ombra creixent (fosca) -->
-            <path d="M -10,-28 C -28,-15 -28,15 -10,28 C -22,22 -32,8 -32,-2 C -32,-14 -22,-26 -10,-28 Z" 
-                  fill="#2a3050" opacity="0.6"/>
-            <!-- Rostre a la part il·luminada -->
-            <g stroke="#4a3510" stroke-width="1" fill="none" stroke-linecap="round">
-              <path d="M 4,-8 Q 8,-11 12,-9"/>
-              <ellipse cx="8" cy="-3" rx="1.4" ry="1.8" fill="#4a3510" stroke="none"/>
-              <path d="M 8,2 L 6,7 L 9,7.5"/>
-              <path d="M 3,12 Q 8,15 13,12"/>
-            </g>
-          </g>
-
-          <!-- ====== QUADRANT INFERIOR: Senyera amb morter i mà de morter ====== -->
-          <rect x="62" y="382" width="276" height="140" fill="url(#orSenyera)"/>
-          <!-- Barres vermelles -->
-          <rect x="62" y="400" width="276" height="18" fill="#c8102e"/>
-          <rect x="62" y="438" width="276" height="18" fill="#c8102e"/>
-          <rect x="62" y="476" width="276" height="18" fill="#c8102e"/>
-
-          <!-- Morter i mà de morter -->
-          <g transform="translate(200, 460)">
-            <!-- Base del morter -->
-            <path d="M -30,5 L -26,30 L 26,30 L 30,5 Z" fill="url(#orVora)" stroke="#3a2705" stroke-width="1"/>
-            <!-- Vora superior -->
-            <ellipse cx="0" cy="5" rx="30" ry="7" fill="url(#orRelleu)" stroke="#3a2705" stroke-width="1"/>
-            <ellipse cx="0" cy="5" rx="24" ry="5" fill="#3a2705" opacity="0.6"/>
-            <!-- Vora inferior -->
-            <ellipse cx="0" cy="30" rx="26" ry="5" fill="url(#orVora)" stroke="#3a2705" stroke-width="0.8"/>
-            <!-- Decoracions del morter -->
-            <path d="M -22,12 L 22,12" stroke="#8a6d1f" stroke-width="0.8"/>
-            <path d="M -20,22 L 20,22" stroke="#8a6d1f" stroke-width="0.8"/>
-            <!-- Mà de morter -->
-            <g transform="rotate(20, 10, -20)">
-              <rect x="10" y="-40" width="6" height="42" fill="url(#orVora)" stroke="#3a2705" stroke-width="0.6"/>
-              <circle cx="13" cy="-42" r="5" fill="url(#orRelleu)" stroke="#3a2705" stroke-width="0.6"/>
-            </g>
-          </g>
-
-          <!-- ====== LÍNIES DIVISÒRIES ====== -->
-          <line x1="62" y1="180" x2="338" y2="180" stroke="url(#orVora)" stroke-width="3"/>
-          <line x1="62" y1="382" x2="338" y2="382" stroke="url(#orVora)" stroke-width="3"/>
-          <line x1="180" y1="72" x2="180" y2="180" stroke="url(#orVora)" stroke-width="3"/>
-          <line x1="270" y1="72" x2="270" y2="180" stroke="url(#orVora)" stroke-width="3"/>
-          <line x1="242" y1="180" x2="242" y2="382" stroke="url(#orVora)" stroke-width="3"/>
-
-          <!-- Vora interior decorativa -->
-          <path d="M 62,72 L 338,72 L 338,300 C 338,405 275,478 200,512 C 125,478 62,405 62,300 Z" 
-                fill="none" stroke="url(#orRelleu)" stroke-width="4"/>
-        </g>
-
-        <!-- ====== VORA EXTERIOR DAURADA ====== -->
-        <path d="M 40,50 L 360,50 L 360,300 C 360,420 290,505 200,545 C 110,505 40,420 40,300 Z" 
-              fill="none" stroke="url(#orVora)" stroke-width="14" stroke-linejoin="round"/>
-        <path d="M 40,50 L 360,50 L 360,300 C 360,420 290,505 200,545 C 110,505 40,420 40,300 Z" 
-              fill="none" stroke="#3a2705" stroke-width="1.5" stroke-linejoin="round" filter="url(#texturaOr)"/>
-
-        <!-- ====== REBLONS A LA VORA ====== -->
-        <g fill="url(#orRelleu)" stroke="#3a2705" stroke-width="1">
-          <circle cx="46" cy="100" r="6"/>
-          <circle cx="46" cy="180" r="6"/>
-          <circle cx="46" cy="260" r="6"/>
-          <circle cx="50" cy="340" r="6"/>
-          <circle cx="65" cy="415" r="6"/>
-          <circle cx="100" cy="475" r="6"/>
-          <circle cx="150" cy="515" r="6"/>
-          <circle cx="200" cy="535" r="6"/>
-          <circle cx="250" cy="515" r="6"/>
-          <circle cx="300" cy="475" r="6"/>
-          <circle cx="335" cy="415" r="6"/>
-          <circle cx="350" cy="340" r="6"/>
-          <circle cx="354" cy="260" r="6"/>
-          <circle cx="354" cy="180" r="6"/>
-          <circle cx="354" cy="100" r="6"/>
-        </g>
-
-        <!-- ====== CINTA SUPERIOR AMB "DONEC PERFICIAM" ====== -->
-        <g>
-          <!-- Forma principal de la cinta -->
-          <path d="M 55,45 Q 55,12 90,12 L 310,12 Q 345,12 345,45 L 345,68 Q 345,80 330,80 L 70,80 Q 55,80 55,68 Z" 
-                fill="url(#orVora)" stroke="#3a2705" stroke-width="1.5"/>
-          <!-- Vores decoratives -->
-          <path d="M 60,48 Q 60,18 90,18 L 310,18 Q 340,18 340,48" 
-                fill="none" stroke="#fff4c4" stroke-width="1" opacity="0.6"/>
-          <!-- Rínxols laterals esquerra -->
-          <path d="M 55,45 Q 35,40 30,55 Q 26,72 42,74 Q 52,72 58,62" 
-                fill="url(#orVora)" stroke="#3a2705" stroke-width="1"/>
-          <path d="M 42,74 Q 50,78 55,68" fill="none" stroke="#3a2705" stroke-width="0.6"/>
-          <!-- Rínxols laterals dreta -->
-          <path d="M 345,45 Q 365,40 370,55 Q 374,72 358,74 Q 348,72 342,62" 
-                fill="url(#orVora)" stroke="#3a2705" stroke-width="1"/>
-          <path d="M 358,74 Q 350,78 345,68" fill="none" stroke="#3a2705" stroke-width="0.6"/>
-          <!-- Text -->
-          <text x="200" y="55" text-anchor="middle" 
-                font-family="'UnifrakturMaguntia', 'Cinzel', serif" 
-                font-size="30" font-weight="400" 
-                fill="#1a0a00" 
-                style="letter-spacing:1px">donec perficiam</text>
-        </g>
-
-        <!-- ====== ORNAMENT SUPERIOR (esfera daurada) ====== -->
-        <g transform="translate(200, 8)">
-          <circle r="10" fill="url(#orRelleu)" stroke="#3a2705" stroke-width="1"/>
-          <circle r="4" fill="#3a2705"/>
-          <circle cx="-3" cy="-3" r="2" fill="#fff4c4" opacity="0.7"/>
-        </g>
-
-        <!-- ====== FILIGRANA sobre la vora superior de l'escut ====== -->
-        <path d="M 40,50 Q 30,42 40,30 Q 55,22 70,30" fill="none" stroke="url(#orVora)" stroke-width="2.5"/>
-        <path d="M 360,50 Q 370,42 360,30 Q 345,22 330,30" fill="none" stroke="url(#orVora)" stroke-width="2.5"/>
-      </svg>
+          <!-- Centre daurat -->
+          <circle cx="100" cy="100" r="4.5" fill="#8a6d1f"/>
+          <circle cx="100" cy="100" r="2.5" fill="#f0c65c"/>
+          <circle cx="99" cy="99" r="1" fill="#fff4c4" opacity="0.8"/>
+        </svg>
+      </div>
     </div>
 
-    <!-- Cara posterior: metall daurat massís -->
-    <div class="face-back"></div>
+    <!-- Revers: escut -->
+    <div class="face face-back">
+      <img src="escut.png" alt="Escut heràldic Donec Perficiam">
+    </div>
   </div>
 </div>
 
 <script>
-  // Generem les capes de volum per simular el gruix de l'escut
+(function () {
+  // ==================== GENERACIÓ DEL VOLUM 3D ====================
   (function generaVolum() {
     const contenidor = document.getElementById('volContainer');
     if (!contenidor) return;
 
-    const totalCapes = 22;       // Nombre de capes (més = més suau)
-    const gruixTotal = 34;       // Profunditat total en px (de -17 a +17)
+    const totalCapes = 25;
+    const gruixTotal = 36;
 
     for (let i = 0; i < totalCapes; i++) {
       const capa = document.createElement('div');
       capa.className = 'vol-layer';
-
       const zPos = -gruixTotal / 2 + (i * (gruixTotal / (totalCapes - 1)));
       capa.style.transform = `translateZ(${zPos.toFixed(2)}px)`;
-
-      // Petita variació d'il·luminació cap al centre per accentuar el volum
       const foscor = Math.abs(zPos) / (gruixTotal / 2);
-      const opacitat = 1 - foscor * 0.15;
-      capa.style.opacity = opacitat.toFixed(2);
-
+      capa.style.opacity = (1 - foscor * 0.18).toFixed(2);
       contenidor.appendChild(capa);
     }
   })();
+
+  // ==================== GIR DE 180° EN CLICAR ====================
+  const flip3d = document.getElementById('flip3d');
+  const scene = document.getElementById('scene');
+
+  let rotacioActual = 0;
+  let girEnCurs = false;
+
+  function gira() {
+    if (girEnCurs) return;
+    girEnCurs = true;
+    flip3d.classList.add('girant');
+
+    // Sempre sumem 180° (mateix sentit de gir acumulatiu)
+    rotacioActual += 180;
+    flip3d.style.transform = `rotateY(${rotacioActual}deg)`;
+
+    // Tanquem el bloqueig quan acabi la transició (5s)
+    setTimeout(() => {
+      girEnCurs = false;
+      flip3d.classList.remove('girant');
+    }, 5000);
+  }
+
+  scene.addEventListener('click', gira);
+  scene.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    gira();
+  }, { passive: false });
+
+  // ==================== RELLOTGE EN TEMPS REAL ====================
+  const agullaHores = document.getElementById('agullaHores');
+  const agullaMinuts = document.getElementById('agullaMinuts');
+
+  function actualitzaRellotge() {
+    const ara = new Date();
+    const h = ara.getHours() % 12;
+    const m = ara.getMinutes();
+    const s = ara.getSeconds();
+
+    // Angle de les hores (amb desplaçament pels minuts)
+    const angHores = (h * 30) + (m * 0.5);
+    // Angle dels minuts (amb desplaçament pels segons)
+    const angMinuts = (m * 6) + (s * 0.1);
+
+    agullaHores.setAttribute('transform', `rotate(${angHores}, 100, 100)`);
+    agullaMinuts.setAttribute('transform', `rotate(${angMinuts}, 100, 100)`);
+  }
+
+  actualitzaRellotge();
+  setInterval(actualitzaRellotge, 1000);
+
+  // ==================== TIC-TAC DEL PÈNDOL ====================
+  // Web Audio API: crea un "tic" i un "tac" alternats cada segon
+  let audioCtx = null;
+  let audioIniciat = false;
+
+  function obtenirAudioCtx() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  // Crea un so curt metàl·lic (com l'escapament d'un rellotge de pèndol)
+  function reprodueixTic(esTic) {
+    const ctx = obtenirAudioCtx();
+    if (!ctx) return;
+
+    const ara = ctx.currentTime;
+
+    // El "tic" és lleugerament més agut que el "tac"
+    const freqBase = esTic ? 2400 : 2000;
+
+    // Component principal: oscil·lador curt
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freqBase, ara);
+    osc.frequency.exponentialRampToValueAtTime(freqBase * 0.6, ara + 0.03);
+
+    gain.gain.setValueAtTime(0.0001, ara);
+    gain.gain.linearRampToValueAtTime(0.08, ara + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0008, ara + 0.05);
+
+    // Filtre per donar-li caràcter metàl·lic i "clic"
+    const filtre = ctx.createBiquadFilter();
+    filtre.type = 'bandpass';
+    filtre.frequency.value = freqBase;
+    filtre.Q.value = 8;
+
+    osc.connect(filtre);
+    filtre.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ara);
+    osc.stop(ara + 0.06);
+
+    // Component de soroll curt per al "clac" mecànic
+    const bufferSize = Math.floor(ctx.sampleRate * 0.015);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 3);
+    }
+    const soroll = ctx.createBufferSource();
+    soroll.buffer = buffer;
+
+    const gainSoroll = ctx.createGain();
+    gainSoroll.gain.setValueAtTime(0.05, ara);
+    gainSoroll.gain.exponentialRampToValueAtTime(0.0001, ara + 0.02);
+
+    const filtreSoroll = ctx.createBiquadFilter();
+    filtreSoroll.type = 'highpass';
+    filtreSoroll.frequency.value = 3000;
+
+    soroll.connect(filtreSoroll);
+    filtreSoroll.connect(gainSoroll);
+    gainSoroll.connect(ctx.destination);
+
+    soroll.start(ara);
+    soroll.stop(ara + 0.02);
+  }
+
+  // Comença el tic-tac quan l'usuari interactua per primera vegada (política d'autoplay)
+  function iniciaTicTac() {
+    if (audioIniciat) return;
+    const ctx = obtenirAudioCtx();
+    if (!ctx) return;
+    audioIniciat = true;
+
+    let esTic = true;
+    // Sincronitzem amb el següent segon exacte
+    const ara = Date.now();
+    const msFinsSeguent = 1000 - (ara % 1000);
+
+    setTimeout(() => {
+      reprodueixTic(esTic);
+      esTic = !esTic;
+      setInterval(() => {
+        reprodueixTic(esTic);
+        esTic = !esTic;
+      }, 1000);
+    }, msFinsSeguent);
+  }
+
+  // Activem l'àudio al primer clic o toc
+  ['click', 'touchstart', 'keydown'].forEach(ev => {
+    document.addEventListener(ev, iniciaTicTac, { once: true, passive: true });
+  });
+
+})();
 </script>
 
 </body>
