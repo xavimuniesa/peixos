@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rellotge de Pèndol Clàssic</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #2c1d11 0%, #0f0a06 100%);
+            font-family: 'Playfair Display', serif;
+            user-select: none;
+        }
+
+        /* Classes per a la tipografia d'època */
+        .font-brand {
+            font-family: 'Cinzel', serif;
+        }
+        .font-script {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* Estils personalitzats de reflex de vidre */
+        .glass-reflection {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.25) 0%,
+                rgba(255, 255, 255, 0.05) 35%,
+                rgba(255, 255, 255, 0) 50%,
+                rgba(255, 255, 255, 0.08) 80%,
+                rgba(255, 255, 255, 0.15) 100%
+            );
+        }
+
+        /* Efecte de textura de fusta de caoba profunda */
+        .mahogany-wood {
+            background: 
+                radial-gradient(ellipse at 50% 20%, rgba(140, 50, 20, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    #3d1408,
+                    #3d1408 3px,
+                    #4a190a 3px,
+                    #4a190a 6px,
+                    #2b0d05 6px,
+                    #2b0d05 12px,
+                    #521d0c 12px,
+                    #521d0c 15px
+                );
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8), 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .brass-accent {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 2px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        /* Ombra de relleu per al tallat de fusta */
+        .carved-border {
+            border: 4px solid #230b04;
+            box-shadow: 
+                inset 2px 2px 4px rgba(255, 255, 255, 0.15),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.9),
+                0 4px 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-amber-100 overflow-hidden">
+
+    <!-- Banner d'activació d'àudio -->
+    <div id="audio-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center transition-opacity duration-500">
+        <div class="bg-gradient-to-b from-stone-900 to-stone-950 p-8 rounded-2xl border border-amber-600/40 max-w-md text-center shadow-2xl">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-900/40 flex items-center justify-center border border-amber-500/30">
+                <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-brand font-bold text-amber-200 mb-2">Rellotge de Pèndol Clàssic</h2>
+            <p class="text-stone-300 text-sm mb-6 leading-relaxed">
+                Per gaudir d'una experiència autèntica amb el so real del mètric "Tic-Tac" mecànic sintetitzat en temps real, activa l'àudio.
+            </p>
+            <button id="enable-audio-btn" class="w-full py-3 px-6 rounded-lg brass-accent text-amber-950 font-bold font-brand tracking-wider hover:brightness-110 active:scale-95 transition">
+                ACTIVAR ÀUDIO I ENTRAR
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenidor Principal del Rellotge -->
+    <div class="relative flex flex-col items-center my-auto scale-90 sm:scale-95 md:scale-100 transition-transform">
+
+        <!-- Marc Superior Arcades (Crestat de fusta esculpida) -->
+        <div class="w-80 sm:w-96 h-20 mahogany-wood rounded-t-full border-t-4 border-l-4 border-r-4 border-amber-950 flex flex-col items-center justify-center relative z-20 shadow-2xl carved-border">
+            <!-- Adorn d'or crestat central -->
+            <div class="w-12 h-6 border-b-2 border-amber-500/60 rounded-b-full flex items-center justify-center">
+                <div class="w-4 h-4 rounded-full brass-accent"></div>
+            </div>
+            <div class="w-3/4 h-1 mt-2 bg-gradient-to-r from-transparent via-amber-700/50 to-transparent"></div>
+        </div>
+
+        <!-- Cos Principal de Fusta de Caoba -->
+        <div class="w-80 sm:w-96 mahogany-wood border-x-4 border-amber-950 p-6 flex flex-col items-center relative z-10 shadow-2xl carved-border">
+
+            <!-- Vidre i Marc de la Porta de Vidre amb Vora Daurada -->
+            <div class="relative w-full rounded-b-xl overflow-hidden border-8 border-stone-900 bg-stone-950 shadow-inner flex flex-col items-center p-4">
+                
+                <!-- Borde de Fulla d'Or Ornamental Intern sobre Vidre -->
+                <div class="absolute inset-2 border-2 border-amber-500/40 rounded-lg pointer-events-none z-30"></div>
+                <div class="absolute inset-3 border border-amber-600/20 rounded pointer-events-none z-30"></div>
+
+                <!-- Capa de Reflex de Vidre Superior -->
+                <div class="absolute inset-0 glass-reflection pointer-events-none z-40"></div>
+
+                <!-- Panell Posterior de Vellut Fosc (Darrere de l'Esfera i Pèndol) -->
+                <div class="absolute inset-0 bg-radial from-stone-900 via-neutral-950 to-black z-0"></div>
+
+                <!-- Esfera del Rellotge -->
+                <div class="relative z-10 w-64 h-64 rounded-full bg-gradient-to-b from-amber-50 via-amber-100/90 to-amber-200/80 p-2 shadow-2xl border-4 border-amber-900 flex items-center justify-center">
+                    
+                    <!-- Anell Exterior de Làmina de Llautó -->
+                    <div class="absolute inset-1 rounded-full border-4 border-amber-600/70 shadow-inner pointer-events-none"></div>
+                    <div class="absolute inset-2 rounded-full border border-amber-900/40 pointer-events-none"></div>
+
+                    <!-- Superfície de l'Esfera amb Canvas de Dibuix de Manetes i Nombres -->
+                    <canvas id="clock-dial" width="240" height="240" class="relative z-10"></canvas>
+                </div>
+
+                <!-- Finestra Inferior del Pèndol -->
+                <div class="relative z-10 w-full h-56 mt-4 flex justify-center items-top overflow-hidden">
+                    <!-- Fons de vellut amb ombra de cavitat -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-neutral-950 to-black shadow-inner rounded-b-lg"></div>
+
+                    <!-- Canvas del Pèndol mòbil -->
+                    <canvas id="pendulum-canvas" width="260" height="220" class="relative z-10"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Base Inferior Motllurada -->
+        <div class="w-88 sm:w-104 h-16 mahogany-wood rounded-b-2xl border-b-4 border-l-4 border-r-4 border-amber-950 z-20 carved-border flex flex-col items-center justify-center">
+            <div class="w-4/5 h-2 brass-accent rounded-full opacity-80"></div>
+            <div class="w-2/3 h-1 bg-amber-950/80 mt-1"></div>
+        </div>
+
+        <!-- Botons de Control d'Àudio i Menú -->
+        <div class="mt-6 flex items-center gap-4 z-30">
+            <button id="mute-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-900/90 border border-amber-600/40 text-amber-200 hover:bg-stone-800 transition shadow-lg text-sm font-medium">
+                <svg id="sound-icon" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.586 5H4a1 1 0 00-1 1v8a1 1 0 001 1h2.586l4.707 4.707C11.923 20.337 13 19.891 13 19V5c0-.891-1.077-1.337-1.707-.707L7.586 9H5"/>
+                </svg>
+                <span id="mute-text">Silenciar So</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- GESTIÓ D'ÀUDIO AMB WEB AUDIO API ---
+        let audioCtx = null;
+        let isMuted = false;
+        let lastSecond = -1;
+
+        // Inicialització del context d'àudio
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Sintetitzador del so mecànic Tic-Tac
+        function playTickSound(isTock) {
+            if (isMuted || !audioCtx) return;
+
+            try {
+                const now = audioCtx.currentTime;
+
+                // Oscil·lador principal per a l'impacte metàl·lic/fusta
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                // Soroll blanc per simular el fregament del descarregador del pèndol
+                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms de soroll
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const noiseFilter = audioCtx.createBiquadFilter();
+                noiseFilter.type = 'bandpass';
+                
+                // Variació entre "TIC" i "TAC"
+                if (!isTock) {
+                    // TIC: Més agut i sec
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.015);
+                    
+                    noiseFilter.frequency.setValueAtTime(3000, now);
+                    noiseFilter.Q.setValueAtTime(3, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+                } else {
+                    // TAC: Lleugerament més greu i profund
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(250, now + 0.02);
+
+                    noiseFilter.frequency.setValueAtTime(1800, now);
+                    noiseFilter.Q.setValueAtTime(2, now);
+
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+                }
+
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.15, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+
+                // Connexió dels nodes d'àudio
+                osc.connect(gain);
+                noise.connect(noiseFilter);
+                noiseFilter.connect(noiseGain);
+
+                gain.connect(audioCtx.destination);
+                noiseGain.connect(audioCtx.destination);
+
+                osc.start(now);
+                noise.start(now);
+                osc.stop(now + 0.03);
+                noise.stop(now + 0.03);
+            } catch (e) {
+                console.error("Error reproduint so:", e);
+            }
+        }
+
+        // --- DIBUIX DE L'ESFERA DEL RELLOTGE (2D FRONT VIEW) ---
+        const dialCanvas = document.getElementById('clock-dial');
+        const dialCtx = dialCanvas.getContext('2d');
+
+        function drawClockDial(date) {
+            const width = dialCanvas.width;
+            const height = dialCanvas.height;
+            const radius = width / 2;
+
+            dialCtx.clearRect(0, 0, width, height);
+
+            dialCtx.save();
+            dialCtx.translate(radius, radius);
+
+            // 1. Text del Logotip "RHYTHM"
+            dialCtx.font = '700 13px "Cinzel", serif';
+            dialCtx.fillStyle = '#2b1810';
+            dialCtx.textAlign = 'center';
+            dialCtx.fillText('RHYTHM', 0, -radius * 0.42);
+
+            // Subtext "Westminster Chime"
+            dialCtx.font = 'italic 11px "Great Vibes", cursive';
+            dialCtx.fillStyle = '#5c3a21';
+            dialCtx.fillText('Westminster Chime', 0, radius * 0.45);
+
+            // 2. Marcadors de Minuts i Hores
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * Math.PI) / 30;
+                dialCtx.rotate(angle);
+
+                if (i % 5 === 0) {
+                    // Marcador d'hora principal
+                    dialCtx.beginPath();
+                    dialCtx.rect(-1.5, -radius + 14, 3, 8);
+                    dialCtx.fillStyle = '#1c0d02';
+                    dialCtx.fill();
+                } else {
+                    // Marcador de minut petit
+                    dialCtx.beginPath();
+                    dialCtx.arc(0, -radius + 16, 1, 0, Math.PI * 2);
+                    dialCtx.fillStyle = '#6e523c';
+                    dialCtx.fill();
+                }
+
+                dialCtx.rotate(-angle);
+            }
+
+            // 3. Números Àrabs Clàssics (1 - 12)
+            dialCtx.font = '600 21px "Playfair Display", serif';
+            dialCtx.fillStyle = '#1a0a03';
+            dialCtx.textBaseline = 'middle';
+            dialCtx.textAlign = 'center';
+
+            for (let num = 1; num <= 12; num++) {
+                const angle = (num * Math.PI) / 6;
+                const dist = radius * 0.71;
+                const x = Math.sin(angle) * dist;
+                const y = -Math.cos(angle) * dist;
+                dialCtx.fillText(num.toString(), x, y);
+            }
+
+            // Extracció del temps actual
+            const hours = date.getHours() % 12;
+            const minutes = date.getMinutes();
+            const seconds = date.getSeconds();
+            const milliseconds = date.getMilliseconds();
+
+            const smoothSeconds = seconds + milliseconds / 1000;
+            const smoothMinutes = minutes + smoothSeconds / 60;
+            const smoothHours = hours + smoothMinutes / 60;
+
+            // 4. Dibuix de Manetes Estil Barroc / Ornamentat
+            
+            // --- MANETA D'HORES ---
+            const hourAngle = (smoothHours * Math.PI) / 6;
+            drawOrnateHand(dialCtx, hourAngle, radius * 0.45, 6, '#110702');
+
+            // --- MANETA DE MINUTS ---
+            const minuteAngle = (smoothMinutes * Math.PI) / 30;
+            drawOrnateHand(dialCtx, minuteAngle, radius * 0.68, 4.5, '#110702');
+
+            // --- MANETA DE SEGONS (Delicada) ---
+            const secondAngle = (smoothSeconds * Math.PI) / 30;
+            dialCtx.save();
+            dialCtx.rotate(secondAngle);
+
+            dialCtx.beginPath();
+            dialCtx.moveTo(0, 15);
+            dialCtx.lineTo(0, -radius * 0.78);
+            dialCtx.strokeStyle = '#8b0000'; // Vermell fosc o llautó fosc
+            dialCtx.lineWidth = 1.5;
+            dialCtx.stroke();
+
+            // Cercle posterior i contrapès de la maneta de segons
+            dialCtx.beginPath();
+            dialCtx.arc(0, 0, 4, 0, Math.PI * 2);
+            dialCtx.fillStyle = '#8b0000';
+            dialCtx.fill();
+
+            dialCtx.restore();
+
+            // Tapa central daurada (Brass Cap)
+            dialCtx.beginPath();
+            dialCtx.arc(0, 0, 5, 0, Math.PI * 2);
+            const brassGrad = dialCtx.createRadialGradient(0, 0, 1, 0, 0, 5);
+            brassGrad.addColorStop(0, '#fff3a8');
+            brassGrad.addColorStop(0.5, '#d4af37');
+            brassGrad.addColorStop(1, '#85581A');
+            dialCtx.fillStyle = brassGrad;
+            dialCtx.fill();
+            dialCtx.strokeStyle = '#3a2203';
+            dialCtx.lineWidth = 1;
+            dialCtx.stroke();
+
+            dialCtx.restore();
+        }
+
+        // Funció per dibuixar manetes ornamentades estil clàssic
+        function drawOrnateHand(ctx, angle, length, width, color) {
+            ctx.save();
+            ctx.rotate(angle);
+
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+
+            // Ombra lleugera de la maneta sobre l'esfera
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
+            // Cos de la maneta
+            ctx.beginPath();
+            ctx.moveTo(-width / 2, 0);
+            ctx.lineTo(-width / 4, -length * 0.4);
+
+            // Pera/Oval ornamentat central
+            ctx.arc(0, -length * 0.6, length * 0.12, 0, Math.PI * 2);
+
+            ctx.lineTo(-0.5, -length);
+            ctx.lineTo(0.5, -length);
+            ctx.lineTo(width / 4, -length * 0.4);
+            ctx.lineTo(width / 2, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- DIBUIX DEL PÈNDOL DE LLAUTÓ EN MOVIMENT HARMÒNIC ---
+        const pendCanvas = document.getElementById('pendulum-canvas');
+        const pendCtx = pendCanvas.getContext('2d');
+
+        function drawPendulum(time) {
+            const width = pendCanvas.width;
+            const height = pendCanvas.height;
+            const pivotX = width / 2;
+            const pivotY = 0;
+            const pendulumLength = 135;
+
+            pendCtx.clearRect(0, 0, width, height);
+
+            // Calcul del moviment harmònic simple (1 oscil·lació completa cada 2 segons, és a dir, 1 segon per anada/tornada)
+            const angleAmplitude = 0.18; // Amplitud d'oscil·lació en rads (~10º)
+            const currentAngle = angleAmplitude * Math.sin(time * Math.PI);
+
+            pendCtx.save();
+            pendCtx.translate(pivotX, pivotY);
+            pendCtx.rotate(currentAngle);
+
+            // 1. Tija del Pèndol / Estructura de Lira
+            pendCtx.strokeStyle = '#b38728';
+            pendCtx.lineWidth = 3;
+
+            // Línies de la tija doble de llautó
+            pendCtx.beginPath();
+            pendCtx.moveTo(-4, 0);
+            pendCtx.lineTo(-4, pendulumLength - 25);
+            pendCtx.moveTo(4, 0);
+            pendCtx.lineTo(4, pendulumLength - 25);
+            pendCtx.stroke();
+
+            // Adorn central tipus Lira de Llautó
+            pendCtx.beginPath();
+            pendCtx.arc(0, pendulumLength - 40, 12, 0, Math.PI * 2);
+            pendCtx.lineWidth = 2;
+            pendCtx.strokeStyle = '#d4af37';
+            pendCtx.stroke();
+
+            // 2. Lent del Pèndol (Bob) Polida de Llautó
+            const bobY = pendulumLength;
+            const bobRadius = 28;
+
+            // Gradient de llautó polit amb lluentor vertical
+            const bobGrad = pendCtx.createRadialGradient(-5, bobY - 5, 2, 0, bobY, bobRadius);
+            bobGrad.addColorStop(0, '#fffbe3');
+            bobGrad.addColorStop(0.3, '#f3e08a');
+            bobGrad.addColorStop(0.7, '#b58721');
+            bobGrad.addColorStop(1, '#5c4107');
+
+            pendCtx.beginPath();
+            pendCtx.arc(0, bobY, bobRadius, 0, Math.PI * 2);
+            pendCtx.fillStyle = bobGrad;
+            pendCtx.fill();
+
+            // Vora bisellada exterior de la lent
+            pendCtx.lineWidth = 2;
+            pendCtx.strokeStyle = '#fff5be';
+            pendCtx.stroke();
+
+            // Cercle d'ajust d'or al centre del pèndol
+            pendCtx.beginPath();
+            pendCtx.arc(0, bobY, 6, 0, Math.PI * 2);
+            pendCtx.fillStyle = '#3a2305';
+            pendCtx.fill();
+            pendCtx.strokeStyle = '#d4af37';
+            pendCtx.stroke();
+
+            pendCtx.restore();
+        }
+
+        // --- BUCLE PRINCIPAL D'ANIMACIÓ I SINCRONITZACIÓ ---
+        function animate() {
+            const now = new Date();
+            const timeSeconds = now.getTime() / 1000;
+
+            // Dibuix dels elements
+            drawClockDial(now);
+            drawPendulum(timeSeconds);
+
+            // Detecció del canvi de segon per reproduir el so Tic-Tac
+            const currentSecond = now.getSeconds();
+            if (currentSecond !== lastSecond) {
+                // Alterna entre so "TIC" (segons parells) i "TAC" (segons senars)
+                playTickSound(currentSecond % 2 === 0);
+                lastSecond = currentSecond;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- GESTIÓ DE DELEGACIÓ D'ESDEVENIMENTS I INTERFÍCIE ---
+        document.getElementById('enable-audio-btn').addEventListener('click', () => {
+            initAudio();
+            document.getElementById('audio-overlay').classList.add('opacity-0', 'pointer-events-none');
+        });
+
+        const muteBtn = document.getElementById('mute-btn');
+        const muteText = document.getElementById('mute-text');
+        const soundIcon = document.getElementById('sound-icon');
+
+        muteBtn.addEventListener('click', () => {
+            if (!audioCtx) {
+                initAudio();
+            }
+            isMuted = !isMuted;
+            if (isMuted) {
+                muteText.textContent = 'Activar So';
+                soundIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" stroke-dasharray="2 2"/>`;
+            } else {
+                muteText.textContent = 'Silenciar So';
+                soundIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.586 5H4a1 1 0 01-1 1v8a1 1 0 011-1h2.586l4.707 4.707C11.923 20.337 13 19.891 13 19V5c0-.891-1.077-1.337-1.707-.707L7.586 9H5"/>`;
+            }
+        });
+
+        // Iniciar el bucle d'animació en carregar la pàgina
+        window.onload = () => {
+            animate();
+        };
+    </script>
+</body>
+</html>
