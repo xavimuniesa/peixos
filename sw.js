@@ -1,8 +1,8 @@
 /* Service worker del Rellotge de Pèndol: funciona sense connexió.
    Quan canviïs index.html, puja el número de VERSIO perquè els dispositius agafin la versió nova. */
-const VERSIO = 'rellotge-v1';
+const VERSIO = 'rellotge-v2';
 const BASE = ['./', './index.html', './manifest.webmanifest',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-64.png'];
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon-64.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSIO).then(c => c.addAll(BASE)).then(() => self.skipWaiting()));
