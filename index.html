@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rellotge de Pèndol Clàssic</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#150c07">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rellotge">
+<meta name="application-name" content="Rellotge">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&display=swap" rel="stylesheet">
@@ -958,12 +967,13 @@ function bell(f,t,vol,decay){
   PARTIALS.forEach(([r,a,dm])=>{const o=ac.createOscillator();o.frequency.value=f*r;const g=ac.createGain();env(g,t,a,decay*dm,.004);o.connect(g);g.connect(out);o.start(t);o.stop(t+decay*dm+.05);});
   click(t,f*6,2,.25,.03,out);
 }
-const NT={G:415.30,F:369.99,E:329.63,B:246.94};
+/* Afinació tradicional en Fa major: quarts amb La, Sol, Fa i Do (Do greu); les hores en Fa greu */
+const NT={G:440.00,F:392.00,E:349.23,B:261.63}; // G=La4, F=Sol4, E=Fa4, B=Do4
 const CHG={1:'GFEB',2:'EGFB',3:'EFGE',4:'GEFB',5:'BFGE'};
 function westminster(q,hour,t){
   const seq={1:[1],2:[2,3],3:[4,5,1],4:[2,3,4,5]}[q];
   seq.forEach(c=>{[...CHG[c]].forEach((n,i)=>{bell(NT[n],t,.2,3.2);t+=i===3?1.45:.72;});});
-  if(q===4){t+=.8;const n=hour%12||12;for(let i=0;i<n;i++){bell(164.81,t,.34,6);t+=2.1;}}
+  if(q===4){t+=.8;const n=hour%12||12;for(let i=0;i<n;i++){bell(174.61,t,.34,6);t+=2.1;}}
 }
 setInterval(()=>{
   if(!(soundOn||chimesOn)||!ac||document.hidden)return;
@@ -1076,6 +1086,21 @@ Promise.all(['20px "IM Fell English"','600 9px "Cinzel"','16px "Pinyon Script"',
 fitWindows();
 document.fonts.ready.then(()=>{fitWindows();paintDials();fitText($('plLoc'),21);fitText($('plInfo'),13.5);});
 requestAnimationFrame(frame);
+
+/* ================= APP INSTAL·LABLE ================= */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW:',err)));
+}
+// Instal·lada com a app: manté la pantalla encesa (ús com a salvapantalles)
+const standalone=matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches||navigator.standalone===true;
+let wakeLock=null;
+async function keepAwake(){
+  if(!standalone||!('wakeLock' in navigator)||document.hidden)return;
+  try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
+}
+keepAwake();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)keepAwake();});
+addEventListener('pointerdown',()=>{if(!wakeLock||wakeLock.released)keepAwake();},{passive:true});
 })();
 </script>
 </body>
