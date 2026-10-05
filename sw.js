@@ -1,6 +1,6 @@
 /* Service worker del Rellotge de Pèndol: funciona sense connexió.
    Quan canviïs index.html, puja el número de VERSIO perquè els dispositius agafin la versió nova. */
-const VERSIO = 'rellotge-v4';
+const VERSIO = 'rellotge-v5';
 const BASE = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon-64.png'];
 

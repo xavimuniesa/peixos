@@ -255,6 +255,15 @@ body.m-zz .modebtn{opacity:.2}
   padding:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
   background:var(--wood-v);background-size:256px 1024px;box-shadow:0 -10px 30px rgba(0,0,0,.6)}
 .ipanel.open{transform:none}
+/* Escriptori: placa més petita que entra pel costat dret i tapa el segon rellotge */
+body.wide .ipanel{left:auto;right:2.5vw;top:5vh;bottom:5vh;width:min(600px,45vw);padding:12px;border-radius:14px;
+  transform:translateX(calc(100% + 4vw));box-shadow:-14px 0 40px rgba(0,0,0,.65)}
+body.wide .ipanel.open{transform:none}
+body.wide #ipPlace{font-size:36px}
+body.wide .ip-big .ip-val{font-size:44px}
+body.wide .ip-val{font-size:24px}
+body.wide .ip-grid{grid-template-columns:repeat(2,1fr)}
+body.wide .ip-plate{padding:26px 30px}
 body.m-night .ipanel{filter:brightness(.78)}
 body.m-zz .ipanel{filter:brightness(.55)}
 .ip-plate{position:relative;min-height:100%;border-radius:10px;background:var(--brass);cursor:pointer;
@@ -526,7 +535,7 @@ body.wide .viewer{display:flex}
    <div class="ip-cell ip-moon"><canvas id="moonCv" width="68" height="68"></canvas><div><div class="ip-lab e">Lluna</div><div class="ip-val e" id="ipMoon">—</div><div class="ip-small e" id="ipMoon2"></div></div></div>
    <div class="ip-cell"><div class="ip-lab e">Dies de l'any</div><div class="ip-val e" id="ipDoy">—</div><div class="ip-small e" id="ipDoy2"></div><div class="ip-bar"><i id="ipDoyBar"></i></div></div>
   </div>
-  <div class="ip-foot e">Toca la placa o llisca-la cap avall per desar-la</div>
+  <div class="ip-foot e" id="ipFoot">Toca la placa o llisca-la cap avall per desar-la</div>
  </div>
 </div>
 <div class="hint" id="hint">Gira el pom <b>PÈNDOL</b> per sentir el tic-tac · toca l'esfera per ampliar-la · toca la placa per veure'n més dades</div>
@@ -613,6 +622,7 @@ function layoutViewer(W,H){
   const v=$('viewer'),ph=H*.92,pw=Math.min(W*.4,ph*.6),u=pw/380;
   Object.assign(v.style,{left:(W*.72-pw/2)+'px',top:((H-ph)/2)+'px',width:pw+'px',fontSize:(pw/27)+'px'});
   v.style.setProperty('--u',u+'px');
+  const ipn=$('ipanel'),vl=W*.72-pw/2;Object.assign(ipn.style,{left:Math.max(W*.5,vl-26)+'px',top:Math.max(8,(H-ph)/2-30)+'px',bottom:Math.max(8,(H-ph)/2-8)+'px',width:'auto'});
   const crownH=pw*170/380,baseH=44*u,bodyH=ph-crownH-baseH;$('vbody').style.height=bodyH+'px';
   const cw=pw*.9474-40*u,ch=bodyH-40*u,gw=cw-28*u,gh=ch-28*u;
   const ds=Math.min(gw*.86,gh*.62),k=ds/280,vd=$('vdial'),cy=14*u+gh*.42;
@@ -629,6 +639,8 @@ function applyView(){
   document.body.classList.toggle('wide',wide);
   document.querySelector('.stage').style.perspectiveOrigin=wide?`${W*.3}px 50%`:'50% 50%';
   if(wide&&!wasWide)$('hint').innerHTML='Gira el pom <b>PÈNDOL</b> per sentir el tic-tac · la clau obre la porta · toca una finestra per veure girar el calendari';
+  if(!wide){const ipn=$('ipanel');['left','top','bottom','width'].forEach(k=>ipn.style[k]='');}
+  $('ipFoot').textContent=wide?'Fes clic a la placa per desar-la':'Toca la placa o llisca-la cap avall per desar-la';
   if(wide){zoomed=false;layoutViewer(W,H);if(!wasWide)requestAnimationFrame(fitWindows);
     s=Math.min(H*.93/1015,W*.5*.93/(doorOpen?530:416));
     t=`translate(${(W*.3-W/2+(doorOpen?48*s:0)).toFixed(1)}px,0px) scale(${s})`;}
@@ -1114,8 +1126,8 @@ function hitCircle(el,x,y,pad=6){const b=el.getBoundingClientRect(),cx=b.left+b.
 function hitRect(el,x,y,pad=4){const b=el.getBoundingClientRect();return x>=b.left-pad&&x<=b.right+pad&&y>=b.top-pad&&y<=b.bottom+pad;}
 window.addEventListener('click',e=>{
   if(Date.now()<suppressClick){e.stopPropagation();e.preventDefault();return;}
-  if(panelOpen){if(e.target.closest('#ipanel')){e.stopPropagation();e.preventDefault();closePanel();}return;}
-  if(e.detail===0)return; // teclat: ho gestiona el botó mateix
+  if(panelOpen){e.stopPropagation();e.preventDefault();closePanel();return;}
+  if(e.detail===0&&!e.clientX&&!e.clientY)return; // teclat: ho gestiona el botó mateix
   if(e.target.closest('#modeBtn'))return;
   const x=e.clientX,y=e.clientY;let act=null;
   if(hitCircle(soundKnob,x,y)||hitRect(document.querySelector('.klabel.right'),x,y))act=()=>setSound(!soundOn);
@@ -1241,11 +1253,21 @@ function fillPanel(){
   $('ipDoy2').textContent=rem===0?"Avui s'acaba l'any":rem===1?"Falta 1 dia per acabar l'any":`Falten ${rem} dies per acabar l'any`;
   $('ipDoyBar').style.width=(doy/tot*100).toFixed(1)+'%';
 }
-function openPanel(){fillPanel();panelOpen=true;$('ipanel').scrollTop=0;$('ipanel').classList.add('open');$('ipanel').setAttribute('aria-hidden','false');hint.classList.add('gone');}
+function openPanel(){try{fillPanel();}catch(err){console.error('Placa:',err);}panelOpen=true;$('ipanel').scrollTop=0;$('ipanel').classList.add('open');$('ipanel').setAttribute('aria-hidden','false');hint.classList.add('gone');}
 function closePanel(){panelOpen=false;$('ipanel').classList.remove('open');$('ipanel').setAttribute('aria-hidden','true');}
 {let sy=null;const ip=$('ipanel');
  ip.addEventListener('touchstart',e=>{sy=ip.scrollTop<=0?e.touches[0].clientY:null;},{passive:true});
- ip.addEventListener('touchend',e=>{if(sy!=null&&e.changedTouches[0].clientY-sy>70){suppressClick=Date.now()+400;closePanel();}sy=null;},{passive:true});}
+ ip.addEventListener('touchend',e=>{if(sy!=null&&e.changedTouches[0].clientY-sy>70){suppressClick=Date.now()+400;tapIgnore=true;closePanel();}sy=null;},{passive:true});}
+let tap=null,tapIgnore=false;
+addEventListener('pointerdown',e=>{tap={x:e.clientX,y:e.clientY,t:Date.now(),st:$('ipanel').scrollTop};tapIgnore=false;},{capture:true,passive:true});
+addEventListener('pointerup',e=>{
+  if(!tap||tapIgnore||e.pointerType==='mouse')return;
+  const ok=Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<12&&Date.now()-tap.t<700&&$('ipanel').scrollTop===tap.st;tap=null;if(!ok)return;
+  if(panelOpen){closePanel();suppressClick=Date.now()+600;return;}
+  if(e.target.closest&&e.target.closest('#modeBtn'))return;
+  const x=e.clientX,y=e.clientY;
+  if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2))){openPanel();suppressClick=Date.now()+600;}
+},{capture:true});
 
 /* ================= MODES DE LLUM: AUTOMÀTIC · DIA · NIT · ZZ ================= */
 const MODES=['auto','dia','nit','zz'],MODE_ICON={auto:'A',dia:'☀︎',nit:'☾',zz:'zᶻ'};
