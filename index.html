@@ -2,7 +2,7 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Rellotge de Pèndol Clàssic</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#150c07">
@@ -221,6 +221,65 @@ body.zoom .dial{cursor:zoom-out}
 
 #needle,#needle2{transform-box:view-box;transform-origin:190px 110px;transform:rotate(-80deg);transition:transform 2.8s cubic-bezier(.3,1.35,.45,1)}
 
+html,body{touch-action:none;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+/* ---------- MODE NOCTURN / ZZ ---------- */
+.veil{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:40;opacity:0;transition:opacity 2.4s ease}
+body.m-night .veil,body.m-zz .veil{opacity:1}
+/* zz: esfera i finestres apagades perquè les agulles fosforescents destaquin */
+#faceCv,#faceCv2,.win{transition:filter 2s}
+body.m-zz #faceCv,body.m-zz #faceCv2,body.m-zz .win{filter:brightness(.42)}
+/* zz: dades de la placa i agulla del termòmetre fosforescents */
+#plLoc,#plTemp,#plInfo,#vDate,#vPlace{transition:color 2s,text-shadow 2s}
+body.m-zz #plLoc,body.m-zz #plTemp,body.m-zz #plInfo,body.m-zz #vDate,body.m-zz #vPlace{color:#d2ffd8;
+  text-shadow:0 0 3px rgba(150,255,170,.95),0 0 9px rgba(110,255,140,.7),0 0 16px rgba(90,240,120,.4)}
+.gdim{transition:opacity 2s}
+body.m-zz .gdim{opacity:.58}
+body.m-zz #needle path,body.m-zz #needle2 path{fill:#d2ffd8}
+body.m-zz #needle circle,body.m-zz #needle2 circle{stroke:#d2ffd8}
+body.m-zz #needle,body.m-zz #needle2{filter:drop-shadow(0 0 2px rgba(130,255,155,.95)) drop-shadow(0 0 5px rgba(100,255,130,.6))}
+body.m-night .hint,body.m-zz .hint{opacity:0}
+.modebtn{position:fixed;z-index:70;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;padding:0;color:#ecd59c;
+  font:17px/40px 'IM Fell English',Georgia,serif;text-align:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,240,200,.22),rgba(120,85,25,.22) 60%,rgba(40,25,8,.35));
+  box-shadow:inset 0 0 0 1px rgba(233,200,120,.35),0 2px 6px rgba(0,0,0,.5);opacity:.5;transition:opacity .4s;touch-action:manipulation}
+.modebtn:hover,.modebtn:focus-visible{opacity:1}
+body.m-zz .modebtn{opacity:.2}
+.toast{position:fixed;z-index:71;top:calc(17px + env(safe-area-inset-top));right:calc(60px + env(safe-area-inset-right));
+  padding:6px 12px;border-radius:14px;background:rgba(20,12,6,.8);color:#ecd59c;font:italic 14px 'IM Fell English',Georgia,serif;
+  opacity:0;transition:opacity .5s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+/* ---------- PLACA D'INFORMACIÓ ---------- */
+.ipanel{position:fixed;inset:0;z-index:80;transform:translateY(103%);transition:transform .8s cubic-bezier(.2,.8,.2,1);
+  overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;
+  padding:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+  background:var(--wood-v);background-size:256px 1024px;box-shadow:0 -10px 30px rgba(0,0,0,.6)}
+.ipanel.open{transform:none}
+body.m-night .ipanel{filter:brightness(.78)}
+body.m-zz .ipanel{filter:brightness(.55)}
+.ip-plate{position:relative;min-height:100%;border-radius:10px;background:var(--brass);cursor:pointer;
+  padding:clamp(20px,3.5vh,40px) clamp(18px,4vw,48px);display:flex;flex-direction:column;gap:clamp(10px,2vh,18px);
+  box-shadow:0 6px 16px rgba(0,0,0,.7),inset 0 0 0 2px rgba(80,55,10,.7),inset 0 0 0 6px rgba(255,240,200,.25),inset 0 0 0 8px rgba(80,55,10,.4)}
+.scr{position:absolute;width:13px;height:13px;border-radius:50%;
+  background:linear-gradient(45deg,transparent 42%,rgba(40,25,5,.85) 43% 57%,transparent 58%),radial-gradient(circle at 35% 35%,#fff2c0,#b8892c 60%,#5a3d0c);
+  box-shadow:0 1px 0 rgba(255,240,200,.5)}
+.e{color:#3b2606;text-shadow:0 1px 0 rgba(255,246,212,.75),0 -1px 0 rgba(0,0,0,.35)}
+.ip-head{text-align:center}
+#ipPlace{font-family:'IM Fell English SC','IM Fell English',serif;font-size:clamp(28px,6vw,48px);letter-spacing:.06em;line-height:1.1}
+#ipSub{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(14px,2.4vw,18px);margin-top:4px}
+.ip-rule{height:2px;flex:none;background:linear-gradient(90deg,transparent,rgba(60,38,6,.55),transparent);box-shadow:0 1px 0 rgba(255,246,212,.5)}
+.ip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:clamp(8px,1.6vh,14px) clamp(10px,2.4vw,22px)}
+.ip-cell{padding:10px 12px;border-radius:7px;background:rgba(255,240,190,.07);
+  box-shadow:inset 0 1px 2px rgba(60,38,6,.5),inset 0 -1px 0 rgba(255,246,212,.55)}
+.ip-lab{font-family:'IM Fell English SC','IM Fell English',serif;font-size:14px;letter-spacing:.07em;opacity:.9}
+.ip-val{font-family:'IM Fell English',Georgia,serif;font-size:clamp(22px,4.2vw,30px);line-height:1.15}
+.ip-small{font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:14px;margin-top:2px}
+.ip-big .ip-val{font-size:clamp(36px,8vw,56px)}
+.ip-moon{display:flex;align-items:center;gap:14px}
+#moonCv{width:68px;height:68px;flex:none;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,.55),0 0 0 2px rgba(80,55,10,.5)}
+.ip-bar{height:8px;border-radius:4px;margin-top:7px;background:rgba(60,38,6,.15);overflow:hidden;box-shadow:inset 0 1px 2px rgba(60,38,6,.6)}
+.ip-bar i{display:block;height:100%;background:linear-gradient(90deg,#7a5412,#3b2606)}
+.ip-foot{text-align:center;font-family:'IM Fell English',serif;font-style:italic;font-size:14px;opacity:.8;margin-top:auto}
 .hint{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-style:italic;font-size:13px;color:rgba(233,210,160,.55);
   transition:opacity 1.5s;pointer-events:none;padding:0 16px}
 .hint.gone{opacity:0}
@@ -267,7 +326,8 @@ body.wide .viewer{display:flex}
 #vDate{font-family:'IM Fell English',serif;font-style:italic;font-size:1.25em;line-height:1.2}
 #vPlace{font-family:'IM Fell English SC','IM Fell English',serif;font-size:.95em;letter-spacing:.06em;margin-top:.15em}
 .vcap .engr{max-width:none}
-@media (max-width:640px){.hint{top:calc(8px + env(safe-area-inset-top));bottom:auto;font-size:12px}}
+@media (max-width:640px){.hint{top:calc(8px + env(safe-area-inset-top));bottom:auto;font-size:12px;padding:0 60px}}
+@media (orientation:landscape) and (max-height:520px){.hint{display:none}}
 @media (prefers-reduced-motion: reduce){.door{transition:none}.knob.invite .cap{animation:none}}
 </style>
 </head>
@@ -347,6 +407,7 @@ body.wide .viewer{display:flex}
       <g id="gTicks" stroke="#2a180a" stroke-linecap="round"></g>
       <g id="gNums" fill="#2a180a" font-family="IM Fell English, Georgia, serif" font-size="10" text-anchor="middle" dominant-baseline="middle"></g>
       <text x="190" y="93" fill="#4a2c12" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="8" text-anchor="middle">°C</text>
+      <path class="gdim" d="M132 110 A58 58 0 0 1 248 110 Z" fill="#000" opacity="0"/>
       <g id="needle">
        <path d="M188.7 114 L189.4 62 L190 56 L190.6 62 L191.3 114 Z" fill="url(#blueSteel)"/>
        <circle cx="190" cy="98" r="2.2" fill="none" stroke="url(#blueSteel)" stroke-width="1.4"/>
@@ -445,7 +506,30 @@ body.wide .viewer{display:flex}
  </div>
  <div class="vbase"><div class="vbead"></div></div>
 </div>
-<div class="hint" id="hint">Gira el pom <b>PÈNDOL</b> per sentir el tic-tac · toca l'esfera per ampliar-la · toca una finestra per veure girar el calendari</div>
+<canvas class="veil" id="veil"></canvas>
+<button class="modebtn" id="modeBtn" title="Mode de llum: automàtic, dia, nit o zz" aria-label="Canvia el mode de llum">A</button>
+<div class="toast" id="toast"></div>
+<div class="ipanel" id="ipanel" aria-hidden="true">
+ <div class="ip-plate">
+  <span class="scr" style="left:12px;top:12px"></span><span class="scr" style="right:12px;top:12px"></span>
+  <span class="scr" style="left:12px;bottom:12px"></span><span class="scr" style="right:12px;bottom:12px"></span>
+  <div class="ip-head"><div class="e" id="ipPlace">—</div><div class="e" id="ipSub">&nbsp;</div></div>
+  <div class="ip-rule"></div>
+  <div class="ip-grid">
+   <div class="ip-cell ip-big"><div class="ip-lab e">Temperatura</div><div class="ip-val e" id="ipT">—</div><div class="ip-small e" id="ipTmm"></div></div>
+   <div class="ip-cell"><div class="ip-lab e">Sensació tèrmica</div><div class="ip-val e" id="ipFeel">—</div></div>
+   <div class="ip-cell"><div class="ip-lab e">Humitat</div><div class="ip-val e" id="ipHum">—</div></div>
+   <div class="ip-cell"><div class="ip-lab e">Estat del cel</div><div class="ip-val e" id="ipSky">—</div></div>
+   <div class="ip-cell"><div class="ip-lab e">Vent</div><div class="ip-val e" id="ipWind">—</div><div class="ip-small e" id="ipWind2"></div></div>
+   <div class="ip-cell"><div class="ip-lab e">Sortida del sol</div><div class="ip-val e" id="ipRise">—</div></div>
+   <div class="ip-cell"><div class="ip-lab e">Posta de sol</div><div class="ip-val e" id="ipSet">—</div><div class="ip-small e" id="ipDayLen"></div></div>
+   <div class="ip-cell ip-moon"><canvas id="moonCv" width="68" height="68"></canvas><div><div class="ip-lab e">Lluna</div><div class="ip-val e" id="ipMoon">—</div><div class="ip-small e" id="ipMoon2"></div></div></div>
+   <div class="ip-cell"><div class="ip-lab e">Dies de l'any</div><div class="ip-val e" id="ipDoy">—</div><div class="ip-small e" id="ipDoy2"></div><div class="ip-bar"><i id="ipDoyBar"></i></div></div>
+  </div>
+  <div class="ip-foot e">Toca la placa o llisca-la cap avall per desar-la</div>
+ </div>
+</div>
+<div class="hint" id="hint">Gira el pom <b>PÈNDOL</b> per sentir el tic-tac · toca l'esfera per ampliar-la · toca la placa per veure'n més dades</div>
 
 <script>
 (() => {
@@ -515,7 +599,9 @@ $('vdial').appendChild(bigDial);
 {const cs=document.querySelector('.crown svg').cloneNode(true);cs.querySelector('defs').remove();
  cs.querySelectorAll('[id]').forEach(el=>{el.id=el.id==='needle'?'needle2':'';if(!el.id)el.removeAttribute('id');});
  cs.removeAttribute('width');cs.removeAttribute('height');$('vcrown').appendChild(cs);}
-let DPRB=0,wide=false;
+let DPRB=0,wide=false,phoneLand=false,panY=0;
+const isPhoneLand=()=>innerWidth>innerHeight&&innerHeight<520&&innerWidth<1000;
+const landScale=()=>Math.min(innerHeight*.94/290,innerWidth*.94/420);
 const faceCv=$('faceCv'),handsCv=$('handsCv'),chamber=$('chamber');
 const fctx=faceCv.getContext('2d'),hctx=handsCv.getContext('2d'),cctx=chamber.getContext('2d');
 const faceCv2=$('faceCv2'),handsCv2=$('handsCv2'),fctx2=faceCv2.getContext('2d'),hctx2=handsCv2.getContext('2d');
@@ -538,13 +624,17 @@ function layoutViewer(W,H){
 }
 function applyView(){
   const W=innerWidth,H=innerHeight,b=baseScale();let s=b,t;
-  const wasWide=wide;wide=W>=1000&&W/H>=1.3;
+  const wasWide=wide,wasLand=phoneLand;wide=W>=1000&&W/H>=1.3;if(wide)phoneLand=false;
+  if(!wasLand&&isPhoneLand())panY=0;
   document.body.classList.toggle('wide',wide);
   document.querySelector('.stage').style.perspectiveOrigin=wide?`${W*.3}px 50%`:'50% 50%';
   if(wide&&!wasWide)$('hint').innerHTML='Gira el pom <b>PÈNDOL</b> per sentir el tic-tac · la clau obre la porta · toca una finestra per veure girar el calendari';
   if(wide){zoomed=false;layoutViewer(W,H);if(!wasWide)requestAnimationFrame(fitWindows);
     s=Math.min(H*.93/1015,W*.5*.93/(doorOpen?530:416));
     t=`translate(${(W*.3-W/2+(doorOpen?48*s:0)).toFixed(1)}px,0px) scale(${s})`;}
+  else if((phoneLand=isPhoneLand())){zoomed=false;s=landScale();
+    const base=(495-350)*s,lim=Math.max(0,495*s-H/2),T=Math.max(-lim,Math.min(lim,base+panY));panY=T-base;
+    t=`translate(${(doorOpen?48*s:0).toFixed(1)}px,${T.toFixed(1)}px) scale(${s})`;}
   else if(zoomed){s=Math.min(W*.94/300,H*.66/300);t=`translate(0px,${(495-350)*s}px) scale(${s})`;}
   else if(doorOpen){s=Math.min(b,W*.95/530);t=`translate(${48*s}px,0px) scale(${s})`;}
   else t=`scale(${s})`;
@@ -552,9 +642,10 @@ function applyView(){
   document.body.classList.toggle('zoom',zoomed);
   const nd=Math.min(3,Math.max(1,(devicePixelRatio||1)*Math.max(s,b)));
   if(Math.abs(nd-DPRD)>.01){DPRD=nd;sizeCv(faceCv,256,256,DPRD);sizeCv(handsCv,256,256,DPRD);drawDialFace();drawHands(new Date());}
+  placeVeilSoon();
 }
 function layout(){
-  DPR=Math.min(2.5,Math.max(1,(devicePixelRatio||1)*baseScale()));
+  DPR=Math.min(2.5,Math.max(1,(devicePixelRatio||1)*(isPhoneLand()?landScale():baseScale())));
   sizeCv(chamber,320,660,DPR);
   staticCv.width=layerCv.width=chamber.width;staticCv.height=layerCv.height=chamber.height;
   lastWeightMin=-1;drawChamber(Date.now());buildWeights();buildPendulum();DPRD=0;applyView();
@@ -666,6 +757,8 @@ document.querySelectorAll('.win').forEach(w=>w.addEventListener('click',e=>{
 
 /* ================= AGULLES ================= */
 function blued(g,w){const gr=g.createLinearGradient(-w,0,w,0);gr.addColorStop(0,'#0a1328');gr.addColorStop(.42,'#2c4a88');gr.addColorStop(.52,'#6488c8');gr.addColorStop(1,'#0e1a35');return gr;}
+let lume=false,quiet=false;
+function lumeFill(g,p,dp){if(!lume)return;g.shadowOffsetX=0;g.shadowOffsetY=0;g.shadowColor='rgba(110,255,140,1)';g.shadowBlur=12*dp;g.fillStyle='rgba(205,255,212,.95)';g.fill(p,'nonzero');g.shadowBlur=4*dp;g.fillStyle='rgba(225,255,230,1)';g.fill(p,'nonzero');}
 function breguet(g,ang,len,w,rp,rr,sh,dp){
   g.save();g.rotate(ang);
   g.shadowColor='rgba(45,28,6,.5)';g.shadowBlur=sh[2]*dp;g.shadowOffsetX=sh[0]*dp;g.shadowOffsetY=sh[1]*dp;
@@ -674,7 +767,7 @@ function breguet(g,ang,len,w,rp,rr,sh,dp){
   p.moveTo(rr,-rp);p.arc(0,-rp,rr,0,TAU,false);
   p.moveTo(rr*.55,-rp);p.arc(0,-rp,rr*.55,0,TAU,true);
   p.moveTo(-w*.4,-(rp+rr*.9));p.lineTo(0,-len);p.lineTo(w*.4,-(rp+rr*.9));p.closePath();
-  g.fillStyle=blued(g,w);g.fill(p,'nonzero');g.restore();
+  g.fillStyle=blued(g,w);g.fill(p,'nonzero');lumeFill(g,p,dp);g.restore();
 }
 function easeOutBack(t){const c1=2.2,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
 function drawHands(d,g,dp){
@@ -690,7 +783,7 @@ function drawHands(d,g,dp){
   const p=new Path2D();p.moveTo(-.9,24);p.lineTo(-.55,-96);p.lineTo(0,-112);p.lineTo(.55,-96);p.lineTo(.9,24);p.closePath();
   p.moveTo(5,22);p.arc(0,22,5,0,TAU);
   p.moveTo(3.4,-82);p.arc(0,-82,3.4,0,TAU,false);p.moveTo(2,-82);p.arc(0,-82,2,0,TAU,true);
-  g.fillStyle=blued(g,2);g.fill(p,'nonzero');g.restore();
+  g.fillStyle=blued(g,2);g.fill(p,'nonzero');lumeFill(g,p,dp);g.restore();
   // Tapa central
   const cg=g.createRadialGradient(-1.5,-1.5,.3,0,0,5.2);cg.addColorStop(0,'#fff5c8');cg.addColorStop(.5,'#d4af37');cg.addColorStop(1,'#6b4a12');
   g.shadowColor='rgba(0,0,0,.4)';g.shadowBlur=2*dp;g.shadowOffsetX=1.5*dp;g.shadowOffsetY=1.5*dp;
@@ -869,13 +962,15 @@ const clockEl=$('clock'),reflEl=document.querySelector('.refl'),glareEl=$('glare
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let tgX=3,tgY=7,lastMove=-1e9;
 addEventListener('pointermove',e=>{
+  if(phoneLand||e.pointerType==='touch')return;
   if(e.target.closest&&e.target.closest('.kw,.klabel,.plaque,.keyhit,.win,.base-front'))return;
   const nx=e.clientX/innerWidth-.5,ny=e.clientY/innerHeight-.5;let k=reduce?.3:1;
   if(zoomed)k*=.35;
   tgY=-nx*26*k;tgX=-ny*14*k;lastMove=performance.now();
 },{passive:true});
 function updateTilt(ts){
-  if(ts-lastMove>5000&&!reduce){const k=zoomed?.35:1;tgY=7*k*Math.sin(ts/9000);tgX=k*(3+1.5*Math.sin(ts/13000));}
+  if(phoneLand){tgX=tgY=0;}
+  else if(ts-lastMove>5000&&!reduce){const k=zoomed?.35:1;tgY=7*k*Math.sin(ts/9000);tgX=k*(3+1.5*Math.sin(ts/13000));}
   tiltX+=(tgX-tiltX)*.05;tiltY+=(tgY-tiltY)*.05;
   clockEl.style.transform=`rotateX(${tiltX.toFixed(3)}deg) rotateY(${tiltY.toFixed(3)}deg)`;
   reflEl.style.transform=`translateX(${(tiltY*3.2).toFixed(2)}px)`;
@@ -1018,28 +1113,33 @@ $('keyBtn').addEventListener('click',toggleDoor);
 function hitCircle(el,x,y,pad=6){const b=el.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2,r=Math.max(b.width,b.height)/2+pad;return (x-cx)**2+(y-cy)**2<=r*r;}
 function hitRect(el,x,y,pad=4){const b=el.getBoundingClientRect();return x>=b.left-pad&&x<=b.right+pad&&y>=b.top-pad&&y<=b.bottom+pad;}
 window.addEventListener('click',e=>{
+  if(Date.now()<suppressClick){e.stopPropagation();e.preventDefault();return;}
+  if(panelOpen){if(e.target.closest('#ipanel')){e.stopPropagation();e.preventDefault();closePanel();}return;}
   if(e.detail===0)return; // teclat: ho gestiona el botó mateix
+  if(e.target.closest('#modeBtn'))return;
   const x=e.clientX,y=e.clientY;let act=null;
   if(hitCircle(soundKnob,x,y)||hitRect(document.querySelector('.klabel.right'),x,y))act=()=>setSound(!soundOn);
   else if(hitCircle(chimeKnob,x,y)||hitRect(document.querySelector('.klabel.left'),x,y))act=()=>setChimes(!chimesOn,true);
   else if(hitRect($('keyBtn'),x,y,0)||(wide&&(hitRect($('vesc'),x,y,10)||[...document.querySelectorAll('.vdf')].some(el=>hitRect(el,x,y,0)))))act=toggleDoor;
+  else if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2)))act=openPanel;
   if(act){e.stopPropagation();e.preventDefault();act();}
 },true);
 door.querySelectorAll('.df').forEach(el=>el.addEventListener('click',toggleDoor));
-function toggleZoom(){if(wide)return;zoomed=!zoomed;hint.classList.add('gone');applyView();}
+function toggleZoom(){if(wide||phoneLand)return;zoomed=!zoomed;hint.classList.add('gone');applyView();}
 document.querySelector('.dial').addEventListener('click',toggleZoom);
 addEventListener('keydown',e=>{
   if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
   const k=e.key.toLowerCase();
   if(k==='s')setSound(!soundOn);else if(k==='c')setChimes(!chimesOn,true);else if(k==='p')toggleDoor();else if(k==='z')toggleZoom();
-  else if(k==='escape'){if(zoomed)toggleZoom();else if(doorOpen)toggleDoor();}
+  else if(k==='i'){panelOpen?closePanel():openPanel();}
+  else if(k==='escape'){if(panelOpen)closePanel();else if(zoomed)toggleZoom();else if(doorOpen)toggleDoor();}
 });
 setTimeout(()=>hint.classList.add('gone'),9000);
 
 /* ================= TEMPERATURA I LLOC ================= */
 const WMO={0:'Cel serè',1:'Gairebé serè',2:'Mig ennuvolat',3:'Cobert',45:'Boira',48:'Boira gebradora',51:'Plugim feble',53:'Plugim',55:'Plugim intens',56:'Plugim gelat',57:'Plugim gelat',
   61:'Pluja feble',63:'Pluja',65:'Pluja forta',66:'Pluja gelada',67:'Pluja gelada',71:'Neu feble',73:'Neu',75:'Neu forta',77:'Neu granulada',80:'Ruixats',81:'Ruixats',82:'Xàfecs',85:'Ruixats de neu',86:'Ruixats de neu',95:'Tempesta',96:'Tempesta i calamarsa',99:'Tempesta i calamarsa'};
-let place=null;
+let place=null,wx=null;
 async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json();}
 async function locate(){
   try{
@@ -1057,8 +1157,11 @@ function fitText(el,max){el.style.fontSize=max+'px';let s=max;while(el.scrollWid
 async function updateWeather(){
   try{
     if(!place){place=await locate();$('plLoc').textContent=place.name||'—';fitText($('plLoc'),21);}
-    const j=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${place.lat}&longitude=${place.lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto`);
-    const T=j.current.temperature_2m,H=j.current.relative_humidity_2m,W=WMO[j.current.weather_code]||'';
+    const j=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${place.lat}&longitude=${place.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+    const c=j.current,T=c.temperature_2m,H=c.relative_humidity_2m,W=WMO[c.weather_code]||'';
+    wx={T,H,W,feel:c.apparent_temperature,ws:c.wind_speed_10m,wd:c.wind_direction_10m,wg:c.wind_gusts_10m,elev:j.elevation,
+        rise:j.daily&&j.daily.sunrise[0],set:j.daily&&j.daily.sunset[0],tmax:j.daily&&j.daily.temperature_2m_max[0],tmin:j.daily&&j.daily.temperature_2m_min[0]};
+    if(panelOpen)fillPanel();
     $('plTemp').textContent=`${T.toFixed(1).replace('.',',')} °C`;
     $('plInfo').textContent=`${W}${H!=null?' · '+Math.round(H)+' % humitat':''}`;
     $('vPlace').textContent=`${place.name||''} · ${T.toFixed(1).replace('.',',')} °C · ${W}`;
@@ -1066,9 +1169,132 @@ async function updateWeather(){
     const deg=-80+(Math.max(-10,Math.min(40,T))+10)*3.2;
     $('needle').style.transform=`rotate(${deg}deg)`;const n2=$('needle2');if(n2)n2.style.transform=`rotate(${deg}deg)`;
     $('plInfo').title=`Humitat relativa ${Math.round(H)} %`;
-  }catch(e){$('plInfo').textContent='Sense dades del temps';fitText($('plInfo'),13.5);}
+  }catch(e){$('plInfo').textContent='Sense dades del temps';fitText($('plInfo'),13.5);if(panelOpen)fillPanel();}
+  applyMode(false);
 }
 updateWeather();setInterval(updateWeather,15*60*1000);
+
+/* ================= SOL I LLUNA ================= */
+const RAD=Math.PI/180,DAYMS=864e5,J1970=2440588,J2000=2451545,OBL=RAD*23.4397;
+function sunTimes(date,lat,lng){
+  const toDays=d=>d.valueOf()/DAYMS-.5+J1970-J2000,fromJ=j=>new Date((j+.5-J1970)*DAYMS);
+  const lw=RAD*-lng,phi=RAD*lat,d=toDays(date),n=Math.round(d-.0009-lw/(2*Math.PI));
+  const ds=.0009+lw/(2*Math.PI)+n,M=RAD*(357.5291+.98560028*ds);
+  const L=M+RAD*(1.9148*Math.sin(M)+.02*Math.sin(2*M)+.0003*Math.sin(3*M))+RAD*102.9372+Math.PI;
+  const dec=Math.asin(Math.sin(OBL)*Math.sin(L)),Jnoon=J2000+ds+.0053*Math.sin(M)-.0069*Math.sin(2*L);
+  const w=Math.acos((Math.sin(-.833*RAD)-Math.sin(phi)*Math.sin(dec))/(Math.cos(phi)*Math.cos(dec)));
+  const Jset=J2000+(.0009+(w+lw)/(2*Math.PI)+n)+.0053*Math.sin(M)-.0069*Math.sin(2*L);
+  return{rise:fromJ(Jnoon-(Jset-Jnoon)),set:fromJ(Jset)};
+}
+const here=()=>place||{lat:41.4966,lon:2.1575,name:'Ripollet'};
+function todaySun(){const n=new Date();return sunTimes(new Date(n.getFullYear(),n.getMonth(),n.getDate(),12),here().lat,here().lon);}
+function moonPhase(t){const p=((t-Date.UTC(2000,0,6,18,14))/DAYMS/29.530588853)%1;return p<0?p+1:p;}
+function moonName(p){return p<.0339||p>.9661?'Lluna nova':p<.2161?'Lluna creixent':p<.2839?'Quart creixent':p<.4661?'Gibosa creixent':p<.5339?'Lluna plena':p<.7161?'Gibosa minvant':p<.7839?'Quart minvant':'Lluna minvant';}
+function drawMoon(cv,p){
+  const dpr=Math.min(3,devicePixelRatio||1),S=68,c=34,r=33;cv.width=S*dpr;cv.height=S*dpr;
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);
+  g.fillStyle='#17171d';g.beginPath();g.arc(c,c,r,0,TAU);g.fill();
+  const k=Math.cos(p*TAU),lit=new Path2D();
+  if(p<.5){lit.arc(c,c,r,-Math.PI/2,Math.PI/2,false);lit.ellipse(c,c,Math.abs(k)*r,r,0,Math.PI/2,-Math.PI/2,k>0);}
+  else{lit.arc(c,c,r,Math.PI/2,Math.PI*1.5,false);lit.ellipse(c,c,Math.abs(k)*r,r,0,-Math.PI/2,Math.PI/2,k>0);}
+  g.save();g.clip(lit);
+  const lg=g.createRadialGradient(c-8,c-9,2,c,c,r);lg.addColorStop(0,'#fbf8ec');lg.addColorStop(.7,'#ddd8c6');lg.addColorStop(1,'#a8a290');
+  g.fillStyle=lg;g.fillRect(0,0,S,S);
+  [[25,22,9,7,.3],[39,23,7,6,.26],[45,33,7,8,.24],[20,38,11,9,.22],[53,26,4,4,.25],[34,48,6,4,.18],[30,33,5,4,.15]].forEach(([x,y,a,b,o])=>{
+    g.fillStyle=`rgba(105,102,92,${o})`;g.beginPath();g.ellipse(x,y,a,b,.3,0,TAU);g.fill();});
+  const rnd=mulberry32(7);for(let i=0;i<26;i++){const x=c+(rnd()-.5)*58,y=c+(rnd()-.5)*58,rr=.6+rnd()*1.8;
+    g.strokeStyle='rgba(90,86,76,.35)';g.lineWidth=.5;g.beginPath();g.arc(x,y,rr,0,TAU);g.stroke();}
+  g.restore();
+  const sh=g.createRadialGradient(c,c,r*.55,c,c,r);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,0,.38)');
+  g.fillStyle=sh;g.beginPath();g.arc(c,c,r,0,TAU);g.fill();
+}
+
+/* ================= PLACA D'INFORMACIÓ ================= */
+let panelOpen=false;
+const f1=v=>v==null?'—':(Math.round(v*10)/10).toFixed(1).replace('.',',');
+const hm=d=>d.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'});
+const WINDS=[['N','Tramuntana'],['NE','Gregal'],['E','Llevant'],['SE','Xaloc'],['S','Migjorn'],['SO','Garbí'],['O','Ponent'],['NO','Mestral']];
+function fillPanel(){
+  const pl=here(),now=new Date();
+  $('ipPlace').textContent=pl.name||'—';
+  const co=`${Math.abs(pl.lat).toFixed(3).replace('.',',')}° ${pl.lat>=0?'N':'S'} · ${Math.abs(pl.lon).toFixed(3).replace('.',',')}° ${pl.lon>=0?'E':'O'}`;
+  $('ipSub').textContent=(wx&&wx.elev!=null?`Altitud ${Math.round(wx.elev)} m · `:'')+co;
+  if(wx){
+    $('ipT').textContent=`${f1(wx.T)} °C`;
+    $('ipTmm').textContent=wx.tmax!=null?`Màx. ${f1(wx.tmax)} ° · Mín. ${f1(wx.tmin)} °`:'';
+    $('ipFeel').textContent=`${f1(wx.feel)} °C`;$('ipHum').textContent=`${Math.round(wx.H)} %`;$('ipSky').textContent=wx.W||'—';
+    const w=WINDS[Math.round(((wx.wd%360)+360)%360/45)%8];
+    $('ipWind').textContent=`${Math.round(wx.ws)} km/h ${w[0]}`;
+    $('ipWind2').textContent=`${w[1]}${wx.wg!=null?` · ratxes de ${Math.round(wx.wg)} km/h`:''}`;
+  }else{['ipT','ipFeel','ipHum','ipSky','ipWind'].forEach(id=>$(id).textContent='—');$('ipTmm').textContent='Sense dades del temps';$('ipWind2').textContent='';}
+  const st=todaySun();
+  const rise=wx&&wx.rise?wx.rise.slice(11,16):hm(st.rise),set=wx&&wx.set?wx.set.slice(11,16):hm(st.set);
+  $('ipRise').textContent=rise;$('ipSet').textContent=set;
+  const mins=(t=>+t.slice(0,2)*60+ +t.slice(3,5)),L=mins(set)-mins(rise);
+  $('ipDayLen').textContent=L>0?`${Math.floor(L/60)} h ${String(L%60).padStart(2,'0')} min de llum`:'';
+  const p=moonPhase(now.getTime()),ill=(1-Math.cos(p*TAU))/2;drawMoon($('moonCv'),p);
+  $('ipMoon').textContent=moonName(p);
+  const toFull=((.5-p+1)%1)*29.530588853,full=new Date(now.getTime()+toFull*DAYMS);
+  $('ipMoon2').textContent=`${Math.round(ill*100)} % il·luminada · plena el ${full.toLocaleDateString('ca-ES',{day:'numeric',month:'long'})}`;
+  const y=now.getFullYear(),doy=Math.round((Date.UTC(y,now.getMonth(),now.getDate())-Date.UTC(y,0,1))/DAYMS)+1,tot=(y%4===0&&y%100!==0)||y%400===0?366:365,rem=tot-doy;
+  $('ipDoy').textContent=`Dia ${doy} de ${tot}`;
+  $('ipDoy2').textContent=rem===0?"Avui s'acaba l'any":rem===1?"Falta 1 dia per acabar l'any":`Falten ${rem} dies per acabar l'any`;
+  $('ipDoyBar').style.width=(doy/tot*100).toFixed(1)+'%';
+}
+function openPanel(){fillPanel();panelOpen=true;$('ipanel').scrollTop=0;$('ipanel').classList.add('open');$('ipanel').setAttribute('aria-hidden','false');hint.classList.add('gone');}
+function closePanel(){panelOpen=false;$('ipanel').classList.remove('open');$('ipanel').setAttribute('aria-hidden','true');}
+{let sy=null;const ip=$('ipanel');
+ ip.addEventListener('touchstart',e=>{sy=ip.scrollTop<=0?e.touches[0].clientY:null;},{passive:true});
+ ip.addEventListener('touchend',e=>{if(sy!=null&&e.changedTouches[0].clientY-sy>70){suppressClick=Date.now()+400;closePanel();}sy=null;},{passive:true});}
+
+/* ================= MODES DE LLUM: AUTOMÀTIC · DIA · NIT · ZZ ================= */
+const MODES=['auto','dia','nit','zz'],MODE_ICON={auto:'A',dia:'☀︎',nit:'☾',zz:'zᶻ'};
+let mode=MODES.includes(store.get('mode'))?store.get('mode'):'auto',effMode='';
+function nightNow(){const s=todaySun(),n=Date.now();return n<s.rise.getTime()-20*60000||n>s.set.getTime()+25*60000;}
+function applyMode(announce){
+  const eff=mode==='auto'?(nightNow()?'nit':'dia'):mode;
+  document.body.classList.toggle('m-night',eff==='nit');document.body.classList.toggle('m-zz',eff==='zz');
+  $('modeBtn').textContent=MODE_ICON[mode];
+  if(eff!==effMode){effMode=eff;const L=eff==='zz';if(L!==lume){lume=L;hSettled=false;drawAllHands(new Date());}quiet=L;placeVeil();}
+  if(announce){const txt={auto:`Automàtic · ara ${eff==='nit'?'de nit':'de dia'}`,dia:'Mode dia',nit:'Mode nit',zz:'Mode zz · silenci i llum tènue'}[mode];
+    const t=$('toast');t.textContent=txt;t.classList.add('show');clearTimeout(applyMode.tm);applyMode.tm=setTimeout(()=>t.classList.remove('show'),2200);}
+}
+$('modeBtn').addEventListener('click',e=>{e.stopPropagation();mode=MODES[(MODES.indexOf(mode)+1)%MODES.length];store.set('mode',mode);applyMode(true);});
+/* Vel de nit: una capa fosca amb "finestres de llum" sobre l'esfera, la mitja esfera del termòmetre i la placa */
+function placeVeil(){
+  const eff=effMode;if(eff!=='nit'&&eff!=='zz')return;
+  const cv=$('veil'),W=innerWidth,H=innerHeight,q=.5,zz=eff==='zz';
+  cv.width=Math.ceil(W*q);cv.height=Math.ceil(H*q);
+  const g=cv.getContext('2d');g.setTransform(q,0,0,q,0,0);
+  const outer=zz?.93:.70;g.fillStyle=zz?`rgba(0,0,3,${outer})`:`rgba(3,5,16,${outer})`;g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='destination-out';
+  // foscor que queda a dins de cada forat: el mateix per a l'esfera i el termòmetre
+  const D=zz?{d:.22,g:.22,p:.30}:{d:.08,g:.08,p:.08};
+  const holes=[];
+  const els=[[document.querySelector('.dial:not(.big)'),'d'],[document.querySelector('.crown svg'),'g'],[document.querySelector('.plaque'),'p']];
+  if(wide)els.push([bigDial,'d'],[document.querySelector('#vcrown svg'),'g'],[$('vcap'),'p']);
+  els.forEach(([el,k])=>{if(!el)return;const b=el.getBoundingClientRect();if(!b.width)return;
+    if(k==='d')holes.push({k,x:b.left+b.width/2,y:b.top+b.height/2,rx:b.width/2,ry:b.height/2,sp:1.35});
+    else if(k==='g'){const u=b.width/380;holes.push({k,x:b.left+190*u,y:b.top+84*u,rx:72*u,ry:44*u,sp:1.45});}
+    else holes.push({k,x:b.left+b.width/2,y:b.top+b.height/2,rx:b.width/2*1.05,ry:b.height/2*1.15,sp:1.35});});
+  holes.forEach(h=>{const cut=Math.max(0,1-D[h.k]/outer);
+    g.save();g.translate(h.x,h.y);g.scale(h.rx*h.sp,h.ry*h.sp);
+    const gr=g.createRadialGradient(0,0,0,0,0,1);gr.addColorStop(0,`rgba(0,0,0,${cut})`);gr.addColorStop(1/h.sp,`rgba(0,0,0,${cut})`);gr.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=gr;g.beginPath();g.arc(0,0,1,0,TAU);g.fill();g.restore();});
+  g.globalCompositeOperation='source-over';
+}
+function placeVeilSoon(){placeVeil();clearTimeout(placeVeilSoon.t);placeVeilSoon.t=setTimeout(placeVeil,1250);}
+
+/* ================= iPhone: sense zoom amb dits; en horitzontal, arrossegar amunt i avall ================= */
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
+let drag=null,suppressClick=0;
+addEventListener('pointerdown',e=>{if(!phoneLand||panelOpen||(e.target.closest&&e.target.closest('#modeBtn')))return;drag={y:e.clientY,p:panY,moved:false};},{passive:true});
+addEventListener('pointermove',e=>{if(!drag)return;const dy=e.clientY-drag.y;
+  if(!drag.moved&&Math.abs(dy)>8){drag.moved=true;$('scaler').style.transition='none';}
+  if(drag.moved){panY=drag.p+dy;applyView();}},{passive:true});
+const endDrag=()=>{if(drag&&drag.moved){suppressClick=Date.now()+350;$('scaler').style.transition='';placeVeilSoon();}drag=null;};
+addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
 
 /* ================= BUCLE PRINCIPAL ================= */
 let hSec=-1,hSettled=false;
@@ -1078,6 +1304,8 @@ function frame(ts){
   if(sec!==hSec){hSec=sec;hSettled=false;}
   if(ms<260)drawAllHands(d);else if(!hSettled){drawAllHands(d);hSettled=true;}
   updateWeights(now);updateCalendar(d);
+  if(now-(frame.lm||0)>30000){frame.lm=now;applyMode(false);if(panelOpen)fillPanel();}
+  if(now-(frame.lv||0)>1500){frame.lv=now;placeVeil();}
   requestAnimationFrame(frame);
 }
 layout();
