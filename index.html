@@ -21,6 +21,7 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
   body{padding:14px 14px 120px;max-width:600px;margin:0 auto;}
 
+  /* ---------- Capçalera ---------- */
   header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 4px;}
   header h1{font-size:1.25rem;margin:0;font-weight:700;letter-spacing:-.02em;}
   .icon-btn{
@@ -30,6 +31,7 @@
   }
   .icon-btn:active{transform:scale(.92);}
 
+  /* ---------- Targetes ---------- */
   .card{
     background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
     padding:20px;margin-bottom:18px;animation:fadeUp .4s ease both;
@@ -37,14 +39,17 @@
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
   .card h2{margin:0 0 14px;font-size:1.1rem;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase;}
 
+  /* ---------- Rellotge ---------- */
   .clock-stage{display:flex;justify-content:center;align-items:center;min-height:280px;position:relative;}
   .clock-svg{width:min(300px,80vw);height:min(300px,80vw);}
 
+  /* Dígits LED */
   .seg{fill:#ff1a1a;transition:fill .1s;}
   .seg.off{fill:#2a0a0a;}
   .led-box{background:#0a0a0a;border-radius:14px;padding:14px 8px;display:flex;
     justify-content:center;align-items:center;gap:6px;width:100%;}
 
+  /* ---------- Botons de control ---------- */
   .controls{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;justify-content:center;}
   .btn{
     flex:1 1 auto;min-width:130px;min-height:var(--tap);border:none;border-radius:16px;
@@ -55,17 +60,33 @@
   .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(230,57,70,.35);}
   .btn-secondary{background:#eef1f4;color:var(--text);}
 
-  /* ---------- Banderes SVG ---------- */
+  /* ---------- Selector d'idioma (dins la targeta) ---------- */
   .lang-row{display:flex;justify-content:center;gap:10px;margin-top:14px;}
   .lang-btn{
-    width:64px;height:48px;border-radius:12px;border:2px solid transparent;
+    width:64px;height:44px;border-radius:12px;border:2px solid transparent;
     background:#eef1f4;cursor:pointer;transition:all .15s;padding:4px;
     display:flex;align-items:center;justify-content:center;
   }
-  .lang-btn.active{border-color:var(--accent);background:#fff;transform:scale(1.05);box-shadow:0 3px 10px rgba(230,57,70,.2);}
-  .flag-svg{width:100%;height:100%;border-radius:6px;display:block;}
+  .lang-btn.active{border-color:var(--accent);background:#fff;transform:scale(1.05);}
 
-  /* ---------- Panell ---------- */
+  /* Senyera dibuixada amb CSS */
+  .senyera{
+    width:44px;height:30px;border-radius:4px;overflow:hidden;
+    display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.15);
+  }
+  .senyera span{flex:1;background:#fdd835;}
+  .senyera span:nth-child(odd){background:#d62828;}
+
+  /* Bandera espanyola simplificada amb CSS */
+  .espanya{
+    width:44px;height:30px;border-radius:4px;overflow:hidden;
+    display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.15);
+  }
+  .espanya span:nth-child(1),
+  .espanya span:nth-child(3){flex:1;background:#d62828;}
+  .espanya span:nth-child(2){flex:2;background:#fdd835;}
+
+  /* ---------- Panell de configuració ---------- */
   .sheet{
     position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;
     justify-content:center;align-items:flex-end;z-index:100;backdrop-filter:blur(2px);
@@ -88,15 +109,8 @@
   }
   .opt.active{border-color:var(--accent);background:#fff5f6;color:var(--accent);}
   .opt small{font-weight:400;color:var(--muted);font-size:.72rem;}
-  .opt .flag-mini{width:32px;height:22px;border-radius:4px;display:block;}
 
-  select{
-    width:100%;min-height:56px;border-radius:14px;border:2px solid #e5e7eb;
-    background:#fff;font-size:.95rem;padding:0 14px;font-family:inherit;
-    color:var(--text);cursor:pointer;
-  }
-  .voice-info{font-size:.78rem;color:var(--muted);margin-top:8px;line-height:1.4;}
-
+  /* ---------- Botó flotant micròfon ---------- */
   .mic-fab{
     position:fixed;bottom:24px;right:24px;width:72px;height:72px;border-radius:50%;
     background:var(--accent);color:#fff;border:none;font-size:1.8rem;cursor:pointer;
@@ -105,6 +119,7 @@
   }
   .mic-fab:active{transform:scale(.9);}
 
+  /* ---------- Toast ---------- */
   .toast{
     position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);
     background:#1c1c1e;color:#fff;padding:14px 22px;border-radius:14px;font-size:.95rem;
@@ -125,6 +140,7 @@
   <h2 id="clockLabel">El rellotge</h2>
 
   <div class="clock-stage">
+    <!-- Rellotge ANALÒGIC -->
     <svg class="clock-svg" id="analogClock" viewBox="0 0 200 200" aria-hidden="true">
       <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="#d8dce0" stroke-width="3"/>
       <g id="hourMarks" stroke="#111" stroke-linecap="butt"></g>
@@ -136,6 +152,7 @@
       <circle cx="100" cy="100" r="4" fill="#e63946"/>
     </svg>
 
+    <!-- Rellotge DIGITAL (LED) -->
     <div class="led-box" id="digitalClock" style="display:none;">
       <svg viewBox="0 0 130 60" width="100%" style="max-width:340px;">
         <g id="ledDigits"></g>
@@ -148,21 +165,12 @@
     <button class="btn btn-secondary" id="toggleFace">🔄 Canviar esfera</button>
   </div>
 
-  <!-- Banderes SVG (senyera + espanyola) -->
   <div class="lang-row">
     <button class="lang-btn active" data-lang="ca" aria-label="Català">
-      <svg class="flag-svg" viewBox="0 0 60 40" preserveAspectRatio="none">
-        <rect width="60" height="40" fill="#fcdd09"/>
-        <rect y="5.7"  width="60" height="5.7" fill="#da121a"/>
-        <rect y="17.1" width="60" height="5.7" fill="#da121a"/>
-        <rect y="28.6" width="60" height="5.7" fill="#da121a"/>
-      </svg>
+      <span class="senyera"><span></span><span></span><span></span><span></span><span></span></span>
     </button>
     <button class="lang-btn" data-lang="es" aria-label="Castellano">
-      <svg class="flag-svg" viewBox="0 0 60 40" preserveAspectRatio="none">
-        <rect width="60" height="40" fill="#aa151b"/>
-        <rect y="10" width="60" height="20" fill="#f1bf00"/>
-      </svg>
+      <span class="espanya"><span></span><span></span><span></span></span>
     </button>
   </div>
 </section>
@@ -173,6 +181,7 @@
   <p style="margin:0;color:var(--muted);">Aquí afegirem els teus esports, música, zodiac i recordatoris.</p>
 </section>
 
+<!-- ============ BOTÓ FLOTANT MICRÒFON ============ -->
 <button class="mic-fab" id="micBtn" aria-label="Parlar">🎤</button>
 
 <!-- ============ PANELL DE CONFIGURACIÓ ============ -->
@@ -192,22 +201,8 @@
     <div class="opt-group">
       <label>Idioma</label>
       <div class="opt-row" id="langRow">
-        <button class="opt active" data-lang="ca">
-          <svg class="flag-mini" viewBox="0 0 60 40" preserveAspectRatio="none">
-            <rect width="60" height="40" fill="#fcdd09"/>
-            <rect y="5.7"  width="60" height="5.7" fill="#da121a"/>
-            <rect y="17.1" width="60" height="5.7" fill="#da121a"/>
-            <rect y="28.6" width="60" height="5.7" fill="#da121a"/>
-          </svg>
-          <span>Català</span>
-        </button>
-        <button class="opt" data-lang="es">
-          <svg class="flag-mini" viewBox="0 0 60 40" preserveAspectRatio="none">
-            <rect width="60" height="40" fill="#aa151b"/>
-            <rect y="10" width="60" height="20" fill="#f1bf00"/>
-          </svg>
-          <span>Castellano</span>
-        </button>
+        <button class="opt active" data-lang="ca">🏴<span>Català</span></button>
+        <button class="opt" data-lang="es">🇪🇸<span>Castellano</span></button>
       </div>
     </div>
 
@@ -218,14 +213,6 @@
         <button class="opt active" data-rate="0.8">🚶<span>Normal</span></button>
         <button class="opt" data-rate="1.1">🐇<span>Ràpida</span></button>
       </div>
-    </div>
-
-    <div class="opt-group">
-      <label>Veu del sistema</label>
-      <select id="voiceSelect">
-        <option value="">Automàtica (recomanada)</option>
-      </select>
-      <div class="voice-info" id="voiceInfo">S'utilitzarà la millor veu disponible en l'idioma triat.</div>
     </div>
 
     <button class="btn btn-secondary" id="closeSettings" style="width:100%;">Tancar</button>
@@ -243,9 +230,11 @@ const state = {
   rate: 0.8,
   mode: 'explorer',
   face: 'analog',
-  voiceURI: '', // si està buit, selecció automàtica
 };
 
+/* ============================================================
+   TEXTOS DE LA INTERFÍCIE
+   ============================================================ */
 const i18n = {
   ca: {
     appTitle: 'El meu taulell',
@@ -258,12 +247,7 @@ const i18n = {
     mode: "Mode d'autonomia",
     language: 'Idioma',
     rate: 'Velocitat de la veu',
-    voice: 'Veu del sistema',
     close: 'Tancar',
-    voiceAuto: 'Automàtica (recomanada)',
-    voiceInfoAuto: "S'utilitzarà la millor veu disponible en l'idioma triat.",
-    voiceInfoPicked: 'Veu seleccionada:',
-    voiceNone: 'No hi ha cap veu instal·lada en aquest idioma. El navegador en farà servir una de semblant.',
   },
   es: {
     appTitle: 'Mi tablero',
@@ -276,15 +260,13 @@ const i18n = {
     mode: 'Modo de autonomía',
     language: 'Idioma',
     rate: 'Velocidad de la voz',
-    voice: 'Voz del sistema',
     close: 'Cerrar',
-    voiceAuto: 'Automática (recomendada)',
-    voiceInfoAuto: 'Se usará la mejor voz disponible en el idioma elegido.',
-    voiceInfoPicked: 'Voz seleccionada:',
-    voiceNone: 'No hay ninguna voz instalada en este idioma. El navegador usará una parecida.',
   }
 };
 
+/* ============================================================
+   NOMS DELS NÚMEROS EN LLETRES
+   ============================================================ */
 const numWords = {
   ca: ['dotze','una','dues','tres','quatre','cinc','sis','set','vuit','nou','deu','onze'],
   es: ['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once']
@@ -295,12 +277,13 @@ const minuteWords = {
 };
 
 /* ============================================================
-   RELLOTGE ANALÒGIC — marques
+   RELLOTGE ANALÒGIC — generació de marques
    ============================================================ */
 (function buildAnalogMarks(){
   const hourG = document.getElementById('hourMarks');
   const minG  = document.getElementById('minuteMarks');
   const cx=100, cy=100;
+
   for(let i=0;i<12;i++){
     const angle = (i*30) * Math.PI/180;
     const r1 = 78, r2 = 88;
@@ -314,6 +297,7 @@ const minuteWords = {
     l.setAttribute('stroke-width','7');
     hourG.appendChild(l);
   }
+
   for(let i=0;i<60;i++){
     if(i%5===0) continue;
     const angle = (i*6) * Math.PI/180;
@@ -331,7 +315,7 @@ const minuteWords = {
 })();
 
 /* ============================================================
-   RELLOTGE DIGITAL LED (SVG set-segments)
+   RELLOTGE DIGITAL — dígits de set segments en SVG
    ============================================================ */
 const SEG_MAP = {
   '0':['a','b','c','d','e','f'],
@@ -345,6 +329,7 @@ const SEG_MAP = {
   '8':['a','b','c','d','e','f','g'],
   '9':['a','b','c','d','f','g'],
 };
+
 function digitPath(seg){
   const w=24, h=46, t=5;
   const segs = {
@@ -358,14 +343,17 @@ function digitPath(seg){
   };
   return segs[seg];
 }
+
 function buildLedDigits(){
   const g = document.getElementById('ledDigits');
   g.innerHTML='';
   const xPositions = [4, 34, 74, 104];
   const y0 = 7;
+
   xPositions.forEach((xp, i) => {
     const digitGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
     digitGroup.setAttribute('transform', `translate(${xp}, ${y0})`);
+    digitGroup.dataset.index = i;
     ['a','b','c','d','e','f','g'].forEach(s => {
       const p = document.createElementNS('http://www.w3.org/2000/svg','path');
       p.setAttribute('d', digitPath(s));
@@ -375,16 +363,18 @@ function buildLedDigits(){
     });
     g.appendChild(digitGroup);
   });
+
   const dot1 = document.createElementNS('http://www.w3.org/2000/svg','circle');
   dot1.setAttribute('cx', 66); dot1.setAttribute('cy', 20);
   dot1.setAttribute('r', 3); dot1.setAttribute('fill', '#ff1a1a');
-  dot1.setAttribute('class','seg');
+  dot1.setAttribute('class','seg'); dot1.dataset.dot = '1';
   const dot2 = document.createElementNS('http://www.w3.org/2000/svg','circle');
   dot2.setAttribute('cx', 66); dot2.setAttribute('cy', 40);
   dot2.setAttribute('r', 3); dot2.setAttribute('fill', '#ff1a1a');
-  dot2.setAttribute('class','seg');
+  dot2.setAttribute('class','seg'); dot2.dataset.dot = '2';
   g.appendChild(dot1); g.appendChild(dot2);
 }
+
 function updateLed(time){
   const hh = String(time.getHours()).padStart(2,'0');
   const mm = String(time.getMinutes()).padStart(2,'0');
@@ -408,85 +398,46 @@ function updateClock(){
   const h = now.getHours() % 12;
   const m = now.getMinutes();
   const s = now.getSeconds();
-  const secAngle  = s*6;
-  const minAngle  = m*6 + s*0.1;
+
+  const secAngle = s*6;
+  const minAngle = m*6 + s*0.1;
   const hourAngle = h*30 + m*0.5;
+
   document.getElementById('hourHand').setAttribute('transform', `rotate(${hourAngle} 100 100)`);
   document.getElementById('minHand').setAttribute('transform',  `rotate(${minAngle} 100 100)`);
   document.getElementById('secHand').setAttribute('transform',  `rotate(${secAngle} 100 100)`);
+
   updateLed(now);
 }
 
 /* ============================================================
-   VEUS — selecció intel·ligent
+   VEUS — SELECCIÓ ACURADA DE LA VEU CATALANA
    ============================================================ */
-function getVoices(){
-  if(!('speechSynthesis' in window)) return [];
-  return window.speechSynthesis.getVoices() || [];
+let voicesLoaded = false;
+let cachedVoices = [];
+
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  cachedVoices = window.speechSynthesis.getVoices();
+  if(cachedVoices.length > 0) voicesLoaded = true;
 }
 
-function pickVoiceForLang(lang){
-  const voices = getVoices();
-  if(!voices.length) return null;
-  const wanted = lang === 'ca' ? ['ca-es','ca-ad','ca'] : ['es-es','es'];
-  // 1) Prioritat: coincidència exacta del prefix principal
-  for(const w of wanted){
-    const v = voices.find(v => v.lang.toLowerCase().startsWith(w));
-    if(v) return v;
-  }
-  // 2) Coincidència parcial (per exemple "ca-ES-valencia")
-  for(const w of wanted){
-    const v = voices.find(v => v.lang.toLowerCase().includes(w));
-    if(v) return v;
-  }
-  return null;
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
 }
 
-function refreshVoiceSelect(){
-  const sel = document.getElementById('voiceSelect');
-  const info = document.getElementById('voiceInfo');
-  const voices = getVoices();
-  const t = i18n[state.lang];
-
-  // Reinicialitzem el selector
-  sel.innerHTML = '';
-  const autoOpt = document.createElement('option');
-  autoOpt.value = '';
-  autoOpt.textContent = t.voiceAuto;
-  sel.appendChild(autoOpt);
-
-  // Filtrem les veus que comencin per ca o es
-  const relevant = voices.filter(v => {
-    const l = v.lang.toLowerCase();
-    return l.startsWith('ca') || l.startsWith('es');
-  });
-
-  // Si no n'hi ha cap de rellevant, mostrem totes
-  const toShow = relevant.length ? relevant : voices;
-
-  toShow.forEach(v => {
-    const o = document.createElement('option');
-    o.value = v.voiceURI;
-    o.textContent = `${v.name} — ${v.lang}${v.default ? ' ⭐' : ''}`;
-    sel.appendChild(o);
-  });
-
-  // Seleccionem el valor guardat
-  sel.value = state.voiceURI || '';
-
-  // Informació
-  if(state.voiceURI){
-    const v = voices.find(x => x.voiceURI === state.voiceURI);
-    info.textContent = v
-      ? `${t.voiceInfoPicked} ${v.name} (${v.lang})`
-      : t.voiceInfoAuto;
+function pickVoice(lang){
+  // Prioritat: ca-ES exacte > qualsevol que comenci per 'ca' > cap
+  if(!cachedVoices.length) refreshVoices();
+  if(lang === 'ca'){
+    let v = cachedVoices.find(x => x.lang === 'ca-ES');
+    if(!v) v = cachedVoices.find(x => x.lang.toLowerCase().startsWith('ca'));
+    return v || null;
   } else {
-    const auto = pickVoiceForLang(state.lang);
-    if(auto){
-      info.textContent = `${t.voiceInfoPicked} ${auto.name} (${auto.lang})`;
-    } else {
-      info.textContent = t.voiceNone;
-    }
+    let v = cachedVoices.find(x => x.lang === 'es-ES');
+    if(!v) v = cachedVoices.find(x => x.lang.toLowerCase().startsWith('es'));
+    return v || null;
   }
 }
 
@@ -494,33 +445,26 @@ function speak(text){
   if(!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  const langCode = state.lang === 'ca' ? 'ca-ES' : 'es-ES';
-  u.lang = langCode;
+  u.lang = state.lang === 'ca' ? 'ca-ES' : 'es-ES';
   u.rate = state.rate;
   u.pitch = 1.0;
 
-  // 1) Si l'usuari ha triat una veu concreta, la fem servir
-  const voices = getVoices();
-  let chosen = null;
-  if(state.voiceURI){
-    chosen = voices.find(v => v.voiceURI === state.voiceURI) || null;
+  const v = pickVoice(state.lang);
+  if(v){
+    u.voice = v;
+    u.lang = v.lang;
+  } else if(state.lang === 'ca'){
+    // Avís amable si no hi ha veu catalana instal·lada
+    console.warn('No s\'ha trobat cap veu catalana instal·lada al dispositiu.');
   }
-  // 2) Si no, selecció automàtica per idioma
-  if(!chosen){
-    chosen = pickVoiceForLang(state.lang);
-  }
-  if(chosen) u.voice = chosen;
-
   window.speechSynthesis.speak(u);
 }
 
-/* ============================================================
-   FRASE DE L'HORA
-   ============================================================ */
 function buildTimePhrase(date){
   const h = date.getHours();
   const m = date.getMinutes();
   const lang = state.lang;
+
   const hourWord = numWords[lang][h % 12];
   const minBucket = Math.floor(m/5);
   const minWord = minuteWords[lang][minBucket];
@@ -539,6 +483,7 @@ function buildTimePhrase(date){
     return `Son las ${hourWord} y ${minWord}.`;
   }
 }
+
 function sayCurrentTime(){
   const phrase = buildTimePhrase(new Date());
   speak(phrase);
@@ -589,7 +534,8 @@ function setLang(lang){
     b.classList.toggle('active', b.dataset.lang === lang);
   });
   applyI18n();
-  refreshVoiceSelect();
+  // Si encara no s'han carregat les veus, torna-ho a provar
+  refreshVoices();
 }
 
 function applyI18n(){
@@ -608,34 +554,24 @@ function applyI18n(){
   groups[0].textContent = t.mode;
   groups[1].textContent = t.language;
   groups[2].textContent = t.rate;
-  groups[3].textContent = t.voice;
   document.getElementById('closeSettings').textContent = t.close;
 }
 
 /* ============================================================
-   CONFIGURACIÓ: MODE, VELOCITAT I VEU
+   CONFIGURACIÓ: MODE I VELOCITAT
    ============================================================ */
 function setMode(mode){
   state.mode = mode;
   document.querySelectorAll('#modeRow .opt').forEach(b=>{
     b.classList.toggle('active', b.dataset.mode === mode);
   });
-  showToast(state.lang === 'ca' ? `Mode: ${mode}` : `Modo: ${mode}`);
 }
+
 function setRate(rate){
   state.rate = parseFloat(rate);
   document.querySelectorAll('#rateRow .opt').forEach(b=>{
     b.classList.toggle('active', parseFloat(b.dataset.rate) === state.rate);
   });
-}
-function setVoice(uri){
-  state.voiceURI = uri;
-  refreshVoiceSelect();
-  // Petita prova de so
-  const t = i18n[state.lang];
-  const msg = state.lang === 'ca' ? 'Aquesta és la meva veu.' : 'Esta es mi voz.';
-  speak(msg);
-  showToast(msg);
 }
 
 /* ============================================================
@@ -650,4 +586,42 @@ document.querySelectorAll('.lang-btn').forEach(b=>{
 document.querySelectorAll('#langRow .opt').forEach(b=>{
   b.addEventListener('click', ()=> setLang(b.dataset.lang));
 });
-document.querySelectorAll
+document.querySelectorAll('#modeRow .opt').forEach(b=>{
+  b.addEventListener('click', ()=> setMode(b.dataset.mode));
+});
+document.querySelectorAll('#rateRow .opt').forEach(b=>{
+  b.addEventListener('click', ()=> setRate(b.dataset.rate));
+});
+
+const sheet = document.getElementById('settingsSheet');
+document.getElementById('openSettings').addEventListener('click', ()=> sheet.classList.add('open'));
+document.getElementById('closeSettings').addEventListener('click', ()=> sheet.classList.remove('open'));
+sheet.addEventListener('click', e=>{ if(e.target === sheet) sheet.classList.remove('open'); });
+
+document.getElementById('micBtn').addEventListener('click', ()=>{
+  const msg = state.lang === 'ca'
+    ? 'El micròfon arribarà aviat. De moment prem "Digues l\'hora".'
+    : 'El micrófono llegará pronto. De momento pulsa "Di la hora".';
+  speak(msg);
+  showToast(msg);
+});
+
+/* ============================================================
+   INICIALITZACIÓ
+   ============================================================ */
+window.addEventListener('load', ()=>{
+  applyI18n();
+  updateClock();
+  setInterval(updateClock, 1000);
+  refreshVoices();
+
+  setTimeout(()=>{
+    const greet = state.lang === 'ca'
+      ? 'Hola! Ja pots veure el teu taulell.'
+      : '¡Hola! Ya puedes ver tu tablero.';
+    speak(greet);
+  }, 800);
+});
+</script>
+</body>
+</html>
