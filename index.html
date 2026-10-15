@@ -265,7 +265,20 @@ body.wide .ip-val{font-size:24px}
 body.wide .ip-grid{grid-template-columns:repeat(2,1fr)}
 body.wide .ip-plate{padding:26px 30px}
 body.m-night .ipanel{filter:brightness(.78)}
-body.m-zz .ipanel{filter:brightness(.55)}
+/* zz: placa del sòcol i de la vitrina en penombra, com les esferes */
+.plaque,.vcap{transition:filter 2s}
+body.m-zz .plaque,body.m-zz .vcap{background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),var(--brass)}
+/* zz: placa gran fosca amb lletres verdes fosforescents */
+body.m-zz .ipanel{background:#050605}
+body.m-zz .ip-plate{background:radial-gradient(ellipse at 40% 20%,#141a15,#0a0d0a 70%);
+  box-shadow:0 6px 16px rgba(0,0,0,.8),inset 0 0 0 2px rgba(60,90,65,.6),inset 0 0 0 6px rgba(120,200,135,.06),inset 0 0 0 8px rgba(30,45,32,.8)}
+body.m-zz .ip-plate .e{color:#c9ffd0;text-shadow:0 0 3px rgba(140,255,160,.85),0 0 9px rgba(100,240,130,.45)}
+body.m-zz .ip-cell{background:rgba(120,255,150,.03);box-shadow:inset 0 1px 2px rgba(0,0,0,.8),inset 0 -1px 0 rgba(120,220,140,.12)}
+body.m-zz .ip-rule{background:linear-gradient(90deg,transparent,rgba(130,255,155,.45),transparent);box-shadow:none}
+body.m-zz .ip-bar{background:rgba(120,255,150,.08);box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
+body.m-zz .ip-bar i{background:linear-gradient(90deg,#3c8a4c,#b6ffbf);box-shadow:0 0 6px rgba(130,255,155,.7)}
+body.m-zz .scr{filter:brightness(.3)}
+body.m-zz #moonCv{filter:brightness(.6) sepia(.3) hue-rotate(60deg);box-shadow:0 0 8px rgba(120,255,150,.35)}
 .ip-plate{position:relative;min-height:100%;border-radius:10px;background:var(--brass);cursor:pointer;
   padding:clamp(20px,3.5vh,40px) clamp(18px,4vw,48px);display:flex;flex-direction:column;gap:clamp(10px,2vh,18px);
   box-shadow:0 6px 16px rgba(0,0,0,.7),inset 0 0 0 2px rgba(80,55,10,.7),inset 0 0 0 6px rgba(255,240,200,.25),inset 0 0 0 8px rgba(80,55,10,.4)}
@@ -1291,7 +1304,7 @@ function placeVeil(){
   const outer=zz?.93:.70;g.fillStyle=zz?`rgba(0,0,3,${outer})`:`rgba(3,5,16,${outer})`;g.fillRect(0,0,W,H);
   g.globalCompositeOperation='destination-out';
   // foscor que queda a dins de cada forat: el mateix per a l'esfera i el termòmetre
-  const D=zz?{d:.22,g:.22,p:.30}:{d:.08,g:.08,p:.08};
+  const D=zz?{d:.22,g:.22,p:.22}:{d:.08,g:.08,p:.08};
   const holes=[];
   const els=[[document.querySelector('.dial:not(.big)'),'d'],[document.querySelector('.crown svg'),'g'],[document.querySelector('.plaque'),'p']];
   if(wide)els.push([bigDial,'d'],[document.querySelector('#vcrown svg'),'g'],[$('vcap'),'p']);
