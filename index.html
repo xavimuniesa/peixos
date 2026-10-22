@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --wood-v: linear-gradient(90deg,#3d1408,#5a1f0c,#2b0d05);
@@ -701,8 +701,9 @@ function drawDialFace(g,dp){
   for(let i=0;i<12;i++){const a=i*TAU/12;g.fillStyle=ink;g.beginPath();g.arc(Math.sin(a)*112,-Math.cos(a)*112,.1,0,TAU);g.fill();}
   // Xifres romanes radials
   g.fillStyle='#1c1008';g.textAlign='center';g.textBaseline='middle';
-  g.font='20px "IM Fell English", Georgia, serif';
-  for(let n=1;n<=12;n++){g.save();g.rotate(n*TAU/12);g.translate(0,-89);g.scale(.84,1.05);g.fillText(ROMAN[n],0,1);g.restore();}
+  // Xifres romanes estilitzades: tipus Didot d'alt contrast, altes i estretes
+  g.font='700 21px "Playfair Display", "Bodoni 72", Didot, Georgia, serif';
+  for(let n=1;n<=12;n++){g.save();g.rotate(n*TAU/12);g.translate(0,-90);g.scale(.62,1.24);g.fillText(ROMAN[n],0,1);g.restore();}
   // Signatura del rellotger
   g.fillStyle='#2b190c';g.font='600 8.5px "Cinzel", Georgia, serif';
   if('letterSpacing' in g)g.letterSpacing='2.2px';
@@ -1345,7 +1346,7 @@ function frame(ts){
 }
 layout();
 addEventListener('resize',layout);
-Promise.all(['20px "IM Fell English"','600 9px "Cinzel"','16px "Pinyon Script"','italic 7px "IM Fell English"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>paintDials());
+Promise.all(['700 21px "Playfair Display"','20px "IM Fell English"','600 9px "Cinzel"','16px "Pinyon Script"','italic 7px "IM Fell English"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>paintDials());
 fitWindows();
 document.fonts.ready.then(()=>{fitWindows();paintDials();fitText($('plLoc'),21);fitText($('plInfo'),13.5);});
 requestAnimationFrame(frame);
