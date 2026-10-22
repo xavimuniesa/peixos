@@ -465,7 +465,7 @@ body.wide .viewer{display:flex}
       <div class="dial">
        <div class="dface">
         <canvas id="faceCv" width="256" height="256"></canvas>
-        <div class="win" style="left:77px;top:70px;width:102px"><div class="drum" id="stripWd"></div></div>
+        <div class="win" style="left:77px;top:79px;width:102px"><div class="drum" id="stripWd"></div></div>
         <div class="win" style="left:81px;top:153px;width:34px"><div class="drum num" id="stripDay"></div></div>
         <div class="win" style="left:121px;top:153px;width:56px"><div class="drum" id="stripMon"></div></div>
         <div class="dshade"></div>
@@ -707,14 +707,14 @@ function drawDialFace(g,dp){
   // Signatura del rellotger
   g.fillStyle='#2b190c';g.font='600 8.5px "Cinzel", Georgia, serif';
   if('letterSpacing' in g)g.letterSpacing='2.2px';
-  g.fillText('ANTAVIANA',0,-68);
+  g.fillText('ANTAVIANA',0,-58);
   if('letterSpacing' in g)g.letterSpacing='0px';
   g.fillStyle='#4a2c16';g.font='16px "Pinyon Script", "IM Fell English", cursive';
-  g.fillText('Barcelona',0,70);
+  g.fillText('Barcelona',0,65);
   // Rivets daurats de les finestres (dibuixats a l'esfera: no parpellegen en animar)
   g.setTransform(dp,0,0,dp,0,0);
   const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();};
-  [[77,70,102,22],[81,153,34,22],[121,153,56,22]].forEach(([x,y,w,h])=>{
+  [[77,79,102,22],[81,153,34,22],[121,153,56,22]].forEach(([x,y,w,h])=>{
     let lg=g.createLinearGradient(0,y-4,0,y+h+4);lg.addColorStop(0,'rgba(90,60,20,.55)');lg.addColorStop(.5,'rgba(90,60,20,0)');lg.addColorStop(1,'rgba(255,250,235,.95)');
     rr(x-4,y-4,w+8,h+8,4);g.fillStyle=lg;g.fill();
     const bg=g.createLinearGradient(x,y-2,x+w*.4,y+h+2);bg.addColorStop(0,'#8a6420');bg.addColorStop(.35,'#f3dc92');bg.addColorStop(.6,'#b08430');bg.addColorStop(1,'#6b4a12');
