@@ -477,7 +477,7 @@ body.llibre .sona{bottom:calc(70px + env(safe-area-inset-bottom))}
 .av-l li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;background:rgba(255,250,235,.55);box-shadow:inset 3px 0 0 #b8892c;font-size:15.5px}
 .av-l li svg{flex:none;width:24px;height:24px;fill:none;stroke:#3b2606;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .av-l li.groc{box-shadow:inset 4px 0 0 #d6a531}.av-l li.taronja{box-shadow:inset 4px 0 0 #c8641e}.av-l li.vermell{box-shadow:inset 4px 0 0 #a82c22}
-.av-l li.info{box-shadow:inset 4px 0 0 #761a29}.av-l li.cap{font-style:italic;color:#5a4128}
+.av-l li.info{box-shadow:inset 4px 0 0 #761a29}.av-l li.buit{font-style:italic;color:#5a4128}
 
 /* Ràdio */
 .m-radios{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -2362,7 +2362,7 @@ function pintaAvisos(){
   if(fa)llista.push(['info',IC_AV.festa,L.a.avuiFestiu(nomFesta(fa))]);
   if(fd)llista.push(['info',IC_AV.festa,L.a.demaFestiu(nomFesta(fd))]);
   const ul=$('avLlista');
-  ul.innerHTML=llista.length?llista.map(([c,ic,t])=>`<li class="${c}">${ic}<span></span></li>`).join(''):`<li class="cap"><span></span></li>`;
+  ul.innerHTML=llista.length?llista.map(([c,ic,t])=>`<li class="${c}">${ic}<span></span></li>`).join(''):`<li class="buit"><span></span></li>`;
   const sp=ul.querySelectorAll('span');
   if(llista.length)llista.forEach((a,i)=>{sp[i].textContent=a[2];});else sp[0].textContent=m?L.capAvis:L.esperantPrev;
 }
