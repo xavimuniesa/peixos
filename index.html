@@ -224,7 +224,18 @@ body.zoom .dial{cursor:zoom-out}
 html,body{touch-action:none;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 /* ---------- MODE NOCTURN / ZZ ---------- */
 .veil{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:40;opacity:0;transition:opacity 2.4s ease}
-body.m-night .veil,body.m-zz .veil{opacity:1}
+body.m-night .veil{opacity:1}
+/* zz: la penombra es fa dins de l'escena (cada peça s'enfosqueix on és), no amb una capa a sobre:
+   així la llum de l'esfera queda sempre enganxada a l'esfera, encara que el rellotge es mogui o s'inclini */
+.zzv,.zzv-s{display:none}
+body.m-zz .zzv{display:block;position:absolute;inset:0;background:rgba(0,0,0,.76);pointer-events:none}
+body.m-zz .zzv-s{display:inline}
+body.m-zz .wall,body.m-zz .wainscot,body.m-zz .side,body.m-zz .topf,body.m-zz .bstrip,body.m-zz .cback,body.m-zz .wlayer,body.m-zz .pshadow,body.m-zz .pend,body.m-zz .cw,
+body.m-zz .hinge,body.m-zz .df,body.m-zz .glass,body.m-zz .escutcheon,body.m-zz .kw,body.m-zz .klabel,body.m-zz .vdf,body.m-zz .vglass,body.m-zz .vhinge,body.m-zz .vesc,body.m-zz .vbase{filter:brightness(.26)}
+body.m-zz .vcav{background:#060403}
+body.m-zz .dial::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,transparent 127.2px,rgba(0,0,0,.76) 128.6px)}
+body.m-zz .dome{opacity:.22}
 /* zz: esfera i finestres apagades perquè les agulles fosforescents destaquin */
 #faceCv,#faceCv2,.win{transition:filter 2s}
 
@@ -688,6 +699,7 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
       <circle cx="32" cy="89" r="6.5" fill="url(#ballG)"/>
       <rect x="340" y="96" width="16" height="4" rx="1.5" fill="url(#brassV)"/>
       <circle cx="348" cy="89" r="6.5" fill="url(#ballG)"/>
+      <path class="zzv-s" fill="#000" fill-opacity=".76" fill-rule="evenodd" d="M-6 -6H386V176H-6Z M132.6 110 A57.4 57.4 0 0 1 247.4 110 Z"/>
      </svg>
     </div>
    </div>
@@ -732,6 +744,7 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
     <div class="f side l"></div><div class="f side r"></div><div class="f topf"></div>
     <div class="f front base-front">
      <div class="bead"></div>
+     <div class="zzv"></div>
      <div class="kw left">
       <div class="rosette"></div>
       <span class="mark" style="left:9px;top:15px"></span><span class="mark" style="right:9px;top:15px;background:#f0cf7a"></span>
@@ -757,6 +770,7 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
 <div class="viewer" id="viewer">
  <div class="vcrown" id="vcrown"></div>
  <div class="vbody" id="vbody">
+  <div class="zzv"></div>
   <div class="vcav" id="vcav">
    <div class="vdial" id="vdial"></div>
    <div class="vcap" id="vcap"><div class="engr" id="vDate">&nbsp;</div><div class="engr" id="vPlace">&nbsp;</div></div>
@@ -3507,7 +3521,7 @@ $('modeBtn').addEventListener('click',e=>{e.stopPropagation();mode=MODES[(MODES.
 /* Vel de nit: una capa fosca amb "finestres de llum" sobre l'esfera, la mitja esfera del termòmetre i la placa */
 function placeVeil(){
   const eff=effMode;if(eff!=='nit'&&eff!=='zz')return;
-  if(eff==='zz')return placeVeilZZ();
+  if(eff==='zz')return;
   const cv=$('veil'),W=innerWidth,H=innerHeight,q=.5,zz=eff==='zz';
   cv.width=Math.ceil(W*q);cv.height=Math.ceil(H*q);
   const g=cv.getContext('2d');g.setTransform(q,0,0,q,0,0);
