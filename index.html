@@ -227,16 +227,16 @@ html,body{touch-action:none;overscroll-behavior:none;-webkit-text-size-adjust:10
 body.m-night .veil,body.m-zz .veil{opacity:1}
 /* zz: esfera i finestres apagades perquè les agulles fosforescents destaquin */
 #faceCv,#faceCv2,.win{transition:filter 2s}
-body.m-zz #faceCv,body.m-zz #faceCv2,body.m-zz .win{filter:brightness(.42)}
+
 /* zz: dades de la placa i agulla del termòmetre fosforescents */
 #plLoc,#plTemp,#plInfo,#vDate,#vPlace{transition:color 2s,text-shadow 2s}
 body.m-zz #plLoc,body.m-zz #plTemp,body.m-zz #plInfo,body.m-zz #vDate,body.m-zz #vPlace{color:#d2ffd8;
   text-shadow:0 0 3px rgba(150,255,170,.95),0 0 9px rgba(110,255,140,.7),0 0 16px rgba(90,240,120,.4)}
 .gdim{transition:opacity 2s}
-body.m-zz .gdim{opacity:.58}
-body.m-zz #needle path,body.m-zz #needle2 path{fill:#d2ffd8}
-body.m-zz #needle circle,body.m-zz #needle2 circle{stroke:#d2ffd8}
-body.m-zz #needle,body.m-zz #needle2{filter:drop-shadow(0 0 2px rgba(130,255,155,.95)) drop-shadow(0 0 5px rgba(100,255,130,.6))}
+body.m-zz .gdim{opacity:.8}
+body.m-zz #needle path,body.m-zz #needle2 path{fill:var(--zzH)}
+body.m-zz #needle circle,body.m-zz #needle2 circle{stroke:var(--zzH)}
+body.m-zz #needle,body.m-zz #needle2{filter:drop-shadow(0 0 calc(2px*var(--zzK)) var(--zzHg)) drop-shadow(0 0 calc(5px*var(--zzK)) var(--zzHg));opacity:var(--zzO)}
 body.m-night .hint,body.m-zz .hint{opacity:0}
 .modebtn{position:fixed;z-index:70;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));
   width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;padding:0;color:#ecd59c;
@@ -247,8 +247,9 @@ body.m-night .hint,body.m-zz .hint{opacity:0}
 body.m-zz .modebtn{opacity:.2}
 .toast{position:fixed;z-index:71;top:calc(17px + env(safe-area-inset-top));right:calc(60px + env(safe-area-inset-right));
   padding:6px 12px;border-radius:14px;background:rgba(20,12,6,.8);color:#ecd59c;font:italic 14px 'IM Fell English',Georgia,serif;
-  opacity:0;transition:opacity .5s;pointer-events:none;white-space:nowrap}
+  opacity:0;transition:opacity .5s;pointer-events:none;white-space:normal;max-width:calc(100vw - 130px);text-align:right;line-height:1.3}
 .toast.show{opacity:1}
+.toast .sw{display:inline-block;width:14px;height:14px;border-radius:50%;margin:0 3px;vertical-align:-2px}
 /* ---------- PLACA D'INFORMACIÓ ---------- */
 .ipanel{position:fixed;inset:0;z-index:80;transform:translateY(103%);transition:transform .8s cubic-bezier(.2,.8,.2,1);
   overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;
@@ -267,7 +268,15 @@ body.wide .ip-plate{padding:26px 30px}
 body.m-night .ipanel{filter:brightness(.78)}
 /* zz: placa del sòcol i de la vitrina en penombra, com les esferes */
 .plaque,.vcap{transition:filter 2s}
-body.m-zz .plaque,body.m-zz .vcap{background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),var(--brass)}
+body.m-zz .plaque,body.m-zz .vcap{background:linear-gradient(rgba(0,0,0,.76),rgba(0,0,0,.76)),var(--brass)}
+/* zz: lluminescència del color triat (--zzH busques, --zzM marques) i intensitat --zzK */
+body.m-zz #plLoc,body.m-zz #plTemp,body.m-zz #vDate{color:var(--zzH)!important;text-shadow:0 0 calc(3px*var(--zzK)) var(--zzHg),0 0 calc(9px*var(--zzK)) var(--zzHg)!important;opacity:var(--zzO)}
+body.m-zz #plInfo,body.m-zz #vPlace{color:var(--zzM)!important;text-shadow:0 0 calc(3px*var(--zzK)) var(--zzMg),0 0 calc(9px*var(--zzK)) var(--zzMg)!important;opacity:var(--zzO)}
+body.m-zz .drum div,body.m-zz .drum div.sat,body.m-zz .drum div.sun{background:#06080a;color:var(--zzH);text-shadow:0 0 calc(3px*var(--zzK)) var(--zzHg),0 0 calc(8px*var(--zzK)) var(--zzHg)}
+body.m-zz .drum{opacity:var(--zzO)}
+body.m-zz .win{background:#06080a}
+body.m-zz .tk{stroke:var(--zzM)}body.m-zz .tn{fill:var(--zzM)}
+body.m-zz .tk,body.m-zz .tn{filter:drop-shadow(0 0 calc(2px*var(--zzK)) var(--zzMg));opacity:var(--zzO)}
 /* zz: placa gran fosca amb lletres verdes fosforescents */
 body.m-zz .ipanel{background:#050605}
 body.m-zz .ip-plate{background:radial-gradient(ellipse at 40% 20%,#141a15,#0a0d0a 70%);
@@ -543,6 +552,12 @@ body.llibre .sona{bottom:calc(70px + env(safe-area-inset-bottom))}
 .sona-x svg{width:14px;height:14px;fill:none;stroke:#ecd59c;stroke-width:2.2;stroke-linecap:round}
 body.m-zz .sona{opacity:.45}
 
+/* Ajuda */
+.aj-p{width:min(460px,100%);touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.aj{display:flex;flex-direction:column;gap:3px;margin:0;color:#3b2606;text-shadow:0 1px 0 rgba(255,246,212,.6)}
+.aj dt{font:700 12.5px 'Cinzel',serif;letter-spacing:.1em;text-transform:uppercase;color:#5a3a10}
+.aj dd{margin:0 0 7px;font-size:15.5px;line-height:1.32}
+#botoAjuda span{color:#ecd59c}
 /* Diàlegs */
 .dlg{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(10,5,2,.6);touch-action:none}
 .dlg-p{position:relative;width:min(380px,100%);max-height:100%;overflow:auto;padding:22px 20px 18px;border-radius:10px;background:var(--brass);
@@ -653,10 +668,10 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
       <path d="M126 110 A64 64 0 0 1 254 110" fill="none" stroke="rgba(255,245,210,.6)" stroke-width="1"/>
       <path d="M132 110 A58 58 0 0 1 248 110 Z" fill="url(#enamelG)" stroke="#5c3f0c" stroke-width="1"/>
       <path d="M149.3 102.8 A42 42 0 0 1 230.7 102.8" fill="none" stroke="url(#bandG)" stroke-width="3" opacity=".75"/>
-      <g id="gTicks" stroke="#2a180a" stroke-linecap="round"></g>
-      <g id="gNums" fill="#2a180a" font-family="IM Fell English, Georgia, serif" font-size="10" text-anchor="middle" dominant-baseline="middle"></g>
-      <text x="190" y="93" fill="#4a2c12" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="8" text-anchor="middle">°C</text>
       <path class="gdim" d="M132 110 A58 58 0 0 1 248 110 Z" fill="#000" opacity="0"/>
+      <g id="gTicks" class="tk" stroke="#2a180a" stroke-linecap="round"></g>
+      <g id="gNums" class="tn" fill="#2a180a" font-family="IM Fell English, Georgia, serif" font-size="10" text-anchor="middle" dominant-baseline="middle"></g>
+      <text x="190" y="93" fill="#4a2c12" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="8" text-anchor="middle">°C</text>
       <g id="needle">
        <path d="M188.7 114 L189.4 62 L190 56 L190.6 62 L191.3 114 Z" fill="url(#blueSteel)"/>
        <circle cx="190" cy="98" r="2.2" fill="none" stroke="url(#blueSteel)" stroke-width="1.4"/>
@@ -827,6 +842,7 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
 </div>
 <div class="tlb ui">
  <button type="button" class="modebtn tl" id="botoIdioma" aria-haspopup="true" aria-expanded="false"><span id="codiIdioma">CA</span></button>
+ <button type="button" class="modebtn tl" id="botoAjuda" aria-label="?"><span style="font:700 19px/40px 'Playfair Display',serif">?</span></button>
  <button type="button" class="modebtn tl" id="botoVeu"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
 </div>
 <ul class="menu-ll ui" id="menuIdioma" role="menu" hidden></ul>
@@ -834,6 +850,7 @@ body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightne
  <svg viewBox="0 0 24 24" id="icSona" aria-hidden="true"></svg><span class="sona-t" id="vSona"></span>
  <button type="button" class="sona-tm" id="sonaTemp"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg><span id="sonaTempT"></span></button><button type="button" class="sona-x" id="sonaTanca" aria-label="×"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
 </div>
+<div class="dlg ui" id="ajudaVelo" hidden><div class="dlg-p aj-p"><button type="button" class="dlg-x" id="ajudaTanca" aria-label="×"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><h3 class="e" id="ajudaTit"></h3><dl class="aj" id="ajudaLl"></dl></div></div>
 <div class="dlg ui" id="alSona" hidden><div class="dlg-p"><div class="al-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2M5 4L2.5 6.5M19 4l2.5 2.5"/></svg></div><div class="al-h e" id="alSonaHora"></div>
  <div class="dlg-b"><button type="button" class="bb" id="alPosposa" data-t="posposa"></button><button type="button" class="bb on" id="alAtura" data-t="aturaAl"></button></div></div></div>
 <div class="dlg ui" id="alDrecera" hidden><div class="dlg-p"><button type="button" class="dlg-x" id="drTanca" aria-label="×"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -1304,7 +1321,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       llisca:'Llisca el full de costat per passar pàgina',prog:'RAC1 · programa sencer',
       modes:{auto:n=>`Automàtic · ara ${n?'de nit':'de dia'}`,dia:'Mode dia',nit:'Mode nit',zz:'Mode zz · silenci i llum tènue'},
       dirs:['N','NE','E','SE','S','SO','O','NO'],vents:['Tramuntana','Gregal','Llevant','Xaloc','Migjorn','Garbí','Ponent','Mestral'],
-      anivBoto:"Aniversari a l'esfera",temp:'Temporitzador',tempOff:'Temporitzador desactivat',tempOn:n=>`S'apagarà d'aquí a ${n} min`,anivCap:'Cap aniversari desat',lluny:'Fora de les terres de parla catalana'},
+      anivBoto:"Aniversari a l'esfera",temp:'Temporitzador',tempOff:'Temporitzador desactivat',tempOn:n=>`S'apagarà d'aquí a ${n} min`,zzAjuda:"Doble toc a l'esfera per canviar el color · llisca a dreta o esquerra per a més o menys llum",ajudaT:"Com funciona",ajuda:[["La placa", "Toca la placa de llautó per obrir el llibre. Llisca el full de costat per passar pàgina; tanca'l amb la ✕ o lliscant la capçalera cap avall."], ["Els poms", "CAMPANES: carilló de Westminster als quarts i a les hores. PÈNDOL: tic-tac i grinyol de la porta."], ["Pèndol i clau", "Toca el pèndol per donar corda (els contrapesos pugen). La clau obre i tanca la porta."], ["L'esfera", "Un toc l'amplia (al mòbil). Toca una finestra del calendari i el veuràs girar."], ["Mode de llum", "El botó de dalt a la dreta alterna automàtic (A), dia, nit i zz."], ["Mode zz", "Doble toc a l'esfera: canvia el color de la llum (12 tons). Llisca a la dreta o a l'esquerra: més o menys llum."], ["Llengua i veu", "El botó de la llengua tria entre nou llengües. L'altaveu diu l'hora en veu alta."], ["Ràdio", "El rellotget de la placa «Ara sona» l'apaga sola al cap de 15 a 90 minuts."], ["Alarmes", "Sonen amb l'app oberta. El botó del mòbil les passa al rellotge del telèfon. També hi pots desar un aniversari."], ["Teclat", "S pèndol · C campanes · P porta · Z zoom · I llibre · ← → pàgines · Esc tanca."]],anivCap:'Cap aniversari desat',lluny:'Fora de les terres de parla catalana'},
     oc:{kl:['CAMPANES','PENDOL'],ind:'Indicadors',cal:'Calendari',estatCel:'Estat deth cèu',vent:'Vent',sortida:'Gessuda deth solei',posta:'Pòsta deth solei',diesAny:"Dies der an",
       dN:(d,t)=>`Dia ${d} de ${t}`,fiAny:r=>r===0?"Uei s'acabe er an":r===1?"Manque 1 dia entà acabar er an":`Manquen ${r} dies entà acabar er an`,ratxesV:v=>`ratges de ${v} km/h`,
       loc:'Localizant…',sensT:'Sensacion tèrmica',senseTemps:'Sense donades deth temps',
@@ -1312,7 +1329,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:"Vira eth pom <b>PENDOL</b> entà enténer eth tic-tac · era clau daurís era pòrta · hè clic ena placa entà daurir eth libre",
       llisca:'Hè lisar eth huelh de costat entà passar pagina',prog:'RAC1 · programa sancèr',
       modes:{auto:n=>`Automatic · ara ${n?'de nueit':'de dia'}`,dia:'Mòde dia',nit:'Mòde nueit',zz:'Mòde zz · silenci e lum fèbla'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:"Aniversari ena esfèra",temp:'Temporizador',tempOff:'Temporizador desactivat',tempOn:n=>`S'amortarà d'aciu a ${n} min`,anivCap:'Cap d’aniversari desat',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:"Aniversari ena esfèra",temp:'Temporizador',tempOff:'Temporizador desactivat',tempOn:n=>`S'amortarà d'aciu a ${n} min`,zzAjuda:"Dus còps ena esfèra entà cambiar de color · lisa a man dreta o quèrra entà mès o mens lum",ajudaT:"Com fonciona",ajuda:[["Era placa", "Toca era placa de lèton entà daurir eth libre. Hè lisar eth huelh de costat entà passar pagina; barra-lo damb era ✕ o lisant era capçalèra cap avau."], ["Es poms", "CAMPANES: carilhon de Westminster as quarts e a es ores. PENDOL: tic-tac e sorriscle dera pòrta."], ["Pendol e clau", "Toca eth pendol entà dar còrda (es contrapesi pugen). Era clau daurís e barra era pòrta."], ["Era esfèra", "Un còp l'agrandís (en mobil). Toca ua hièstra deth calendari e lo veiràs virar."], ["Mòde de lum", "Eth boton de dalt a man dreta alterne automatic (A), dia, nueit e zz."], ["Mòde zz", "Dus còps ena esfèra: cambie era color dera lum (12 tons). Lisa a man dreta o a man quèrra: mès o mens lum."], ["Lengua e votz", "Eth boton dera lengua tríe entre nau lengües. Eth parlador ditz era ora en votz nauta."], ["Ràdio", "Eth relotget dera placa «Ara sone» la tanque soleta en 15 a 90 minuts."], ["Alarmes", "Sònen damb era app dubèrta. Eth boton deth mobil les passe ath relòtge deth telefòn. Tanben i pòs sauvar un anniversari."], ["Clavèr", "S pendol · C campanes · P pòrta · Z zoom · I libre · ← → pagines · Esc barra."]],anivCap:'Cap d’aniversari desat',lluny:''},
     gl:{kl:['CAMPÁS','PÉNDULO'],ind:'Indicadores',cal:'Calendario',estatCel:'Estado do ceo',vent:'Vento',sortida:'Saída do sol',posta:'Posta do sol',diesAny:'Días do ano',
       dN:(d,t)=>`Día ${d} de ${t}`,fiAny:r=>r===0?'Hoxe remata o ano':r===1?'Falta 1 día para rematar o ano':`Faltan ${r} días para rematar o ano`,ratxesV:v=>`refachos de ${v} km/h`,
       loc:'Localizando…',sensT:'Sensación térmica',senseTemps:'Sen datos do tempo',
@@ -1320,7 +1337,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Xira o pomo <b>PÉNDULO</b> para escoitar o tic-tac · a chave abre a porta · fai clic na placa para abrir o libro',
       llisca:'Despraza a folla cara ao lado para pasar páxina',prog:'RAC1 · programa enteiro',
       modes:{auto:n=>`Automático · agora ${n?'de noite':'de día'}`,dia:'Modo día',nit:'Modo noite',zz:'Modo zz · silencio e luz tenue'},
-      dirs:['N','NE','L','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversario na esfera',temp:'Temporizador',tempOff:'Temporizador desactivado',tempOn:n=>`Apagarase dentro de ${n} min`,anivCap:'Ningún aniversario gardado',lluny:''},
+      dirs:['N','NE','L','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversario na esfera',temp:'Temporizador',tempOff:'Temporizador desactivado',tempOn:n=>`Apagarase dentro de ${n} min`,zzAjuda:"Dobre toque na esfera para cambiar a cor · despraza á dereita ou á esquerda para máis ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca a placa de latón para abrir o libro. Despraza a folla cara ao lado para pasar páxina; péchao coa ✕ ou desprazando a cabeceira cara abaixo."], ["Os pomos", "CAMPÁS: carillón de Westminster nos cuartos e nas horas. PÉNDULO: tic-tac e renxer da porta."], ["Péndulo e chave", "Toca o péndulo para darlle corda (os contrapesos soben). A chave abre e pecha a porta."], ["A esfera", "Un toque amplíaa (no móbil). Toca unha xanela do calendario e verás como xira."], ["Modo de luz", "O botón de arriba á dereita alterna automático (A), día, noite e zz."], ["Modo zz", "Dobre toque na esfera: cambia a cor da luz (12 tons). Despraza á dereita ou á esquerda: máis ou menos luz."], ["Lingua e voz", "O botón da lingua escolle entre nove linguas. O altofalante di a hora en voz alta."], ["Radio", "O reloxiño da placa «Soando agora» apágaa soa ao cabo de 15 a 90 minutos."], ["Alarmas", "Soan coa app aberta. O botón do móbil pásaas ao reloxo do teléfono. Tamén podes gardar un aniversario."], ["Teclado", "S péndulo · C campás · P porta · Z zoom · I libro · ← → páxinas · Esc pecha."]],anivCap:'Ningún aniversario gardado',lluny:''},
     eu:{kl:['KANPAIAK','PENDULUA'],ind:'Adierazleak',cal:'Egutegia',estatCel:'Zeruaren egoera',vent:'Haizea',sortida:'Eguzki-irteera',posta:'Eguzki-sartzea',diesAny:'Urteko egunak',
       dN:(d,t)=>`${d}. eguna (${t})`,fiAny:r=>r===0?'Gaur amaitzen da urtea':r===1?'Egun 1 falta da urtea amaitzeko':`${r} egun falta dira urtea amaitzeko`,ratxesV:v=>`${v} km/h-ko haize-boladak`,
       loc:'Kokatzen…',sensT:'Sentsazio termikoa',senseTemps:'Ez dago eguraldiaren daturik',
@@ -1328,7 +1345,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Biratu <b>PENDULUA</b> heldulekua tik-taka entzuteko · giltzak atea irekitzen du · egin klik plakan liburua irekitzeko',
       llisca:'Irristatu orria alboetara orrialdez aldatzeko',prog:'RAC1 · saio osoa',
       modes:{auto:n=>`Automatikoa · orain ${n?'gaua':'eguna'}`,dia:'Egun modua',nit:'Gau modua',zz:'zz modua · isiltasuna eta argi ahula'},
-      dirs:['I','IE','E','HE','H','HM','M','IM'],vents:null,anivBoto:'Urtebetetzea esferan',temp:'Tenporizadorea',tempOff:'Tenporizadorea desaktibatuta',tempOn:n=>`${n} min barru itzaliko da`,anivCap:'Ez dago urtebetetzerik gordeta',lluny:''},
+      dirs:['I','IE','E','HE','H','HM','M','IM'],vents:null,anivBoto:'Urtebetetzea esferan',temp:'Tenporizadorea',tempOff:'Tenporizadorea desaktibatuta',tempOn:n=>`${n} min barru itzaliko da`,zzAjuda:"Ukitu bikoitza esferan kolorea aldatzeko · irristatu eskuinera edo ezkerrera argi gehiago edo gutxiago izateko",ajudaT:"Nola dabilen",ajuda:[["Plaka", "Ukitu letoizko plaka liburua irekitzeko. Irristatu orria alboetara orrialdez aldatzeko; itxi ✕ botoiarekin edo goiburua behera irristatuz."], ["Heldulekuak", "KANPAIAK: Westminsterreko kanpai-jotzea laurdenetan eta orduetan. PENDULUA: tik-taka eta atearen karraska."], ["Pendulua eta giltza", "Ukitu pendulua soka emateko (kontrapisuak igotzen dira). Giltzak atea ireki eta ixten du."], ["Esfera", "Ukitu batek handitzen du (mugikorrean). Ukitu egutegiaren leiho bat eta biratzen ikusiko duzu."], ["Argi modua", "Goian eskuineko botoiak automatikoa (A), eguna, gaua eta zz txandakatzen ditu."], ["zz modua", "Ukitu bikoitza esferan: argiaren kolorea aldatzen du (12 tonu). Irristatu eskuinera edo ezkerrera: argi gehiago edo gutxiago."], ["Hizkuntza eta ahotsa", "Hizkuntza botoiak bederatzi hizkuntzaren artean aukeratzen du. Bozgorailuak ordua ozen esaten du."], ["Irratia", "«Orain entzuten» plakako erlojutxoak bakarrik itzaltzen du 15-90 minutura."], ["Alarmak", "Aplikazioa irekita dagoela jotzen dute. Mugikorraren botoiak telefonoaren erlojura pasatzen ditu. Urtebetetze bat ere gorde dezakezu."], ["Teklatua", "S pendulua · C kanpaiak · P atea · Z zooma · I liburua · ← → orriak · Esc itxi."]],anivCap:'Ez dago urtebetetzerik gordeta',lluny:''},
     fr:{kl:['CARILLON','BALANCIER'],ind:'Indicateurs',cal:'Calendrier',estatCel:'État du ciel',vent:'Vent',sortida:'Lever du soleil',posta:'Coucher du soleil',diesAny:"Jours de l'année",
       dN:(d,t)=>`Jour ${d} sur ${t}`,fiAny:r=>r===0?"L'année se termine aujourd'hui":r===1?"Plus qu'un jour avant la fin de l'année":`Plus que ${r} jours avant la fin de l'année`,ratxesV:v=>`rafales à ${v} km/h`,
       loc:'Localisation…',sensT:'Ressenti',senseTemps:'Pas de données météo',
@@ -1336,7 +1353,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Tournez le bouton <b>BALANCIER</b> pour entendre le tic-tac · la clé ouvre la porte · cliquez sur la plaque pour ouvrir le livre',
       llisca:'Faites glisser la feuille sur le côté pour tourner la page',prog:'RAC1 · émission complète',
       modes:{auto:n=>`Automatique · ${n?'nuit':'jour'} en ce moment`,dia:'Mode jour',nit:'Mode nuit',zz:'Mode zz · silence et lumière douce'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Anniversaire sur le cadran',temp:'Minuterie',tempOff:'Minuterie désactivée',tempOn:n=>`Arrêt dans ${n} min`,anivCap:'Aucun anniversaire enregistré',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Anniversaire sur le cadran',temp:'Minuterie',tempOff:'Minuterie désactivée',tempOn:n=>`Arrêt dans ${n} min`,zzAjuda:"Double toucher sur le cadran pour changer de couleur · glissez à droite ou à gauche pour plus ou moins de lumière",ajudaT:"Mode d'emploi",ajuda:[["La plaque", "Touchez la plaque de laiton pour ouvrir le livre. Faites glisser la feuille sur le côté pour tourner la page ; fermez-le avec la ✕ ou en faisant glisser l'en-tête vers le bas."], ["Les boutons", "CARILLON : carillon de Westminster aux quarts et aux heures. BALANCIER : tic-tac et grincement de la porte."], ["Balancier et clé", "Touchez le balancier pour remonter l'horloge (les poids montent). La clé ouvre et ferme la porte."], ["Le cadran", "Un toucher l'agrandit (sur mobile). Touchez une fenêtre du calendrier pour le voir tourner."], ["Mode d'éclairage", "Le bouton en haut à droite alterne automatique (A), jour, nuit et zz."], ["Mode zz", "Double toucher sur le cadran : change la couleur de la lumière (12 teintes). Glissez à droite ou à gauche : plus ou moins de lumière."], ["Langue et voix", "Le bouton de langue propose neuf langues. Le haut-parleur annonce l'heure à voix haute."], ["Radio", "La petite horloge de la plaque « En écoute » l'éteint seule au bout de 15 à 90 minutes."], ["Alarmes", "Elles sonnent quand l'app est ouverte. Le bouton du téléphone les transfère au réveil du téléphone. Vous pouvez aussi enregistrer un anniversaire."], ["Clavier", "S balancier · C carillon · P porte · Z zoom · I livre · ← → pages · Échap ferme."]],anivCap:'Aucun anniversaire enregistré',lluny:''},
     en:{kl:['CHIMES','PENDULUM'],ind:'Indicators',cal:'Calendar',estatCel:'Sky',vent:'Wind',sortida:'Sunrise',posta:'Sunset',diesAny:'Days of the year',
       dN:(d,t)=>`Day ${d} of ${t}`,fiAny:r=>r===0?'The year ends today':r===1?'1 day left in the year':`${r} days left in the year`,ratxesV:v=>`gusts up to ${v} km/h`,
       loc:'Locating…',sensT:'Feels like',senseTemps:'No weather data',
@@ -1344,7 +1361,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Turn the <b>PENDULUM</b> knob to hear the tick-tock · the key opens the door · click the plaque to open the book',
       llisca:'Swipe the sheet sideways to turn the page',prog:'RAC1 · full programme',
       modes:{auto:n=>`Automatic · ${n?'night':'day'} now`,dia:'Day mode',nit:'Night mode',zz:'zz mode · silence and dim light'},
-      dirs:['N','NE','E','SE','S','SW','W','NW'],vents:null,anivBoto:'Birthday on the dial',temp:'Sleep timer',tempOff:'Sleep timer off',tempOn:n=>`Turning off in ${n} min`,anivCap:'No birthday saved',lluny:''},
+      dirs:['N','NE','E','SE','S','SW','W','NW'],vents:null,anivBoto:'Birthday on the dial',temp:'Sleep timer',tempOff:'Sleep timer off',tempOn:n=>`Turning off in ${n} min`,zzAjuda:"Double-tap the dial to change colour · swipe right or left for more or less light",ajudaT:"How it works",ajuda:[["The plaque", "Tap the brass plaque to open the book. Swipe the sheet sideways to turn the page; close it with the ✕ or by swiping the header down."], ["The knobs", "CHIMES: Westminster chimes on the quarters and hours. PENDULUM: tick-tock and creaking door."], ["Pendulum and key", "Tap the pendulum to wind the clock (the weights rise). The key opens and closes the door."], ["The dial", "One tap zooms in (on mobile). Tap a calendar window to watch it turn."], ["Light mode", "The top-right button cycles automatic (A), day, night and zz."], ["zz mode", "Double-tap the dial: change the light colour (12 shades). Swipe right or left: more or less light."], ["Language and voice", "The language button offers nine languages. The speaker says the time out loud."], ["Radio", "The small clock on the “Now playing” plaque switches it off after 15 to 90 minutes."], ["Alarms", "They ring while the app is open. The phone button sends them to the phone's clock. You can also save a birthday."], ["Keyboard", "S pendulum · C chimes · P door · Z zoom · I book · ← → pages · Esc closes."]],anivCap:'No birthday saved',lluny:''},
     de:{kl:['GLOCKEN','PENDEL'],ind:'Anzeigen',cal:'Kalender',estatCel:'Himmel',vent:'Wind',sortida:'Sonnenaufgang',posta:'Sonnenuntergang',diesAny:'Tage des Jahres',
       dN:(d,t)=>`Tag ${d} von ${t}`,fiAny:r=>r===0?'Heute endet das Jahr':r===1?'Noch 1 Tag bis Jahresende':`Noch ${r} Tage bis Jahresende`,ratxesV:v=>`Böen bis ${v} km/h`,
       loc:'Standort…',sensT:'Gefühlt',senseTemps:'Keine Wetterdaten',
@@ -1352,7 +1369,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Dreh den Knopf <b>PENDEL</b> für das Ticken · der Schlüssel öffnet die Tür · klicke auf das Schild, um das Buch zu öffnen',
       llisca:'Wische das Blatt zur Seite, um umzublättern',prog:'RAC1 · ganze Sendung',
       modes:{auto:n=>`Automatisch · jetzt ${n?'Nacht':'Tag'}`,dia:'Tagmodus',nit:'Nachtmodus',zz:'zz-Modus · Stille und gedämpftes Licht'},
-      dirs:['N','NO','O','SO','S','SW','W','NW'],vents:null,anivBoto:'Geburtstag auf dem Zifferblatt',temp:'Schlaf-Timer',tempOff:'Schlaf-Timer aus',tempOn:n=>`Schaltet in ${n} Min. ab`,anivCap:'Kein Geburtstag gespeichert',lluny:''},
+      dirs:['N','NO','O','SO','S','SW','W','NW'],vents:null,anivBoto:'Geburtstag auf dem Zifferblatt',temp:'Schlaf-Timer',tempOff:'Schlaf-Timer aus',tempOn:n=>`Schaltet in ${n} Min. ab`,zzAjuda:"Doppeltippen auf das Zifferblatt für eine andere Farbe · nach rechts oder links wischen für mehr oder weniger Licht",ajudaT:"So funktioniert's",ajuda:[["Das Schild", "Tippe auf das Messingschild, um das Buch zu öffnen. Wische das Blatt zur Seite, um umzublättern; schließe es mit dem ✕ oder indem du die Kopfzeile nach unten wischst."], ["Die Knöpfe", "GLOCKEN: Westminster-Schlag zu den Viertel- und vollen Stunden. PENDEL: Ticken und Knarren der Tür."], ["Pendel und Schlüssel", "Tippe auf das Pendel, um die Uhr aufzuziehen (die Gewichte steigen). Der Schlüssel öffnet und schließt die Tür."], ["Das Zifferblatt", "Ein Tippen vergrößert es (auf dem Handy). Tippe auf ein Kalenderfenster, um es drehen zu sehen."], ["Lichtmodus", "Die Taste oben rechts wechselt zwischen Automatik (A), Tag, Nacht und zz."], ["zz-Modus", "Doppeltippen auf das Zifferblatt: ändert die Lichtfarbe (12 Töne). Nach rechts oder links wischen: mehr oder weniger Licht."], ["Sprache und Stimme", "Die Sprachtaste bietet neun Sprachen. Der Lautsprecher sagt die Uhrzeit an."], ["Radio", "Die kleine Uhr auf dem Schild „Jetzt läuft“ schaltet es nach 15 bis 90 Minuten selbst aus."], ["Wecker", "Sie klingeln, solange die App offen ist. Die Handy-Taste überträgt sie in die Uhr-App. Du kannst auch einen Geburtstag speichern."], ["Tastatur", "S Pendel · C Glocken · P Tür · Z Zoom · I Buch · ← → Seiten · Esc schließt."]],anivCap:'Kein Geburtstag gespeichert',lluny:''},
     it:{kl:['CAMPANE','PENDOLO'],ind:'Indicatori',cal:'Calendario',estatCel:'Cielo',vent:'Vento',sortida:'Alba',posta:'Tramonto',diesAny:"Giorni dell'anno",
       dN:(d,t)=>`Giorno ${d} di ${t}`,fiAny:r=>r===0?"Oggi finisce l'anno":r===1?"Manca 1 giorno alla fine dell'anno":`Mancano ${r} giorni alla fine dell'anno`,ratxesV:v=>`raffiche fino a ${v} km/h`,
       loc:'Localizzazione…',sensT:'Percepita',senseTemps:'Nessun dato meteo',
@@ -1360,7 +1377,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Gira il pomello <b>PENDOLO</b> per sentire il tic-tac · la chiave apre lo sportello · fai clic sulla targa per aprire il libro',
       llisca:'Fai scorrere il foglio di lato per girare pagina',prog:'RAC1 · puntata intera',
       modes:{auto:n=>`Automatico · ora ${n?'notte':'giorno'}`,dia:'Modalità giorno',nit:'Modalità notte',zz:'Modalità zz · silenzio e luce soffusa'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Compleanno sul quadrante',temp:'Timer di spegnimento',tempOff:'Timer disattivato',tempOn:n=>`Si spegne tra ${n} min`,anivCap:'Nessun compleanno salvato',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Compleanno sul quadrante',temp:'Timer di spegnimento',tempOff:'Timer disattivato',tempOn:n=>`Si spegne tra ${n} min`,zzAjuda:"Doppio tocco sul quadrante per cambiare colore · scorri a destra o a sinistra per più o meno luce",ajudaT:"Come funziona",ajuda:[["La targa", "Tocca la targa d'ottone per aprire il libro. Fai scorrere il foglio di lato per girare pagina; chiudilo con la ✕ o trascinando l'intestazione verso il basso."], ["I pomelli", "CAMPANE: carillon di Westminster ai quarti e alle ore. PENDOLO: tic-tac e cigolio dello sportello."], ["Pendolo e chiave", "Tocca il pendolo per caricare l'orologio (i pesi salgono). La chiave apre e chiude lo sportello."], ["Il quadrante", "Un tocco lo ingrandisce (sul cellulare). Tocca una finestra del calendario per vederlo girare."], ["Modalità luce", "Il pulsante in alto a destra alterna automatico (A), giorno, notte e zz."], ["Modalità zz", "Doppio tocco sul quadrante: cambia il colore della luce (12 tonalità). Scorri a destra o a sinistra: più o meno luce."], ["Lingua e voce", "Il pulsante della lingua offre nove lingue. L'altoparlante dice l'ora ad alta voce."], ["Radio", "Il piccolo orologio della targa «In ascolto» la spegne da sola dopo 15–90 minuti."], ["Sveglie", "Suonano con l'app aperta. Il pulsante del telefono le passa all'orologio del telefono. Puoi anche salvare un compleanno."], ["Tastiera", "S pendolo · C campane · P sportello · Z zoom · I libro · ← → pagine · Esc chiude."]],anivCap:'Nessun compleanno salvato',lluny:''},
     pt:{kl:['SINOS','PÊNDULO'],ind:'Indicadores',cal:'Calendário',estatCel:'Estado do céu',vent:'Vento',sortida:'Nascer do sol',posta:'Pôr do sol',diesAny:'Dias do ano',
       dN:(d,t)=>`Dia ${d} de ${t}`,fiAny:r=>r===0?'Hoje termina o ano':r===1?'Falta 1 dia para acabar o ano':`Faltam ${r} dias para acabar o ano`,ratxesV:v=>`rajadas até ${v} km/h`,
       loc:'A localizar…',sensT:'Sensação térmica',senseTemps:'Sem dados do tempo',
@@ -1368,7 +1385,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Roda o botão <b>PÊNDULO</b> para ouvir o tique-taque · a chave abre a porta · clica na placa para abrir o livro',
       llisca:'Desliza a folha para o lado para mudar de página',prog:'RAC1 · programa completo',
       modes:{auto:n=>`Automático · agora ${n?'noite':'dia'}`,dia:'Modo dia',nit:'Modo noite',zz:'Modo zz · silêncio e luz ténue'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversário no mostrador',temp:'Temporizador',tempOff:'Temporizador desligado',tempOn:n=>`Desliga dentro de ${n} min`,anivCap:'Nenhum aniversário guardado',lluny:''}
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversário no mostrador',temp:'Temporizador',tempOff:'Temporizador desligado',tempOn:n=>`Desliga dentro de ${n} min`,zzAjuda:"Toque duplo no mostrador para mudar de cor · desliza para a direita ou para a esquerda para mais ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca na placa de latão para abrir o livro. Desliza a folha para o lado para mudar de página; fecha-o com o ✕ ou deslizando o cabeçalho para baixo."], ["Os botões", "SINOS: carrilhão de Westminster nos quartos e nas horas. PÊNDULO: tique-taque e ranger da porta."], ["Pêndulo e chave", "Toca no pêndulo para dar corda (os pesos sobem). A chave abre e fecha a porta."], ["O mostrador", "Um toque amplia-o (no telemóvel). Toca numa janela do calendário para o veres girar."], ["Modo de luz", "O botão em cima à direita alterna automático (A), dia, noite e zz."], ["Modo zz", "Toque duplo no mostrador: muda a cor da luz (12 tons). Desliza para a direita ou para a esquerda: mais ou menos luz."], ["Língua e voz", "O botão da língua oferece nove línguas. O altifalante diz as horas em voz alta."], ["Rádio", "O pequeno relógio da placa «A tocar» desliga-a sozinha ao fim de 15 a 90 minutos."], ["Alarmes", "Tocam com a app aberta. O botão do telemóvel passa-os para o relógio do telefone. Também podes guardar um aniversário."], ["Teclado", "S pêndulo · C sinos · P porta · Z zoom · I livro · ← → páginas · Esc fecha."]],anivCap:'Nenhum aniversário guardado',lluny:''}
   };
   let X = EX[LLENGUA];
   /* Text per clau: primer els propis del rellotge, després els del diccionari general */
@@ -1497,10 +1514,10 @@ function layout(){
 const ROMAN=['','I','II','III','IIII','V','VI','VII','VIII','IX','X','XI','XII'];
 /* Localitat a l'esfera: una línia si hi cap; si no, dues línies partides pel millor espai */
 let dialPlace=store.get('lloc')||'';
-function drawDialPlace(g,name){
+function drawDialPlace(g,name,ink){
   if(!name)return;
   const font=px=>`${px}px "Pinyon Script", "IM Fell English", cursive`,MAXW=118;
-  g.fillStyle="#4a2c16";g.font=font(17);
+  g.fillStyle=ink||"#4a2c16";g.font=font(17);
   const fit=(t,y)=>{const w=g.measureText(t).width,k=Math.min(1,MAXW/w);g.save();g.translate(0,y);g.scale(k,1);g.fillText(t,0,0);g.restore();};
   const words=name.split(/\s+/);
   if(g.measureText(name).width<=MAXW||words.length<2){fit(name,64);return;}
@@ -1508,6 +1525,25 @@ function drawDialPlace(g,name){
   for(let i=1;i<words.length;i++){const a=words.slice(0,i).join(' '),b=words.slice(i).join(' ');
     const m=Math.max(g.measureText(a).width,g.measureText(b).width);if(!best||m<best.m)best={a,b,m};}
   fit(best.a,56);fit(best.b,70);
+}
+function marques(g,ink,ink2){
+  // Anell de minuts
+  ink=ink||'#23150a';
+  g.strokeStyle=ink;g.lineWidth=.9;[121,118,104].forEach(R=>{g.beginPath();g.arc(0,0,R,0,TAU);g.stroke();});
+  for(let i=0;i<60;i++){const a=i*TAU/60,s=Math.sin(a),c=-Math.cos(a),maj=i%5===0;
+    g.lineWidth=maj?2.2:.8;g.beginPath();g.moveTo(s*(maj?104:110),c*(maj?104:110));g.lineTo(s*118,c*118);g.stroke();}
+  for(let i=0;i<12;i++){const a=i*TAU/12;g.fillStyle=ink;g.beginPath();g.arc(Math.sin(a)*112,-Math.cos(a)*112,.1,0,TAU);g.fill();}
+  // Xifres romanes radials
+  g.fillStyle=ink2||'#1c1008';g.textAlign='center';g.textBaseline='middle';
+  // Xifres romanes estilitzades: tipus Didot d'alt contrast, altes i estretes
+  g.font='700 21px "Playfair Display", "Bodoni 72", Didot, Georgia, serif';
+  for(let n=1;n<=12;n++){g.save();g.rotate(n*TAU/12);g.translate(0,-90);g.scale(.62,1.24);g.fillText(ROMAN[n],0,1);g.restore();}
+  // Signatura del rellotger
+  g.fillStyle=ink2||'#2b190c';g.font='600 8.5px "Cinzel", Georgia, serif';
+  if('letterSpacing' in g)g.letterSpacing='2.2px';
+  g.fillText('ANTAVIANA',0,-58);
+  if('letterSpacing' in g)g.letterSpacing='0px';
+  drawDialPlace(g,dialPlace,ink2);
 }
 function drawDialFace(g,dp){
   if(!g){g=fctx;dp=DPRD;}g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
@@ -1524,23 +1560,7 @@ function drawDialFace(g,dp){
   for(let i=0;i<22;i++){let x=(r()-.5)*220,y=(r()-.5)*220;g.beginPath();g.moveTo(x,y);for(let k=0;k<5;k++){x+=(r()-.5)*22;y+=(r()-.5)*22;g.lineTo(x,y);}g.stroke();}
   // Guilloché central
   g.strokeStyle='rgba(120,85,35,.10)';g.lineWidth=.5;for(let rr=6;rr<30;rr+=2.2){g.beginPath();g.arc(0,0,rr,0,TAU);g.stroke();}
-  // Anell de minuts
-  const ink='#23150a';
-  g.strokeStyle=ink;g.lineWidth=.9;[121,118,104].forEach(R=>{g.beginPath();g.arc(0,0,R,0,TAU);g.stroke();});
-  for(let i=0;i<60;i++){const a=i*TAU/60,s=Math.sin(a),c=-Math.cos(a),maj=i%5===0;
-    g.lineWidth=maj?2.2:.8;g.beginPath();g.moveTo(s*(maj?104:110),c*(maj?104:110));g.lineTo(s*118,c*118);g.stroke();}
-  for(let i=0;i<12;i++){const a=i*TAU/12;g.fillStyle=ink;g.beginPath();g.arc(Math.sin(a)*112,-Math.cos(a)*112,.1,0,TAU);g.fill();}
-  // Xifres romanes radials
-  g.fillStyle='#1c1008';g.textAlign='center';g.textBaseline='middle';
-  // Xifres romanes estilitzades: tipus Didot d'alt contrast, altes i estretes
-  g.font='700 21px "Playfair Display", "Bodoni 72", Didot, Georgia, serif';
-  for(let n=1;n<=12;n++){g.save();g.rotate(n*TAU/12);g.translate(0,-90);g.scale(.62,1.24);g.fillText(ROMAN[n],0,1);g.restore();}
-  // Signatura del rellotger
-  g.fillStyle='#2b190c';g.font='600 8.5px "Cinzel", Georgia, serif';
-  if('letterSpacing' in g)g.letterSpacing='2.2px';
-  g.fillText('ANTAVIANA',0,-58);
-  if('letterSpacing' in g)g.letterSpacing='0px';
-  drawDialPlace(g,dialPlace);
+  marques(g);
   // Rivets daurats de les finestres (dibuixats a l'esfera: no parpellegen en animar)
   g.setTransform(dp,0,0,dp,0,0);
   const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();};
@@ -1551,6 +1571,16 @@ function drawDialFace(g,dp){
     rr(x-2,y-2,w+4,h+4,2.5);g.fillStyle=bg;g.fill();
     rr(x-.6,y-.6,w+1.2,h+1.2,1.5);g.fillStyle='#3a2606';g.fill();
   });
+  /* zz: esfera a la penombra, halo de llum que neix a la vora i s'apaga cap al centre, i marques fosforescents */
+  if(lume){
+    const k=zzK,c=zzM();g.setTransform(dp,0,0,dp,0,0);g.translate(128,128);
+    g.fillStyle='rgba(3,4,7,.84)';g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
+    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.8,rgba(c,.09*k));hg.addColorStop(.94,rgba(c,.2*k));hg.addColorStop(1,rgba(c,.34*k));
+    g.fillStyle=hg;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
+    g.shadowColor=rgba(c,.9*k);g.shadowBlur=5*dp*Math.min(1.6,.4+.6*k);
+    const ink=rgba(clar(c,.3),.3+.5*k);marques(g,ink,ink);
+    g.shadowBlur=0;g.shadowColor='transparent';
+  }
   g.setTransform(1,0,0,1,0,0);
 }
 
@@ -1620,7 +1650,19 @@ document.querySelectorAll('.win').forEach(w=>w.addEventListener('click',e=>{
 /* ================= AGULLES ================= */
 function blued(g,w){const gr=g.createLinearGradient(-w,0,w,0);gr.addColorStop(0,'#0a1328');gr.addColorStop(.42,'#2c4a88');gr.addColorStop(.52,'#6488c8');gr.addColorStop(1,'#0e1a35');return gr;}
 let lume=false,quiet=false;
-function lumeFill(g,p,dp){if(!lume)return;g.shadowOffsetX=0;g.shadowOffsetY=0;g.shadowColor='rgba(110,255,140,1)';g.shadowBlur=12*dp;g.fillStyle='rgba(205,255,212,.95)';g.fill(p,'nonzero');g.shadowBlur=4*dp;g.fillStyle='rgba(225,255,230,1)';g.fill(p,'nonzero');}
+/* ---- Mode zz: colors fosforescents (busques, marques) i intensitat de la llum de les esferes ---- */
+const ZZP=[['#7dff8f','#7dff8f'],['#82b6ff','#82b6ff'],['#ffa24c','#ffa24c'],['#ff5f7e','#ff5f7e'],['#ffe46b','#ffe46b'],['#66f4ff','#66f4ff'],
+  ['#7dff8f','#66f4ff'],['#66f4ff','#82b6ff'],['#ffa24c','#ff5f7e'],['#ffe46b','#ffa24c'],['#ff5f7e','#ffe46b'],['#ffe46b','#7dff8f']];
+let zzI=Math.min(ZZP.length-1,Math.max(0,parseInt(store.get('zzColor'))||0)),zzK=Math.min(2,Math.max(.25,parseFloat(store.get('zzLlum'))||1));
+const zzH=()=>ZZP[zzI][0],zzM=()=>ZZP[zzI][1];
+const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${Math.max(0,Math.min(1,a)).toFixed(3)})`;};
+const clar=(hex,t)=>{const n=parseInt(hex.slice(1),16),m=v=>Math.round(v+(255-v)*t);return '#'+[n>>16,n>>8&255,n&255].map(v=>m(v).toString(16).padStart(2,'0')).join('');};
+function aplicaZZ(){const st=document.body.style;
+  st.setProperty('--zzH',clar(zzH(),.25));st.setProperty('--zzM',clar(zzM(),.25));st.setProperty('--zzK',zzK.toFixed(2));
+  st.setProperty('--zzO',Math.min(1,.35+.45*zzK).toFixed(2));
+  st.setProperty('--zzHg',rgba(zzH(),.5*zzK));st.setProperty('--zzMg',rgba(zzM(),.5*zzK));}
+aplicaZZ();
+function lumeFill(g,p,dp){if(!lume)return;const c=zzH(),k=zzK;g.shadowOffsetX=0;g.shadowOffsetY=0;g.shadowColor=rgba(c,.95*k);g.shadowBlur=12*dp*Math.min(1.5,.4+.6*k);g.fillStyle=rgba(clar(c,.45),.45+.45*k);g.fill(p,'nonzero');g.shadowBlur=4*dp;g.fillStyle=rgba(clar(c,.65),.4+.5*k);g.fill(p,'nonzero');}
 function breguet(g,ang,len,w,rp,rr,sh,dp){
   g.save();g.rotate(ang);
   g.shadowColor='rgba(45,28,6,.5)';g.shadowBlur=sh[2]*dp;g.shadowOffsetX=sh[0]*dp;g.shadowOffsetY=sh[1]*dp;
@@ -1987,15 +2029,25 @@ window.addEventListener('click',e=>{
   else if(hitRect($('keyBtn'),x,y,0)||(wide&&(hitRect($('vesc'),x,y,10)||[...document.querySelectorAll('.vdf')].some(el=>hitRect(el,x,y,0)))))act=toggleDoor;
   else if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2)))act=openPanel;
   else if(hitPend(x,y))act=()=>windUp(false);
+  else if(effMode==='zz'&&(hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0))))act=zzToc;
   if(act){e.stopPropagation();e.preventDefault();act();}
 },true);
 door.querySelectorAll('.df').forEach(el=>el.addEventListener('click',toggleDoor));
-function toggleZoom(){if(wide||phoneLand)return;zoomed=!zoomed;hint.classList.add('gone');applyView();}
+function zzSeguent(){
+  zzI=(zzI+1)%ZZP.length;store.set('zzColor',String(zzI));aplicaZZ();paintDials();hSettled=false;drawAllHands(new Date());
+  const t=$('toast');t.innerHTML=`<span class="sw" style="background:${zzH()};box-shadow:0 0 8px ${zzH()}"></span><span class="sw" style="background:${zzM()};box-shadow:0 0 8px ${zzM()}"></span> ${zzI+1}/${ZZP.length}`;
+  t.classList.add('show');clearTimeout(avisa.tm);avisa.tm=setTimeout(()=>t.classList.remove('show'),1800);
+}
+let zzTocAnt=0;
+function zzToc(){const t=Date.now();if(t-zzTocAnt<450){zzTocAnt=0;zzSeguent();}else zzTocAnt=t;}
+function toggleZoom(){if(effMode==='zz'){zzToc();return;}if(wide||phoneLand)return;zoomed=!zoomed;hint.classList.add('gone');applyView();}
 document.querySelector('.dial').addEventListener('click',toggleZoom);
+
 addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('input,select,textarea'))return;
   if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
   const k=e.key.toLowerCase();
+  if(k==='escape'&&!$('ajudaVelo').hidden){$('ajudaVelo').hidden=true;return;}
   if(k==='escape'&&!menu.hidden){obreMenu(false);return;}
   if(k==='escape'&&window.__anivObert&&window.__anivObert()){window.__anivTanca();return;}
   if(k==='escape'&&!$('alDrecera').hidden){$('alDrecera').hidden=true;return;}
@@ -2150,6 +2202,7 @@ addEventListener('pointerup',e=>{
   const x=e.clientX,y=e.clientY;
   if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2))){openPanel();suppressClick=Date.now()+600;}
   else if(hitPend(x,y)){windUp(false);suppressClick=Date.now()+600;}
+  else if(effMode==='zz'&&(hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0)))){zzToc();suppressClick=Date.now()+600;}
 },{capture:true});
 
 /* ================= AVÍS BREU ================= */
@@ -3387,6 +3440,7 @@ function pintaTextos(){
   $('codiIdioma').textContent=LLENGUA.toUpperCase();
   $('botoVeu').setAttribute('aria-label',L.parla);$('botoVeu').title=L.parla;
   $('botoIdioma').setAttribute('aria-label',L.idioma);$('botoIdioma').title=L.idioma;
+  pintaAjuda();
 }
 function posaLlengua(codi){
   if(!I18N[codi])return;
@@ -3404,6 +3458,13 @@ function posaLlengua(codi){
   repintaLlibre();if(panelOpen)alMostrar(bkPags[bkI].dataset.pg);
   pintaMenu();
 }
+/* ---- Ajuda: resum de com funciona l'app ---- */
+function pintaAjuda(){$('ajudaTit').textContent=X.ajudaT;const dl=$('ajudaLl');dl.innerHTML='';
+  X.ajuda.forEach(([t,d])=>{const a=document.createElement('dt'),b=document.createElement('dd');a.textContent=t;b.textContent=d;dl.append(a,b);});
+  $('botoAjuda').title=X.ajudaT;$('botoAjuda').setAttribute('aria-label',X.ajudaT);}
+$('botoAjuda').addEventListener('click',e=>{e.stopPropagation();pintaAjuda();$('ajudaVelo').hidden=false;});
+$('ajudaTanca').addEventListener('click',e=>{e.stopPropagation();$('ajudaVelo').hidden=true;});
+$('ajudaVelo').addEventListener('click',e=>{if(e.target.id==='ajudaVelo')$('ajudaVelo').hidden=true;});
 const menu=$('menuIdioma'),botoIdioma=$('botoIdioma');
 function pintaMenu(){menu.innerHTML=Object.keys(I18N).map(k=>`<li role="menuitem" data-codi="${k}" class="${k===LLENGUA?'on':''}"><b>${k.toUpperCase()}</b>${I18N[k].nom}</li>`).join('');}
 function obreMenu(o){menu.hidden=!o;botoIdioma.setAttribute('aria-expanded',o?'true':'false');}
@@ -3439,13 +3500,14 @@ function applyMode(announce){
   const eff=mode==='auto'?(nightNow()?'nit':'dia'):mode;
   document.body.classList.toggle('m-night',eff==='nit');document.body.classList.toggle('m-zz',eff==='zz');
   $('modeBtn').textContent=MODE_ICON[mode];
-  if(eff!==effMode){effMode=eff;const L=eff==='zz';if(L!==lume){lume=L;hSettled=false;drawAllHands(new Date());}quiet=L;placeVeil();}
+  if(eff!==effMode){effMode=eff;const L=eff==='zz';if(L!==lume){lume=L;hSettled=false;drawAllHands(new Date());paintDials();if(L)setTimeout(()=>{if(effMode==='zz')avisa(X.zzAjuda,5200);},2600);}quiet=L;placeVeil();}
   if(announce)avisa(mode==='auto'?X.modes.auto(eff==='nit'):X.modes[mode]);
 }
 $('modeBtn').addEventListener('click',e=>{e.stopPropagation();mode=MODES[(MODES.indexOf(mode)+1)%MODES.length];store.set('mode',mode);applyMode(true);});
 /* Vel de nit: una capa fosca amb "finestres de llum" sobre l'esfera, la mitja esfera del termòmetre i la placa */
 function placeVeil(){
   const eff=effMode;if(eff!=='nit'&&eff!=='zz')return;
+  if(eff==='zz')return placeVeilZZ();
   const cv=$('veil'),W=innerWidth,H=innerHeight,q=.5,zz=eff==='zz';
   cv.width=Math.ceil(W*q);cv.height=Math.ceil(H*q);
   const g=cv.getContext('2d');g.setTransform(q,0,0,q,0,0);
@@ -3466,18 +3528,47 @@ function placeVeil(){
     g.fillStyle=gr;g.beginPath();g.arc(0,0,1,0,TAU);g.fill();g.restore();});
   g.globalCompositeOperation='source-over';
 }
+/* zz: penombra uniforme sobre tot el rellotge (el pèndol es veu); només s'obre la cara de les esferes,
+   l'esmalt del termòmetre i les plaques, que es pinten a la penombra pel seu compte i fan llum pròpia */
+function placeVeilZZ(){
+  const cv=$('veil'),W=innerWidth,H=innerHeight,q=.5;
+  cv.width=Math.ceil(W*q);cv.height=Math.ceil(H*q);
+  const g=cv.getContext('2d');g.setTransform(q,0,0,q,0,0);
+  g.fillStyle='rgba(0,0,3,.76)';g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='destination-out';g.fillStyle='#000';
+  const faces=[document.querySelector('.dial:not(.big) .dface')],gauges=[document.querySelector('.crown svg')],plaques=[document.querySelector('.plaque')];
+  if(wide){faces.push(bigDial.querySelector('.dface'));gauges.push(document.querySelector('#vcrown svg'));plaques.push($('vcap'));}
+  faces.forEach(el=>{if(!el)return;const b=el.getBoundingClientRect();if(!b.width)return;g.beginPath();g.arc(b.left+b.width/2,b.top+b.height/2,b.width/2-.5,0,TAU);g.fill();});
+  gauges.forEach(el=>{const e=el&&el.querySelector('path[fill="url(#enamelG)"]');if(!e)return;const b=e.getBoundingClientRect();if(!b.width)return;
+    g.beginPath();g.ellipse(b.left+b.width/2,b.bottom,b.width/2-.5,b.height-.5,0,Math.PI,0);g.closePath();g.fill();});
+  plaques.forEach(el=>{if(!el)return;const b=el.getBoundingClientRect();if(!b.width)return;const r=Math.min(6,b.height*.08);
+    g.beginPath();g.moveTo(b.left+r,b.top);g.arcTo(b.right,b.top,b.right,b.bottom,r);g.arcTo(b.right,b.bottom,b.left,b.bottom,r);g.arcTo(b.left,b.bottom,b.left,b.top,r);g.arcTo(b.left,b.top,b.right,b.top,r);g.closePath();g.fill();});
+  g.globalCompositeOperation='source-over';
+}
 function placeVeilSoon(){placeVeil();clearTimeout(placeVeilSoon.t);placeVeilSoon.t=setTimeout(placeVeil,1250);}
 
 /* ================= iPhone: sense zoom amb dits; en horitzontal, arrossegar amunt i avall ================= */
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
 let drag=null,suppressClick=0;
-addEventListener('pointerdown',e=>{if(!phoneLand||panelOpen||(e.target.closest&&e.target.closest('.ui')))return;drag={y:e.clientY,p:panY,moved:false};},{passive:true});
+addEventListener('pointerdown',e=>{if(!phoneLand||panelOpen||(e.target.closest&&e.target.closest('.ui')))return;drag={x:e.clientX,y:e.clientY,p:panY,moved:false};},{passive:true});
 addEventListener('pointermove',e=>{if(!drag)return;const dy=e.clientY-drag.y;
-  if(!drag.moved&&Math.abs(dy)>8){drag.moved=true;$('scaler').style.transition='none';}
+  if(!drag.moved&&Math.abs(dy)>8&&Math.abs(dy)>Math.abs(e.clientX-drag.x)){drag.moved=true;$('scaler').style.transition='none';}
   if(drag.moved){panY=drag.p+dy;applyView();}},{passive:true});
 const endDrag=()=>{if(drag&&drag.moved){suppressClick=Date.now()+350;$('scaler').style.transition='';placeVeilSoon();}drag=null;};
 addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
+
+/* ================= zz: lliscar amunt o avall canvia la intensitat de la llum de les esferes ================= */
+{let zs=null,raf=0;
+ const aplica=()=>{raf=0;aplicaZZ();paintDials();hSettled=false;drawAllHands(new Date());};
+ addEventListener('pointerdown',e=>{if(effMode!=='zz'||panelOpen||(e.target.closest&&e.target.closest('.ui')))return;zs={x:e.clientX,y:e.clientY,k:zzK,mou:false};},{passive:true});
+ addEventListener('pointermove',e=>{if(!zs)return;const dx=e.clientX-zs.x,dy=e.clientY-zs.y;
+   if(!zs.mou){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){zs=null;return;}if(Math.abs(dx)<10)return;zs.mou=true;if(drag)drag=null;}
+   zzK=Math.min(2,Math.max(.25,zs.k*Math.exp(dx/180)));
+   if(!raf)raf=requestAnimationFrame(aplica);
+   const t=$('toast');t.textContent=`◐ ${Math.round(zzK*100)} %`;t.classList.add('show');clearTimeout(avisa.tm);},{passive:true});
+ const fi=()=>{if(!zs)return;if(zs.mou){suppressClick=Date.now()+400;tapIgnore=true;store.set('zzLlum',zzK.toFixed(2));avisa.tm=setTimeout(()=>$('toast').classList.remove('show'),1200);}zs=null;};
+ addEventListener('pointerup',fi);addEventListener('pointercancel',fi);}
 
 /* ================= BUCLE PRINCIPAL ================= */
 let hSec=-1,hSettled=false;
