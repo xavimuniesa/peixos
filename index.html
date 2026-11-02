@@ -26,7 +26,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  overflow:hidden; user-select:none; -webkit-user-select:none;
+  overflow:hidden; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
   background:#150c07; color:#e9d8b4;
   font-family:'IM Fell English',Georgia,serif;
   -webkit-tap-highlight-color:transparent;
@@ -1335,7 +1335,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       llisca:'Llisca el full de costat per passar pàgina',prog:'RAC1 · programa sencer',
       modes:{auto:n=>`Automàtic · ara ${n?'de nit':'de dia'}`,dia:'Mode dia',nit:'Mode nit',zz:'Mode zz · silenci i llum tènue'},
       dirs:['N','NE','E','SE','S','SO','O','NO'],vents:['Tramuntana','Gregal','Llevant','Xaloc','Migjorn','Garbí','Ponent','Mestral'],
-      anivBoto:"Aniversari a l'esfera",temp:'Temporitzador',tempOff:'Temporitzador desactivat',tempOn:n=>`S'apagarà d'aquí a ${n} min`,zzAjuda:"Doble toc a l'esfera per canviar el color · llisca a dreta o esquerra per a més o menys llum",ajudaT:"Com funciona",ajuda:[["La placa", "Toca la placa de llautó per obrir el llibre. Llisca el full de costat per passar pàgina; tanca'l amb la ✕ o lliscant la capçalera cap avall."], ["Els poms", "CAMPANES: carilló de Westminster als quarts i a les hores. PÈNDOL: tic-tac i grinyol de la porta."], ["Pèndol i clau", "Toca el pèndol per donar corda (els contrapesos pugen). La clau obre i tanca la porta."], ["L'esfera", "Un toc l'amplia (al mòbil). Toca una finestra del calendari i el veuràs girar."], ["Mode de llum", "El botó de dalt a la dreta alterna automàtic (A), dia, nit i zz."], ["Mode zz", "Doble toc a l'esfera: canvia el color de la llum (12 tons). Llisca a la dreta o a l'esquerra: més o menys llum."], ["Llengua i veu", "El botó de la llengua tria entre nou llengües. L'altaveu diu l'hora en veu alta."], ["Ràdio", "El rellotget de la placa «Ara sona» l'apaga sola al cap de 15 a 90 minuts."], ["Alarmes", "Sonen amb l'app oberta. El botó del mòbil les passa al rellotge del telèfon. També hi pots desar un aniversari."], ["Teclat", "S pèndol · C campanes · P porta · Z zoom · I llibre · ← → pàgines · Esc tanca."]],anivCap:'Cap aniversari desat',lluny:'Fora de les terres de parla catalana'},
+      anivBoto:"Aniversari a l'esfera",temp:'Temporitzador',tempOff:'Temporitzador desactivat',tempOn:n=>`S'apagarà d'aquí a ${n} min`,zzAjuda:"Doble toc a l'esfera per canviar el color · llisca a dreta o esquerra per a més o menys llum",ajudaT:"Com funciona",ajuda:[["La placa", "Toca la placa de llautó per obrir el llibre. Llisca el full de costat per passar pàgina; tanca'l amb la ✕ o lliscant la capçalera cap avall."], ["Els poms", "CAMPANES: carilló de Westminster als quarts i a les hores. PÈNDOL: tic-tac i grinyol de la porta."], ["Pèndol i clau", "Toca el pèndol per donar corda (els contrapesos pugen). La clau obre i tanca la porta."], ["L'esfera", "Un toc l'amplia (al mòbil). Toca una finestra del calendari i el veuràs girar. Mantén-hi el dit un segon per canviar d'esfera (clàssica o Tempus Fugit)."], ["Mode de llum", "El botó de dalt a la dreta alterna automàtic (A), dia, nit i zz."], ["Mode zz", "Doble toc a l'esfera: canvia el color de la llum (12 tons). Llisca a la dreta o a l'esquerra: més o menys llum."], ["Llengua i veu", "El botó de la llengua tria entre nou llengües. L'altaveu diu l'hora en veu alta."], ["Ràdio", "El rellotget de la placa «Ara sona» l'apaga sola al cap de 15 a 90 minuts."], ["Alarmes", "Sonen amb l'app oberta. El botó del mòbil les passa al rellotge del telèfon. També hi pots desar un aniversari."], ["Teclat", "S pèndol · C campanes · P porta · Z zoom · I llibre · ← → pàgines · Esc tanca."]],anivCap:'Cap aniversari desat',lluny:'Fora de les terres de parla catalana'},
     oc:{kl:['CAMPANES','PENDOL'],ind:'Indicadors',cal:'Calendari',estatCel:'Estat deth cèu',vent:'Vent',sortida:'Gessuda deth solei',posta:'Pòsta deth solei',diesAny:"Dies der an",
       dN:(d,t)=>`Dia ${d} de ${t}`,fiAny:r=>r===0?"Uei s'acabe er an":r===1?"Manque 1 dia entà acabar er an":`Manquen ${r} dies entà acabar er an`,ratxesV:v=>`ratges de ${v} km/h`,
       loc:'Localizant…',sensT:'Sensacion tèrmica',senseTemps:'Sense donades deth temps',
@@ -1343,7 +1343,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:"Vira eth pom <b>PENDOL</b> entà enténer eth tic-tac · era clau daurís era pòrta · hè clic ena placa entà daurir eth libre",
       llisca:'Hè lisar eth huelh de costat entà passar pagina',prog:'RAC1 · programa sancèr',
       modes:{auto:n=>`Automatic · ara ${n?'de nueit':'de dia'}`,dia:'Mòde dia',nit:'Mòde nueit',zz:'Mòde zz · silenci e lum fèbla'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:"Aniversari ena esfèra",temp:'Temporizador',tempOff:'Temporizador desactivat',tempOn:n=>`S'amortarà d'aciu a ${n} min`,zzAjuda:"Dus còps ena esfèra entà cambiar de color · lisa a man dreta o quèrra entà mès o mens lum",ajudaT:"Com fonciona",ajuda:[["Era placa", "Toca era placa de lèton entà daurir eth libre. Hè lisar eth huelh de costat entà passar pagina; barra-lo damb era ✕ o lisant era capçalèra cap avau."], ["Es poms", "CAMPANES: carilhon de Westminster as quarts e a es ores. PENDOL: tic-tac e sorriscle dera pòrta."], ["Pendol e clau", "Toca eth pendol entà dar còrda (es contrapesi pugen). Era clau daurís e barra era pòrta."], ["Era esfèra", "Un còp l'agrandís (en mobil). Toca ua hièstra deth calendari e lo veiràs virar."], ["Mòde de lum", "Eth boton de dalt a man dreta alterne automatic (A), dia, nueit e zz."], ["Mòde zz", "Dus còps ena esfèra: cambie era color dera lum (12 tons). Lisa a man dreta o a man quèrra: mès o mens lum."], ["Lengua e votz", "Eth boton dera lengua tríe entre nau lengües. Eth parlador ditz era ora en votz nauta."], ["Ràdio", "Eth relotget dera placa «Ara sone» la tanque soleta en 15 a 90 minuts."], ["Alarmes", "Sònen damb era app dubèrta. Eth boton deth mobil les passe ath relòtge deth telefòn. Tanben i pòs sauvar un anniversari."], ["Clavèr", "S pendol · C campanes · P pòrta · Z zoom · I libre · ← → pagines · Esc barra."]],anivCap:'Cap d’aniversari desat',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:"Aniversari ena esfèra",temp:'Temporizador',tempOff:'Temporizador desactivat',tempOn:n=>`S'amortarà d'aciu a ${n} min`,zzAjuda:"Dus còps ena esfèra entà cambiar de color · lisa a man dreta o quèrra entà mès o mens lum",ajudaT:"Com fonciona",ajuda:[["Era placa", "Toca era placa de lèton entà daurir eth libre. Hè lisar eth huelh de costat entà passar pagina; barra-lo damb era ✕ o lisant era capçalèra cap avau."], ["Es poms", "CAMPANES: carilhon de Westminster as quarts e a es ores. PENDOL: tic-tac e sorriscle dera pòrta."], ["Pendol e clau", "Toca eth pendol entà dar còrda (es contrapesi pugen). Era clau daurís e barra era pòrta."], ["Era esfèra", "Un còp l'agrandís (en mobil). Toca ua hièstra deth calendari e lo veiràs virar. Tene-i eth dit un segond entà cambiar d'esfèra (classica o Tempus Fugit)."], ["Mòde de lum", "Eth boton de dalt a man dreta alterne automatic (A), dia, nueit e zz."], ["Mòde zz", "Dus còps ena esfèra: cambie era color dera lum (12 tons). Lisa a man dreta o a man quèrra: mès o mens lum."], ["Lengua e votz", "Eth boton dera lengua tríe entre nau lengües. Eth parlador ditz era ora en votz nauta."], ["Ràdio", "Eth relotget dera placa «Ara sone» la tanque soleta en 15 a 90 minuts."], ["Alarmes", "Sònen damb era app dubèrta. Eth boton deth mobil les passe ath relòtge deth telefòn. Tanben i pòs sauvar un anniversari."], ["Clavèr", "S pendol · C campanes · P pòrta · Z zoom · I libre · ← → pagines · Esc barra."]],anivCap:'Cap d’aniversari desat',lluny:''},
     gl:{kl:['CAMPÁS','PÉNDULO'],ind:'Indicadores',cal:'Calendario',estatCel:'Estado do ceo',vent:'Vento',sortida:'Saída do sol',posta:'Posta do sol',diesAny:'Días do ano',
       dN:(d,t)=>`Día ${d} de ${t}`,fiAny:r=>r===0?'Hoxe remata o ano':r===1?'Falta 1 día para rematar o ano':`Faltan ${r} días para rematar o ano`,ratxesV:v=>`refachos de ${v} km/h`,
       loc:'Localizando…',sensT:'Sensación térmica',senseTemps:'Sen datos do tempo',
@@ -1351,7 +1351,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Xira o pomo <b>PÉNDULO</b> para escoitar o tic-tac · a chave abre a porta · fai clic na placa para abrir o libro',
       llisca:'Despraza a folla cara ao lado para pasar páxina',prog:'RAC1 · programa enteiro',
       modes:{auto:n=>`Automático · agora ${n?'de noite':'de día'}`,dia:'Modo día',nit:'Modo noite',zz:'Modo zz · silencio e luz tenue'},
-      dirs:['N','NE','L','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversario na esfera',temp:'Temporizador',tempOff:'Temporizador desactivado',tempOn:n=>`Apagarase dentro de ${n} min`,zzAjuda:"Dobre toque na esfera para cambiar a cor · despraza á dereita ou á esquerda para máis ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca a placa de latón para abrir o libro. Despraza a folla cara ao lado para pasar páxina; péchao coa ✕ ou desprazando a cabeceira cara abaixo."], ["Os pomos", "CAMPÁS: carillón de Westminster nos cuartos e nas horas. PÉNDULO: tic-tac e renxer da porta."], ["Péndulo e chave", "Toca o péndulo para darlle corda (os contrapesos soben). A chave abre e pecha a porta."], ["A esfera", "Un toque amplíaa (no móbil). Toca unha xanela do calendario e verás como xira."], ["Modo de luz", "O botón de arriba á dereita alterna automático (A), día, noite e zz."], ["Modo zz", "Dobre toque na esfera: cambia a cor da luz (12 tons). Despraza á dereita ou á esquerda: máis ou menos luz."], ["Lingua e voz", "O botón da lingua escolle entre nove linguas. O altofalante di a hora en voz alta."], ["Radio", "O reloxiño da placa «Soando agora» apágaa soa ao cabo de 15 a 90 minutos."], ["Alarmas", "Soan coa app aberta. O botón do móbil pásaas ao reloxo do teléfono. Tamén podes gardar un aniversario."], ["Teclado", "S péndulo · C campás · P porta · Z zoom · I libro · ← → páxinas · Esc pecha."]],anivCap:'Ningún aniversario gardado',lluny:''},
+      dirs:['N','NE','L','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversario na esfera',temp:'Temporizador',tempOff:'Temporizador desactivado',tempOn:n=>`Apagarase dentro de ${n} min`,zzAjuda:"Dobre toque na esfera para cambiar a cor · despraza á dereita ou á esquerda para máis ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca a placa de latón para abrir o libro. Despraza a folla cara ao lado para pasar páxina; péchao coa ✕ ou desprazando a cabeceira cara abaixo."], ["Os pomos", "CAMPÁS: carillón de Westminster nos cuartos e nas horas. PÉNDULO: tic-tac e renxer da porta."], ["Péndulo e chave", "Toca o péndulo para darlle corda (os contrapesos soben). A chave abre e pecha a porta."], ["A esfera", "Un toque amplíaa (no móbil). Toca unha xanela do calendario e verás como xira. Mantén o dedo un segundo para cambiar de esfera (clásica ou Tempus Fugit)."], ["Modo de luz", "O botón de arriba á dereita alterna automático (A), día, noite e zz."], ["Modo zz", "Dobre toque na esfera: cambia a cor da luz (12 tons). Despraza á dereita ou á esquerda: máis ou menos luz."], ["Lingua e voz", "O botón da lingua escolle entre nove linguas. O altofalante di a hora en voz alta."], ["Radio", "O reloxiño da placa «Soando agora» apágaa soa ao cabo de 15 a 90 minutos."], ["Alarmas", "Soan coa app aberta. O botón do móbil pásaas ao reloxo do teléfono. Tamén podes gardar un aniversario."], ["Teclado", "S péndulo · C campás · P porta · Z zoom · I libro · ← → páxinas · Esc pecha."]],anivCap:'Ningún aniversario gardado',lluny:''},
     eu:{kl:['KANPAIAK','PENDULUA'],ind:'Adierazleak',cal:'Egutegia',estatCel:'Zeruaren egoera',vent:'Haizea',sortida:'Eguzki-irteera',posta:'Eguzki-sartzea',diesAny:'Urteko egunak',
       dN:(d,t)=>`${d}. eguna (${t})`,fiAny:r=>r===0?'Gaur amaitzen da urtea':r===1?'Egun 1 falta da urtea amaitzeko':`${r} egun falta dira urtea amaitzeko`,ratxesV:v=>`${v} km/h-ko haize-boladak`,
       loc:'Kokatzen…',sensT:'Sentsazio termikoa',senseTemps:'Ez dago eguraldiaren daturik',
@@ -1359,7 +1359,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Biratu <b>PENDULUA</b> heldulekua tik-taka entzuteko · giltzak atea irekitzen du · egin klik plakan liburua irekitzeko',
       llisca:'Irristatu orria alboetara orrialdez aldatzeko',prog:'RAC1 · saio osoa',
       modes:{auto:n=>`Automatikoa · orain ${n?'gaua':'eguna'}`,dia:'Egun modua',nit:'Gau modua',zz:'zz modua · isiltasuna eta argi ahula'},
-      dirs:['I','IE','E','HE','H','HM','M','IM'],vents:null,anivBoto:'Urtebetetzea esferan',temp:'Tenporizadorea',tempOff:'Tenporizadorea desaktibatuta',tempOn:n=>`${n} min barru itzaliko da`,zzAjuda:"Ukitu bikoitza esferan kolorea aldatzeko · irristatu eskuinera edo ezkerrera argi gehiago edo gutxiago izateko",ajudaT:"Nola dabilen",ajuda:[["Plaka", "Ukitu letoizko plaka liburua irekitzeko. Irristatu orria alboetara orrialdez aldatzeko; itxi ✕ botoiarekin edo goiburua behera irristatuz."], ["Heldulekuak", "KANPAIAK: Westminsterreko kanpai-jotzea laurdenetan eta orduetan. PENDULUA: tik-taka eta atearen karraska."], ["Pendulua eta giltza", "Ukitu pendulua soka emateko (kontrapisuak igotzen dira). Giltzak atea ireki eta ixten du."], ["Esfera", "Ukitu batek handitzen du (mugikorrean). Ukitu egutegiaren leiho bat eta biratzen ikusiko duzu."], ["Argi modua", "Goian eskuineko botoiak automatikoa (A), eguna, gaua eta zz txandakatzen ditu."], ["zz modua", "Ukitu bikoitza esferan: argiaren kolorea aldatzen du (12 tonu). Irristatu eskuinera edo ezkerrera: argi gehiago edo gutxiago."], ["Hizkuntza eta ahotsa", "Hizkuntza botoiak bederatzi hizkuntzaren artean aukeratzen du. Bozgorailuak ordua ozen esaten du."], ["Irratia", "«Orain entzuten» plakako erlojutxoak bakarrik itzaltzen du 15-90 minutura."], ["Alarmak", "Aplikazioa irekita dagoela jotzen dute. Mugikorraren botoiak telefonoaren erlojura pasatzen ditu. Urtebetetze bat ere gorde dezakezu."], ["Teklatua", "S pendulua · C kanpaiak · P atea · Z zooma · I liburua · ← → orriak · Esc itxi."]],anivCap:'Ez dago urtebetetzerik gordeta',lluny:''},
+      dirs:['I','IE','E','HE','H','HM','M','IM'],vents:null,anivBoto:'Urtebetetzea esferan',temp:'Tenporizadorea',tempOff:'Tenporizadorea desaktibatuta',tempOn:n=>`${n} min barru itzaliko da`,zzAjuda:"Ukitu bikoitza esferan kolorea aldatzeko · irristatu eskuinera edo ezkerrera argi gehiago edo gutxiago izateko",ajudaT:"Nola dabilen",ajuda:[["Plaka", "Ukitu letoizko plaka liburua irekitzeko. Irristatu orria alboetara orrialdez aldatzeko; itxi ✕ botoiarekin edo goiburua behera irristatuz."], ["Heldulekuak", "KANPAIAK: Westminsterreko kanpai-jotzea laurdenetan eta orduetan. PENDULUA: tik-taka eta atearen karraska."], ["Pendulua eta giltza", "Ukitu pendulua soka emateko (kontrapisuak igotzen dira). Giltzak atea ireki eta ixten du."], ["Esfera", "Ukitu batek handitzen du (mugikorrean). Ukitu egutegiaren leiho bat eta biratzen ikusiko duzu. Eutsi hatza segundo batez esfera aldatzeko (klasikoa edo Tempus Fugit)."], ["Argi modua", "Goian eskuineko botoiak automatikoa (A), eguna, gaua eta zz txandakatzen ditu."], ["zz modua", "Ukitu bikoitza esferan: argiaren kolorea aldatzen du (12 tonu). Irristatu eskuinera edo ezkerrera: argi gehiago edo gutxiago."], ["Hizkuntza eta ahotsa", "Hizkuntza botoiak bederatzi hizkuntzaren artean aukeratzen du. Bozgorailuak ordua ozen esaten du."], ["Irratia", "«Orain entzuten» plakako erlojutxoak bakarrik itzaltzen du 15-90 minutura."], ["Alarmak", "Aplikazioa irekita dagoela jotzen dute. Mugikorraren botoiak telefonoaren erlojura pasatzen ditu. Urtebetetze bat ere gorde dezakezu."], ["Teklatua", "S pendulua · C kanpaiak · P atea · Z zooma · I liburua · ← → orriak · Esc itxi."]],anivCap:'Ez dago urtebetetzerik gordeta',lluny:''},
     fr:{kl:['CARILLON','BALANCIER'],ind:'Indicateurs',cal:'Calendrier',estatCel:'État du ciel',vent:'Vent',sortida:'Lever du soleil',posta:'Coucher du soleil',diesAny:"Jours de l'année",
       dN:(d,t)=>`Jour ${d} sur ${t}`,fiAny:r=>r===0?"L'année se termine aujourd'hui":r===1?"Plus qu'un jour avant la fin de l'année":`Plus que ${r} jours avant la fin de l'année`,ratxesV:v=>`rafales à ${v} km/h`,
       loc:'Localisation…',sensT:'Ressenti',senseTemps:'Pas de données météo',
@@ -1367,7 +1367,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Tournez le bouton <b>BALANCIER</b> pour entendre le tic-tac · la clé ouvre la porte · cliquez sur la plaque pour ouvrir le livre',
       llisca:'Faites glisser la feuille sur le côté pour tourner la page',prog:'RAC1 · émission complète',
       modes:{auto:n=>`Automatique · ${n?'nuit':'jour'} en ce moment`,dia:'Mode jour',nit:'Mode nuit',zz:'Mode zz · silence et lumière douce'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Anniversaire sur le cadran',temp:'Minuterie',tempOff:'Minuterie désactivée',tempOn:n=>`Arrêt dans ${n} min`,zzAjuda:"Double toucher sur le cadran pour changer de couleur · glissez à droite ou à gauche pour plus ou moins de lumière",ajudaT:"Mode d'emploi",ajuda:[["La plaque", "Touchez la plaque de laiton pour ouvrir le livre. Faites glisser la feuille sur le côté pour tourner la page ; fermez-le avec la ✕ ou en faisant glisser l'en-tête vers le bas."], ["Les boutons", "CARILLON : carillon de Westminster aux quarts et aux heures. BALANCIER : tic-tac et grincement de la porte."], ["Balancier et clé", "Touchez le balancier pour remonter l'horloge (les poids montent). La clé ouvre et ferme la porte."], ["Le cadran", "Un toucher l'agrandit (sur mobile). Touchez une fenêtre du calendrier pour le voir tourner."], ["Mode d'éclairage", "Le bouton en haut à droite alterne automatique (A), jour, nuit et zz."], ["Mode zz", "Double toucher sur le cadran : change la couleur de la lumière (12 teintes). Glissez à droite ou à gauche : plus ou moins de lumière."], ["Langue et voix", "Le bouton de langue propose neuf langues. Le haut-parleur annonce l'heure à voix haute."], ["Radio", "La petite horloge de la plaque « En écoute » l'éteint seule au bout de 15 à 90 minutes."], ["Alarmes", "Elles sonnent quand l'app est ouverte. Le bouton du téléphone les transfère au réveil du téléphone. Vous pouvez aussi enregistrer un anniversaire."], ["Clavier", "S balancier · C carillon · P porte · Z zoom · I livre · ← → pages · Échap ferme."]],anivCap:'Aucun anniversaire enregistré',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Anniversaire sur le cadran',temp:'Minuterie',tempOff:'Minuterie désactivée',tempOn:n=>`Arrêt dans ${n} min`,zzAjuda:"Double toucher sur le cadran pour changer de couleur · glissez à droite ou à gauche pour plus ou moins de lumière",ajudaT:"Mode d'emploi",ajuda:[["La plaque", "Touchez la plaque de laiton pour ouvrir le livre. Faites glisser la feuille sur le côté pour tourner la page ; fermez-le avec la ✕ ou en faisant glisser l'en-tête vers le bas."], ["Les boutons", "CARILLON : carillon de Westminster aux quarts et aux heures. BALANCIER : tic-tac et grincement de la porte."], ["Balancier et clé", "Touchez le balancier pour remonter l'horloge (les poids montent). La clé ouvre et ferme la porte."], ["Le cadran", "Un toucher l'agrandit (sur mobile). Touchez une fenêtre du calendrier pour le voir tourner. Gardez le doigt une seconde pour changer de cadran (classique ou Tempus Fugit)."], ["Mode d'éclairage", "Le bouton en haut à droite alterne automatique (A), jour, nuit et zz."], ["Mode zz", "Double toucher sur le cadran : change la couleur de la lumière (12 teintes). Glissez à droite ou à gauche : plus ou moins de lumière."], ["Langue et voix", "Le bouton de langue propose neuf langues. Le haut-parleur annonce l'heure à voix haute."], ["Radio", "La petite horloge de la plaque « En écoute » l'éteint seule au bout de 15 à 90 minutes."], ["Alarmes", "Elles sonnent quand l'app est ouverte. Le bouton du téléphone les transfère au réveil du téléphone. Vous pouvez aussi enregistrer un anniversaire."], ["Clavier", "S balancier · C carillon · P porte · Z zoom · I livre · ← → pages · Échap ferme."]],anivCap:'Aucun anniversaire enregistré',lluny:''},
     en:{kl:['CHIMES','PENDULUM'],ind:'Indicators',cal:'Calendar',estatCel:'Sky',vent:'Wind',sortida:'Sunrise',posta:'Sunset',diesAny:'Days of the year',
       dN:(d,t)=>`Day ${d} of ${t}`,fiAny:r=>r===0?'The year ends today':r===1?'1 day left in the year':`${r} days left in the year`,ratxesV:v=>`gusts up to ${v} km/h`,
       loc:'Locating…',sensT:'Feels like',senseTemps:'No weather data',
@@ -1375,7 +1375,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Turn the <b>PENDULUM</b> knob to hear the tick-tock · the key opens the door · click the plaque to open the book',
       llisca:'Swipe the sheet sideways to turn the page',prog:'RAC1 · full programme',
       modes:{auto:n=>`Automatic · ${n?'night':'day'} now`,dia:'Day mode',nit:'Night mode',zz:'zz mode · silence and dim light'},
-      dirs:['N','NE','E','SE','S','SW','W','NW'],vents:null,anivBoto:'Birthday on the dial',temp:'Sleep timer',tempOff:'Sleep timer off',tempOn:n=>`Turning off in ${n} min`,zzAjuda:"Double-tap the dial to change colour · swipe right or left for more or less light",ajudaT:"How it works",ajuda:[["The plaque", "Tap the brass plaque to open the book. Swipe the sheet sideways to turn the page; close it with the ✕ or by swiping the header down."], ["The knobs", "CHIMES: Westminster chimes on the quarters and hours. PENDULUM: tick-tock and creaking door."], ["Pendulum and key", "Tap the pendulum to wind the clock (the weights rise). The key opens and closes the door."], ["The dial", "One tap zooms in (on mobile). Tap a calendar window to watch it turn."], ["Light mode", "The top-right button cycles automatic (A), day, night and zz."], ["zz mode", "Double-tap the dial: change the light colour (12 shades). Swipe right or left: more or less light."], ["Language and voice", "The language button offers nine languages. The speaker says the time out loud."], ["Radio", "The small clock on the “Now playing” plaque switches it off after 15 to 90 minutes."], ["Alarms", "They ring while the app is open. The phone button sends them to the phone's clock. You can also save a birthday."], ["Keyboard", "S pendulum · C chimes · P door · Z zoom · I book · ← → pages · Esc closes."]],anivCap:'No birthday saved',lluny:''},
+      dirs:['N','NE','E','SE','S','SW','W','NW'],vents:null,anivBoto:'Birthday on the dial',temp:'Sleep timer',tempOff:'Sleep timer off',tempOn:n=>`Turning off in ${n} min`,zzAjuda:"Double-tap the dial to change colour · swipe right or left for more or less light",ajudaT:"How it works",ajuda:[["The plaque", "Tap the brass plaque to open the book. Swipe the sheet sideways to turn the page; close it with the ✕ or by swiping the header down."], ["The knobs", "CHIMES: Westminster chimes on the quarters and hours. PENDULUM: tick-tock and creaking door."], ["Pendulum and key", "Tap the pendulum to wind the clock (the weights rise). The key opens and closes the door."], ["The dial", "One tap zooms in (on mobile). Tap a calendar window to watch it turn. Hold your finger on it for a second to switch dials (classic or Tempus Fugit)."], ["Light mode", "The top-right button cycles automatic (A), day, night and zz."], ["zz mode", "Double-tap the dial: change the light colour (12 shades). Swipe right or left: more or less light."], ["Language and voice", "The language button offers nine languages. The speaker says the time out loud."], ["Radio", "The small clock on the “Now playing” plaque switches it off after 15 to 90 minutes."], ["Alarms", "They ring while the app is open. The phone button sends them to the phone's clock. You can also save a birthday."], ["Keyboard", "S pendulum · C chimes · P door · Z zoom · I book · ← → pages · Esc closes."]],anivCap:'No birthday saved',lluny:''},
     de:{kl:['GLOCKEN','PENDEL'],ind:'Anzeigen',cal:'Kalender',estatCel:'Himmel',vent:'Wind',sortida:'Sonnenaufgang',posta:'Sonnenuntergang',diesAny:'Tage des Jahres',
       dN:(d,t)=>`Tag ${d} von ${t}`,fiAny:r=>r===0?'Heute endet das Jahr':r===1?'Noch 1 Tag bis Jahresende':`Noch ${r} Tage bis Jahresende`,ratxesV:v=>`Böen bis ${v} km/h`,
       loc:'Standort…',sensT:'Gefühlt',senseTemps:'Keine Wetterdaten',
@@ -1383,7 +1383,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Dreh den Knopf <b>PENDEL</b> für das Ticken · der Schlüssel öffnet die Tür · klicke auf das Schild, um das Buch zu öffnen',
       llisca:'Wische das Blatt zur Seite, um umzublättern',prog:'RAC1 · ganze Sendung',
       modes:{auto:n=>`Automatisch · jetzt ${n?'Nacht':'Tag'}`,dia:'Tagmodus',nit:'Nachtmodus',zz:'zz-Modus · Stille und gedämpftes Licht'},
-      dirs:['N','NO','O','SO','S','SW','W','NW'],vents:null,anivBoto:'Geburtstag auf dem Zifferblatt',temp:'Schlaf-Timer',tempOff:'Schlaf-Timer aus',tempOn:n=>`Schaltet in ${n} Min. ab`,zzAjuda:"Doppeltippen auf das Zifferblatt für eine andere Farbe · nach rechts oder links wischen für mehr oder weniger Licht",ajudaT:"So funktioniert's",ajuda:[["Das Schild", "Tippe auf das Messingschild, um das Buch zu öffnen. Wische das Blatt zur Seite, um umzublättern; schließe es mit dem ✕ oder indem du die Kopfzeile nach unten wischst."], ["Die Knöpfe", "GLOCKEN: Westminster-Schlag zu den Viertel- und vollen Stunden. PENDEL: Ticken und Knarren der Tür."], ["Pendel und Schlüssel", "Tippe auf das Pendel, um die Uhr aufzuziehen (die Gewichte steigen). Der Schlüssel öffnet und schließt die Tür."], ["Das Zifferblatt", "Ein Tippen vergrößert es (auf dem Handy). Tippe auf ein Kalenderfenster, um es drehen zu sehen."], ["Lichtmodus", "Die Taste oben rechts wechselt zwischen Automatik (A), Tag, Nacht und zz."], ["zz-Modus", "Doppeltippen auf das Zifferblatt: ändert die Lichtfarbe (12 Töne). Nach rechts oder links wischen: mehr oder weniger Licht."], ["Sprache und Stimme", "Die Sprachtaste bietet neun Sprachen. Der Lautsprecher sagt die Uhrzeit an."], ["Radio", "Die kleine Uhr auf dem Schild „Jetzt läuft“ schaltet es nach 15 bis 90 Minuten selbst aus."], ["Wecker", "Sie klingeln, solange die App offen ist. Die Handy-Taste überträgt sie in die Uhr-App. Du kannst auch einen Geburtstag speichern."], ["Tastatur", "S Pendel · C Glocken · P Tür · Z Zoom · I Buch · ← → Seiten · Esc schließt."]],anivCap:'Kein Geburtstag gespeichert',lluny:''},
+      dirs:['N','NO','O','SO','S','SW','W','NW'],vents:null,anivBoto:'Geburtstag auf dem Zifferblatt',temp:'Schlaf-Timer',tempOff:'Schlaf-Timer aus',tempOn:n=>`Schaltet in ${n} Min. ab`,zzAjuda:"Doppeltippen auf das Zifferblatt für eine andere Farbe · nach rechts oder links wischen für mehr oder weniger Licht",ajudaT:"So funktioniert's",ajuda:[["Das Schild", "Tippe auf das Messingschild, um das Buch zu öffnen. Wische das Blatt zur Seite, um umzublättern; schließe es mit dem ✕ oder indem du die Kopfzeile nach unten wischst."], ["Die Knöpfe", "GLOCKEN: Westminster-Schlag zu den Viertel- und vollen Stunden. PENDEL: Ticken und Knarren der Tür."], ["Pendel und Schlüssel", "Tippe auf das Pendel, um die Uhr aufzuziehen (die Gewichte steigen). Der Schlüssel öffnet und schließt die Tür."], ["Das Zifferblatt", "Ein Tippen vergrößert es (auf dem Handy). Tippe auf ein Kalenderfenster, um es drehen zu sehen. Halte den Finger eine Sekunde darauf, um das Zifferblatt zu wechseln (klassisch oder Tempus Fugit)."], ["Lichtmodus", "Die Taste oben rechts wechselt zwischen Automatik (A), Tag, Nacht und zz."], ["zz-Modus", "Doppeltippen auf das Zifferblatt: ändert die Lichtfarbe (12 Töne). Nach rechts oder links wischen: mehr oder weniger Licht."], ["Sprache und Stimme", "Die Sprachtaste bietet neun Sprachen. Der Lautsprecher sagt die Uhrzeit an."], ["Radio", "Die kleine Uhr auf dem Schild „Jetzt läuft“ schaltet es nach 15 bis 90 Minuten selbst aus."], ["Wecker", "Sie klingeln, solange die App offen ist. Die Handy-Taste überträgt sie in die Uhr-App. Du kannst auch einen Geburtstag speichern."], ["Tastatur", "S Pendel · C Glocken · P Tür · Z Zoom · I Buch · ← → Seiten · Esc schließt."]],anivCap:'Kein Geburtstag gespeichert',lluny:''},
     it:{kl:['CAMPANE','PENDOLO'],ind:'Indicatori',cal:'Calendario',estatCel:'Cielo',vent:'Vento',sortida:'Alba',posta:'Tramonto',diesAny:"Giorni dell'anno",
       dN:(d,t)=>`Giorno ${d} di ${t}`,fiAny:r=>r===0?"Oggi finisce l'anno":r===1?"Manca 1 giorno alla fine dell'anno":`Mancano ${r} giorni alla fine dell'anno`,ratxesV:v=>`raffiche fino a ${v} km/h`,
       loc:'Localizzazione…',sensT:'Percepita',senseTemps:'Nessun dato meteo',
@@ -1391,7 +1391,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Gira il pomello <b>PENDOLO</b> per sentire il tic-tac · la chiave apre lo sportello · fai clic sulla targa per aprire il libro',
       llisca:'Fai scorrere il foglio di lato per girare pagina',prog:'RAC1 · puntata intera',
       modes:{auto:n=>`Automatico · ora ${n?'notte':'giorno'}`,dia:'Modalità giorno',nit:'Modalità notte',zz:'Modalità zz · silenzio e luce soffusa'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Compleanno sul quadrante',temp:'Timer di spegnimento',tempOff:'Timer disattivato',tempOn:n=>`Si spegne tra ${n} min`,zzAjuda:"Doppio tocco sul quadrante per cambiare colore · scorri a destra o a sinistra per più o meno luce",ajudaT:"Come funziona",ajuda:[["La targa", "Tocca la targa d'ottone per aprire il libro. Fai scorrere il foglio di lato per girare pagina; chiudilo con la ✕ o trascinando l'intestazione verso il basso."], ["I pomelli", "CAMPANE: carillon di Westminster ai quarti e alle ore. PENDOLO: tic-tac e cigolio dello sportello."], ["Pendolo e chiave", "Tocca il pendolo per caricare l'orologio (i pesi salgono). La chiave apre e chiude lo sportello."], ["Il quadrante", "Un tocco lo ingrandisce (sul cellulare). Tocca una finestra del calendario per vederlo girare."], ["Modalità luce", "Il pulsante in alto a destra alterna automatico (A), giorno, notte e zz."], ["Modalità zz", "Doppio tocco sul quadrante: cambia il colore della luce (12 tonalità). Scorri a destra o a sinistra: più o meno luce."], ["Lingua e voce", "Il pulsante della lingua offre nove lingue. L'altoparlante dice l'ora ad alta voce."], ["Radio", "Il piccolo orologio della targa «In ascolto» la spegne da sola dopo 15–90 minuti."], ["Sveglie", "Suonano con l'app aperta. Il pulsante del telefono le passa all'orologio del telefono. Puoi anche salvare un compleanno."], ["Tastiera", "S pendolo · C campane · P sportello · Z zoom · I libro · ← → pagine · Esc chiude."]],anivCap:'Nessun compleanno salvato',lluny:''},
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Compleanno sul quadrante',temp:'Timer di spegnimento',tempOff:'Timer disattivato',tempOn:n=>`Si spegne tra ${n} min`,zzAjuda:"Doppio tocco sul quadrante per cambiare colore · scorri a destra o a sinistra per più o meno luce",ajudaT:"Come funziona",ajuda:[["La targa", "Tocca la targa d'ottone per aprire il libro. Fai scorrere il foglio di lato per girare pagina; chiudilo con la ✕ o trascinando l'intestazione verso il basso."], ["I pomelli", "CAMPANE: carillon di Westminster ai quarti e alle ore. PENDOLO: tic-tac e cigolio dello sportello."], ["Pendolo e chiave", "Tocca il pendolo per caricare l'orologio (i pesi salgono). La chiave apre e chiude lo sportello."], ["Il quadrante", "Un tocco lo ingrandisce (sul cellulare). Tocca una finestra del calendario per vederlo girare. Tieni premuto un secondo per cambiare quadrante (classico o Tempus Fugit)."], ["Modalità luce", "Il pulsante in alto a destra alterna automatico (A), giorno, notte e zz."], ["Modalità zz", "Doppio tocco sul quadrante: cambia il colore della luce (12 tonalità). Scorri a destra o a sinistra: più o meno luce."], ["Lingua e voce", "Il pulsante della lingua offre nove lingue. L'altoparlante dice l'ora ad alta voce."], ["Radio", "Il piccolo orologio della targa «In ascolto» la spegne da sola dopo 15–90 minuti."], ["Sveglie", "Suonano con l'app aperta. Il pulsante del telefono le passa all'orologio del telefono. Puoi anche salvare un compleanno."], ["Tastiera", "S pendolo · C campane · P sportello · Z zoom · I libro · ← → pagine · Esc chiude."]],anivCap:'Nessun compleanno salvato',lluny:''},
     pt:{kl:['SINOS','PÊNDULO'],ind:'Indicadores',cal:'Calendário',estatCel:'Estado do céu',vent:'Vento',sortida:'Nascer do sol',posta:'Pôr do sol',diesAny:'Dias do ano',
       dN:(d,t)=>`Dia ${d} de ${t}`,fiAny:r=>r===0?'Hoje termina o ano':r===1?'Falta 1 dia para acabar o ano':`Faltam ${r} dias para acabar o ano`,ratxesV:v=>`rajadas até ${v} km/h`,
       loc:'A localizar…',sensT:'Sensação térmica',senseTemps:'Sem dados do tempo',
@@ -1399,7 +1399,7 @@ const CODIS_CEL = [0,1,2,3,45,48,51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81
       hintW:'Roda o botão <b>PÊNDULO</b> para ouvir o tique-taque · a chave abre a porta · clica na placa para abrir o livro',
       llisca:'Desliza a folha para o lado para mudar de página',prog:'RAC1 · programa completo',
       modes:{auto:n=>`Automático · agora ${n?'noite':'dia'}`,dia:'Modo dia',nit:'Modo noite',zz:'Modo zz · silêncio e luz ténue'},
-      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversário no mostrador',temp:'Temporizador',tempOff:'Temporizador desligado',tempOn:n=>`Desliga dentro de ${n} min`,zzAjuda:"Toque duplo no mostrador para mudar de cor · desliza para a direita ou para a esquerda para mais ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca na placa de latão para abrir o livro. Desliza a folha para o lado para mudar de página; fecha-o com o ✕ ou deslizando o cabeçalho para baixo."], ["Os botões", "SINOS: carrilhão de Westminster nos quartos e nas horas. PÊNDULO: tique-taque e ranger da porta."], ["Pêndulo e chave", "Toca no pêndulo para dar corda (os pesos sobem). A chave abre e fecha a porta."], ["O mostrador", "Um toque amplia-o (no telemóvel). Toca numa janela do calendário para o veres girar."], ["Modo de luz", "O botão em cima à direita alterna automático (A), dia, noite e zz."], ["Modo zz", "Toque duplo no mostrador: muda a cor da luz (12 tons). Desliza para a direita ou para a esquerda: mais ou menos luz."], ["Língua e voz", "O botão da língua oferece nove línguas. O altifalante diz as horas em voz alta."], ["Rádio", "O pequeno relógio da placa «A tocar» desliga-a sozinha ao fim de 15 a 90 minutos."], ["Alarmes", "Tocam com a app aberta. O botão do telemóvel passa-os para o relógio do telefone. Também podes guardar um aniversário."], ["Teclado", "S pêndulo · C sinos · P porta · Z zoom · I livro · ← → páginas · Esc fecha."]],anivCap:'Nenhum aniversário guardado',lluny:''}
+      dirs:['N','NE','E','SE','S','SO','O','NO'],vents:null,anivBoto:'Aniversário no mostrador',temp:'Temporizador',tempOff:'Temporizador desligado',tempOn:n=>`Desliga dentro de ${n} min`,zzAjuda:"Toque duplo no mostrador para mudar de cor · desliza para a direita ou para a esquerda para mais ou menos luz",ajudaT:"Como funciona",ajuda:[["A placa", "Toca na placa de latão para abrir o livro. Desliza a folha para o lado para mudar de página; fecha-o com o ✕ ou deslizando o cabeçalho para baixo."], ["Os botões", "SINOS: carrilhão de Westminster nos quartos e nas horas. PÊNDULO: tique-taque e ranger da porta."], ["Pêndulo e chave", "Toca no pêndulo para dar corda (os pesos sobem). A chave abre e fecha a porta."], ["O mostrador", "Um toque amplia-o (no telemóvel). Toca numa janela do calendário para o veres girar. Mantém o dedo um segundo para mudar de mostrador (clássico ou Tempus Fugit)."], ["Modo de luz", "O botão em cima à direita alterna automático (A), dia, noite e zz."], ["Modo zz", "Toque duplo no mostrador: muda a cor da luz (12 tons). Desliza para a direita ou para a esquerda: mais ou menos luz."], ["Língua e voz", "O botão da língua oferece nove línguas. O altifalante diz as horas em voz alta."], ["Rádio", "O pequeno relógio da placa «A tocar» desliga-a sozinha ao fim de 15 a 90 minutos."], ["Alarmes", "Tocam com a app aberta. O botão do telemóvel passa-os para o relógio do telefone. Também podes guardar um aniversário."], ["Teclado", "S pêndulo · C sinos · P porta · Z zoom · I livro · ← → páginas · Esc fecha."]],anivCap:'Nenhum aniversário guardado',lluny:''}
   };
   let X = EX[LLENGUA];
   /* Text per clau: primer els propis del rellotge, després els del diccionari general */
@@ -1560,7 +1560,8 @@ function marques(g,ink,ink2){
   drawDialPlace(g,dialPlace,ink2);
 }
 function drawDialFace(g,dp){
-  if(!g){g=fctx;dp=DPRD;}g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
+  if(!g){g=fctx;dp=DPRD;}
+  if(esfera==='tf')return drawDialFaceTF(g,dp);g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
   let gr=g.createRadialGradient(-30,-40,10,0,0,132);
   gr.addColorStop(0,'#f8efd8');gr.addColorStop(.6,'#efe1bd');gr.addColorStop(1,'#d6bd8a');
   g.fillStyle=gr;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
@@ -1687,13 +1688,96 @@ function breguet(g,ang,len,w,rp,rr,sh,dp){
   p.moveTo(-w*.4,-(rp+rr*.9));p.lineTo(0,-len);p.lineTo(w*.4,-(rp+rr*.9));p.closePath();
   g.fillStyle=blued(g,w);g.fill(p,'nonzero');lumeFill(g,p,dp);g.restore();
 }
+/* ================= ESFERA «TEMPUS FUGIT»: anell de vori, minuts aràbics, flors de lis i centre de llautó granejat ================= */
+let esfera=store.get('esfera')==='tf'?'tf':'clas';
+const ARAB=['60','5','10','15','20','25','30','35','40','45','50','55'];
+function flor(){const p=new Path2D();
+  p.moveTo(0,-7);p.bezierCurveTo(2.3,-4.2,2.2,-1.6,0,.6);p.bezierCurveTo(-2.2,-1.6,-2.3,-4.2,0,-7);
+  p.moveTo(-.7,-.9);p.bezierCurveTo(-4.4,-3.6,-6.8,-.7,-4.3,1.4);p.bezierCurveTo(-3.6,.2,-2.1,-.1,-.7,-.9);
+  p.moveTo(.7,-.9);p.bezierCurveTo(4.4,-3.6,6.8,-.7,4.3,1.4);p.bezierCurveTo(3.6,.2,2.1,-.1,.7,-.9);
+  p.rect(-2.7,.7,5.4,1.3);p.moveTo(-1.1,2);p.lineTo(1.1,2);p.lineTo(0,3.8);p.closePath();return p;}
+const FLOR=flor();
+function marquesTF(g,ink,ink2){
+  ink=ink||'#1d130a';ink2=ink2||'#1a1007';
+  g.strokeStyle=ink;g.fillStyle=ink;
+  g.lineWidth=.9;[125.5,121.5,108,103.5,77].forEach(R=>{g.beginPath();g.arc(0,0,R,0,TAU);g.stroke();});
+  g.lineWidth=.5;g.beginPath();g.arc(0,0,79,0,TAU);g.stroke();
+  for(let i=0;i<60;i++){const a=i*TAU/60,s=Math.sin(a),c=-Math.cos(a),maj=i%5===0;g.lineWidth=maj?1.6:.6;
+    g.beginPath();g.moveTo(s*103.5,c*103.5);g.lineTo(s*(maj?108:107),c*(maj?108:107));g.stroke();}
+  g.textAlign='center';g.textBaseline='middle';g.fillStyle=ink2;
+  g.font='600 9.5px "Playfair Display", Georgia, serif';
+  for(let i=0;i<12;i++){g.save();g.rotate(i*TAU/12);g.translate(0,-114.6);g.fillText(ARAB[i],0,.5);g.restore();}
+  g.font='700 17px "Playfair Display", Georgia, serif';
+  for(let n=1;n<=12;n++){g.save();g.rotate(n*TAU/12);g.translate(0,-91);g.scale(.74,1.12);g.fillText(ROMAN[n],0,1);g.restore();}
+  for(let n=0;n<12;n++){g.save();g.rotate((n+.5)*TAU/12);g.translate(0,-92);g.scale(.95,.95);g.fill(FLOR);g.restore();}
+  g.fillStyle=ink2;g.font='600 8px "Cinzel", Georgia, serif';if('letterSpacing' in g)g.letterSpacing='2.2px';
+  g.fillText('ANTAVIANA',0,-58);if('letterSpacing' in g)g.letterSpacing='0px';
+  if(dialPlace){g.font='15px "Pinyon Script", "IM Fell English", cursive';const w=g.measureText(dialPlace).width,k=Math.min(1,82/w);
+    g.save();g.translate(0,61);g.scale(k,1);g.fillText(dialPlace,0,0);g.restore();}
+}
+function drawDialFaceTF(g,dp){
+  g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
+  let gr=g.createRadialGradient(-30,-40,10,0,0,132);gr.addColorStop(0,'#fbf5e4');gr.addColorStop(.6,'#f1e7cc');gr.addColorStop(1,'#dccaa0');
+  g.fillStyle=gr;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
+  const r=mulberry32(2207);
+  for(let i=0;i<300;i++){const a=r()*TAU,d=78+r()*50;g.fillStyle=`rgba(120,80,30,${r()*.07})`;g.beginPath();g.arc(Math.cos(a)*d,Math.sin(a)*d,r()*1+.2,0,TAU);g.fill();}
+  // centre de llautó granejat (daurat mat, amb el gra del cisell)
+  const cg=g.createRadialGradient(-22,-28,6,0,0,80);cg.addColorStop(0,'#f6dc86');cg.addColorStop(.55,'#d6aa44');cg.addColorStop(1,'#9c7420');
+  g.fillStyle=cg;g.beginPath();g.arc(0,0,77,0,TAU);g.fill();
+  g.save();g.beginPath();g.arc(0,0,77,0,TAU);g.clip();
+  for(let i=0;i<2600;i++){const a=r()*TAU,d=Math.sqrt(r())*77;const lt=r()<.5;
+    g.fillStyle=lt?`rgba(255,240,190,${.10+r()*.22})`:`rgba(90,60,10,${.08+r()*.2})`;g.fillRect(Math.cos(a)*d,Math.sin(a)*d,.55+r()*.7,.55+r()*.7);}
+  for(let i=0;i<70;i++){const a=r()*TAU,d=Math.sqrt(r())*74,l=2+r()*5,o=r()*TAU;g.strokeStyle=`rgba(110,75,15,${.12+r()*.15})`;g.lineWidth=.45;
+    g.beginPath();g.arc(Math.cos(a)*d,Math.sin(a)*d,l,o,o+1.2+r()*1.6);g.stroke();}
+  const sh=g.createRadialGradient(0,0,66,0,0,78);sh.addColorStop(0,'rgba(60,35,0,0)');sh.addColorStop(1,'rgba(60,35,0,.45)');g.fillStyle=sh;g.fillRect(-80,-80,160,160);
+  g.restore();
+  marquesTF(g);
+  // marcs daurats de les finestres (els mateixos que a l'esfera clàssica)
+  g.setTransform(dp,0,0,dp,0,0);
+  const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();};
+  [[77,79,102,22],[81,153,34,22],[121,153,56,22]].forEach(([x,y,w,h])=>{
+    let lg=g.createLinearGradient(0,y-4,0,y+h+4);lg.addColorStop(0,'rgba(70,45,5,.6)');lg.addColorStop(.5,'rgba(70,45,5,0)');lg.addColorStop(1,'rgba(255,240,200,.7)');
+    rr(x-4,y-4,w+8,h+8,4);g.fillStyle=lg;g.fill();
+    const bg=g.createLinearGradient(x,y-2,x+w*.4,y+h+2);bg.addColorStop(0,'#5a3e10');bg.addColorStop(.35,'#c9a24a');bg.addColorStop(.6,'#7a5a1c');bg.addColorStop(1,'#3e2a08');
+    rr(x-2,y-2,w+4,h+4,2.5);g.fillStyle=bg;g.fill();
+    rr(x-.6,y-.6,w+1.2,h+1.2,1.5);g.fillStyle='#1e1404';g.fill();
+  });
+  if(lume){
+    const k=zzK,c=zzM();g.setTransform(dp,0,0,dp,0,0);g.translate(128,128);
+    g.fillStyle='rgba(3,4,7,.84)';g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
+    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.8,rgba(c,.09*k));hg.addColorStop(.94,rgba(c,.2*k));hg.addColorStop(1,rgba(c,.34*k));
+    g.fillStyle=hg;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
+    g.shadowColor=rgba(c,.9*k);g.shadowBlur=5*dp*Math.min(1.6,.4+.6*k);
+    const ink=rgba(clar(c,.3),.3+.5*k);marquesTF(g,ink,ink);
+    g.shadowBlur=0;g.shadowColor='transparent';
+  }
+  g.setTransform(1,0,0,1,0,0);
+}
+/* Busques calades de ferro negre, a joc amb la de la imatge */
+function tfHand(g,ang,minut,dp){
+  g.save();g.rotate(ang);
+  g.shadowColor='rgba(45,28,6,.5)';g.shadowBlur=2.6*dp;g.shadowOffsetX=(minut?3:2.2)*dp;g.shadowOffsetY=(minut?4:3)*dp;
+  const p=new Path2D(),L=minut?100:64,rc=minut?66:40,rx=minut?4.6:7,ry=minut?6.8:9.5,t=minut?1.5:2.1,w0=minut?2.6:3.6,w1=minut?1.4:2.2;
+  p.moveTo(-w0,0);p.lineTo(-w1,-(rc-ry+.8));p.lineTo(w1,-(rc-ry+.8));p.lineTo(w0,0);p.lineTo(w0*.7,minut?18:12);p.lineTo(-w0*.7,minut?18:12);p.closePath();
+  p.moveTo(0,minut?20:14);p.arc(0,minut?20:14,minut?3:2.8,0,TAU);
+  p.ellipse(0,-rc,rx,ry,0,0,TAU,false);p.ellipse(0,-rc,rx-t,ry-t,0,0,TAU,true);
+  const sx=rx+(minut?1.6:2.4),sy=-rc+ry*.55,sr=minut?1.6:2.3;
+  [-1,1].forEach(sg=>{p.moveTo(sg*sx+sr,sy);p.arc(sg*sx,sy,sr,0,TAU);p.moveTo(sg*(rx-.5),sy-.8);p.lineTo(sg*sx,sy-sr*.6);p.lineTo(sg*sx,sy+sr*.6);p.lineTo(sg*(rx-.5),sy+.8);p.closePath();});
+  const tb=-rc-ry+.6;p.moveTo(-w1*.8,tb);p.lineTo(-w1*.8,tb-3);p.lineTo(-(minut?2.8:4.4),tb-6);p.lineTo(0,-L);p.lineTo(minut?2.8:4.4,tb-6);p.lineTo(w1*.8,tb-3);p.lineTo(w1*.8,tb);p.closePath();
+  const fg=g.createLinearGradient(-6,0,6,0);fg.addColorStop(0,'#3b342c');fg.addColorStop(.45,'#14100c');fg.addColorStop(1,'#050403');
+  g.fillStyle=fg;g.fill(p,'nonzero');g.shadowColor='transparent';
+  g.strokeStyle='rgba(255,235,190,.18)';g.lineWidth=.4;g.stroke(p);
+  lumeFill(g,p,dp);g.restore();
+}
+
 function easeOutBack(t){const c1=2.2,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
 function drawHands(d,g,dp){
   if(!g){g=hctx;dp=DPRD;}g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
   const ms=d.getMilliseconds(),s=d.getSeconds(),m=d.getMinutes(),h=d.getHours()%12;
   const mm=m+(s+ms/1000)/60,hh=h+mm/60;
-  breguet(g,hh*TAU/12,64,6.5,44,8.5,[1.6,2.2,2],dp);
-  breguet(g,mm*TAU/60,100,4.6,74,6.5,[2.6,3.4,3],dp);
+  if(esfera==='tf'){tfHand(g,hh*TAU/12,false,dp);tfHand(g,mm*TAU/60,true,dp);}
+  else{breguet(g,hh*TAU/12,64,6.5,44,8.5,[1.6,2.2,2],dp);
+  breguet(g,mm*TAU/60,100,4.6,74,6.5,[2.6,3.4,3],dp);}
   // Segons amb salt i petit rebot de l'escapament
   const f=ms/1000,disp=s-1+(f<.2?easeOutBack(f/.2):1);
   g.save();g.rotate(disp*TAU/60);
@@ -1701,7 +1785,7 @@ function drawHands(d,g,dp){
   const p=new Path2D();p.moveTo(-.9,24);p.lineTo(-.55,-96);p.lineTo(0,-112);p.lineTo(.55,-96);p.lineTo(.9,24);p.closePath();
   p.moveTo(5,22);p.arc(0,22,5,0,TAU);
   p.moveTo(3.4,-82);p.arc(0,-82,3.4,0,TAU,false);p.moveTo(2,-82);p.arc(0,-82,2,0,TAU,true);
-  g.fillStyle=blued(g,2);g.fill(p,'nonzero');lumeFill(g,p,dp);g.restore();
+  g.fillStyle=esfera==='tf'?'#120d08':blued(g,2);g.fill(p,'nonzero');lumeFill(g,p,dp);g.restore();
   // Tapa central
   const cg=g.createRadialGradient(-1.5,-1.5,.3,0,0,5.2);cg.addColorStop(0,'#fff5c8');cg.addColorStop(.5,'#d4af37');cg.addColorStop(1,'#6b4a12');
   g.shadowColor='rgba(0,0,0,.4)';g.shadowBlur=2*dp;g.shadowOffsetX=1.5*dp;g.shadowOffsetY=1.5*dp;
@@ -2043,7 +2127,8 @@ window.addEventListener('click',e=>{
   else if(hitRect($('keyBtn'),x,y,0)||(wide&&(hitRect($('vesc'),x,y,10)||[...document.querySelectorAll('.vdf')].some(el=>hitRect(el,x,y,0)))))act=toggleDoor;
   else if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2)))act=openPanel;
   else if(hitPend(x,y))act=()=>windUp(false);
-  else if(effMode==='zz'&&(hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0))))act=zzToc;
+  else if(effMode==='zz'&&(e.target.closest('.dial')||hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0))))act=zzToc;
+  else if(!wide&&!phoneLand&&!e.target.closest('.win')&&(e.target.closest('.dial')||hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)))act=toggleZoom;
   if(act){e.stopPropagation();e.preventDefault();act();}
 },true);
 door.querySelectorAll('.df').forEach(el=>el.addEventListener('click',toggleDoor));
@@ -2216,7 +2301,8 @@ addEventListener('pointerup',e=>{
   const x=e.clientX,y=e.clientY;
   if(hitRect(document.querySelector('.plaque'),x,y,2)||(wide&&hitRect($('vcap'),x,y,2))){openPanel();suppressClick=Date.now()+600;}
   else if(hitPend(x,y)){windUp(false);suppressClick=Date.now()+600;}
-  else if(effMode==='zz'&&(hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0)))){zzToc();suppressClick=Date.now()+600;}
+  else if(effMode==='zz'&&((e.target.closest&&e.target.closest('.dial'))||hitCircle(document.querySelector('.dial:not(.big)'),x,y,0)||(wide&&hitCircle(bigDial,x,y,0)))){zzToc();suppressClick=Date.now()+600;}
+  else if(!wide&&!phoneLand&&!(e.target.closest&&e.target.closest('.win'))&&((e.target.closest&&e.target.closest('.dial'))||hitCircle(document.querySelector('.dial:not(.big)'),x,y,0))){toggleZoom();suppressClick=Date.now()+600;}
 },{capture:true});
 
 /* ================= AVÍS BREU ================= */
@@ -3583,6 +3669,29 @@ addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
    const t=$('toast');t.textContent=`◐ ${Math.round(zzK*100)} %`;t.classList.add('show');clearTimeout(avisa.tm);},{passive:true});
  const fi=()=>{if(!zs)return;if(zs.mou){suppressClick=Date.now()+400;tapIgnore=true;store.set('zzLlum',zzK.toFixed(2));avisa.tm=setTimeout(()=>$('toast').classList.remove('show'),1200);}zs=null;};
  addEventListener('pointerup',fi);addEventListener('pointercancel',fi);}
+
+/* ================= Canvi d'esfera: pitjar llarg (0,75 s) sobre l'esfera; gira com una moneda i mostra l'altra ================= */
+let flipant=false;
+function canviaEsfera(){
+  if(flipant)return;flipant=true;
+  const fs=[document.querySelector('.dial:not(.big) .dface'),bigDial.querySelector('.dface')];
+  fs.forEach(f=>{f.style.transition='transform .38s cubic-bezier(.5,0,.75,0)';f.style.transform='rotateY(90deg)';});
+  try{if(soundOn&&ac)tick(ac.currentTime+.02,false,.25,.8);}catch(e){}
+  setTimeout(()=>{
+    esfera=esfera==='tf'?'clas':'tf';store.set('esfera',esfera);paintDials();hSettled=false;drawAllHands(new Date());
+    fs.forEach(f=>{f.style.transition='none';f.style.transform='rotateY(-90deg)';void f.offsetWidth;f.style.transition='transform .45s cubic-bezier(.25,1,.5,1)';f.style.transform='';});
+    try{if(soundOn&&ac)tick(ac.currentTime+.42,true,.32,.7);}catch(e){}
+    setTimeout(()=>{fs.forEach(f=>{f.style.transition='';});flipant=false;},480);
+  },390);
+}
+{let lp=null,fet=false;
+ const sobreEsfera=e=>(e.target.closest&&e.target.closest('.dial'))||hitCircle(document.querySelector('.dial:not(.big)'),e.clientX,e.clientY,0)||(wide&&hitCircle(bigDial,e.clientX,e.clientY,0));
+ addEventListener('pointerdown',e=>{fet=false;if(panelOpen||e.button>0||(e.target.closest&&e.target.closest('.ui'))||!sobreEsfera(e))return;
+   lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;fet=true;tapIgnore=true;zzTocAnt=0;canviaEsfera();},750)};},{capture:true,passive:true});
+ addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null;}},{passive:true});
+ const no=()=>{if(lp){clearTimeout(lp.t);lp=null;}if(fet){suppressClick=Date.now()+500;fet=false;}};
+ addEventListener('pointerup',no,true);addEventListener('pointercancel',no,true);
+ addEventListener('contextmenu',e=>{if(sobreEsfera(e))e.preventDefault();});}
 
 /* ================= BUCLE PRINCIPAL ================= */
 let hSec=-1,hSettled=false;
