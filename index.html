@@ -224,7 +224,6 @@ body.zoom .dial{cursor:zoom-out}
 html,body{touch-action:none;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 /* ---------- MODE NOCTURN / ZZ ---------- */
 .veil{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:40;opacity:0;transition:opacity 2.4s ease}
-body.m-night .veil{opacity:1}
 /* zz: la penombra es fa dins de l'escena (cada peça s'enfosqueix on és), no amb una capa a sobre:
    així la llum de l'esfera queda sempre enganxada a l'esfera, encara que el rellotge es mogui o s'inclini */
 .zzv,.zzv-s{display:none}
@@ -236,6 +235,15 @@ body.m-zz .vcav{background:#060403}
 body.m-zz .dial::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle at 50% 50%,transparent 127.2px,rgba(0,0,0,.76) 128.6px)}
 body.m-zz .dome{opacity:.22}
+/* Nit: la mateixa penombra dins de l'escena, més suau, amb l'esfera, l'esmalt del termòmetre i les plaques il·luminats */
+body.m-night .zzv{display:block;position:absolute;inset:0;background:rgba(0,0,0,.6);pointer-events:none}
+body.m-night .zzv-s{display:inline;fill-opacity:.6}
+body.m-night .wall,body.m-night .wainscot,body.m-night .side,body.m-night .topf,body.m-night .bstrip,body.m-night .cback,body.m-night .wlayer,body.m-night .pshadow,body.m-night .pend,body.m-night .cw,
+body.m-night .hinge,body.m-night .df,body.m-night .glass,body.m-night .escutcheon,body.m-night .kw,body.m-night .klabel,body.m-night .vdf,body.m-night .vglass,body.m-night .vhinge,body.m-night .vesc,body.m-night .vbase{filter:brightness(.4)}
+body.m-night .vcav{background:#0b0705}
+body.m-night .dial::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,transparent 127.2px,rgba(0,0,0,.45) 128.6px)}
+body.m-night .dome{opacity:.4}
 /* zz: esfera i finestres apagades perquè les agulles fosforescents destaquin */
 #faceCv,#faceCv2,.win{transition:filter 2s}
 
@@ -3617,7 +3625,7 @@ $('modeBtn').addEventListener('click',e=>{e.stopPropagation();mode=MODES[(MODES.
 /* Vel de nit: una capa fosca amb "finestres de llum" sobre l'esfera, la mitja esfera del termòmetre i la placa */
 function placeVeil(){
   const eff=effMode;if(eff!=='nit'&&eff!=='zz')return;
-  if(eff==='zz')return;
+  if(eff==='zz'||eff==='nit')return;
   const cv=$('veil'),W=innerWidth,H=innerHeight,q=.5,zz=eff==='zz';
   cv.width=Math.ceil(W*q);cv.height=Math.ceil(H*q);
   const g=cv.getContext('2d');g.setTransform(q,0,0,q,0,0);
