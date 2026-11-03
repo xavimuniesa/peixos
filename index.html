@@ -1753,23 +1753,68 @@ function drawDialFaceTF(g,dp){
   }
   g.setTransform(1,0,0,1,0,0);
 }
-/* Busques calades de ferro negre, a joc amb la de la imatge */
-function tfHand(g,ang,minut,dp){
-  g.save();g.rotate(ang);
-  g.shadowColor='rgba(45,28,6,.5)';g.shadowBlur=2.6*dp;g.shadowOffsetX=(minut?3:2.2)*dp;g.shadowOffsetY=(minut?4:3)*dp;
-  const p=new Path2D(),L=minut?100:64,rc=minut?66:40,rx=minut?4.6:7,ry=minut?6.8:9.5,t=minut?1.5:2.1,w0=minut?2.6:3.6,w1=minut?1.4:2.2;
-  p.moveTo(-w0,0);p.lineTo(-w1,-(rc-ry+.8));p.lineTo(w1,-(rc-ry+.8));p.lineTo(w0,0);p.lineTo(w0*.7,minut?18:12);p.lineTo(-w0*.7,minut?18:12);p.closePath();
-  p.moveTo(0,minut?20:14);p.arc(0,minut?20:14,minut?3:2.8,0,TAU);
-  p.ellipse(0,-rc,rx,ry,0,0,TAU,false);p.ellipse(0,-rc,rx-t,ry-t,0,0,TAU,true);
-  const sx=rx+(minut?1.6:2.4),sy=-rc+ry*.55,sr=minut?1.6:2.3;
-  [-1,1].forEach(sg=>{p.moveTo(sg*sx+sr,sy);p.arc(sg*sx,sy,sr,0,TAU);p.moveTo(sg*(rx-.5),sy-.8);p.lineTo(sg*sx,sy-sr*.6);p.lineTo(sg*sx,sy+sr*.6);p.lineTo(sg*(rx-.5),sy+.8);p.closePath();});
-  const tb=-rc-ry+.6;p.moveTo(-w1*.8,tb);p.lineTo(-w1*.8,tb-3);p.lineTo(-(minut?2.8:4.4),tb-6);p.lineTo(0,-L);p.lineTo(minut?2.8:4.4,tb-6);p.lineTo(w1*.8,tb-3);p.lineTo(w1*.8,tb);p.closePath();
-  const fg=g.createLinearGradient(-6,0,6,0);fg.addColorStop(0,'#3b342c');fg.addColorStop(.45,'#14100c');fg.addColorStop(1,'#050403');
-  g.fillStyle=fg;g.fill(p,'nonzero');g.shadowColor='transparent';
-  g.strokeStyle='rgba(255,235,190,.18)';g.lineWidth=.4;g.stroke(p);
-  lumeFill(g,p,dp);g.restore();
+/* Busques calades de ferro negre, com les del rellotge Tempus Fugit:
+   un disseny amb cap de flor (lòbuls i forats rodons) i punta de llança (la minutera),
+   i un altre amb l'òval i l'essa calats prop de l'eix (l'horària).
+   Es dibuixen un cop en un llenç a part (amb els forats retallats) i després es giren. */
+const tfSprites={};
+function tfSprite(minut,dp){
+  const key=`${minut?1:0}|${dp.toFixed(2)}|${lume?zzI+':'+zzK.toFixed(2):'n'}`;
+  if(tfSprites[key])return tfSprites[key];
+  if(Object.keys(tfSprites).length>24)for(const k in tfSprites)delete tfSprites[k];
+  // proporcions del model: caps amples i busques llargues fins a l'anell de les hores
+  const sx=minut?1.9:1.6,sy=minut?.86:1.56;
+  const top=Math.ceil((minut?102:70)*sy)+2,bot=Math.ceil((minut?23:12)*sy)+2,W=Math.ceil(32*sx),sc=dp*1.6;
+  const cv=document.createElement('canvas');cv.width=Math.ceil(W*sc);cv.height=Math.ceil((top+bot)*sc);
+  const g=cv.getContext('2d');const escala=()=>g.setTransform(sc*sx,0,0,sc*sy,W/2*sc,top*sc);escala();
+  // cada peça es pinta per separat (unió), i els forats després es retallen
+  const P=pts=>{g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();g.fill();};
+  const C=(x,y,r)=>{g.beginPath();g.arc(x,y,r,0,TAU);g.fill();};
+  const E=(x,y,rx,ry)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fill();};
+  if(lume){const c=zzH();g.fillStyle=rgba(clar(c,.45),.5+.45*zzK);}
+  else{const fg=g.createLinearGradient(-8,0,8,0);fg.addColorStop(0,'#3a332b');fg.addColorStop(.42,'#16110d');fg.addColorStop(1,'#040303');g.fillStyle=fg;}
+  if(!minut){
+    C(0,0,7.2);P([[-2.3,-5],[2.3,-5],[2.3,-10],[-2.3,-10]]);
+    P([[0,-8],[5,-13.5],[0,-19.6],[-5,-13.5]]);C(6.3,-13.5,1.8);C(-6.3,-13.5,1.8);
+    P([[-2.6,-18],[2.6,-18],[1.7,-23.5],[-1.7,-23.5]]);
+    P([[-1.8,-23],[1.8,-23],[5,-28],[-5,-28]]);
+    C(6.2,-33,4.5);C(-6.2,-33,4.5);E(0,-36,4.4,6.4);C(10.4,-30.4,1.6);C(-10.4,-30.4,1.6);
+    C(4.3,-43.4,3.3);C(-4.3,-43.4,3.3);
+    P([[-3.4,-46.5],[3.4,-46.5],[0,-70]]);
+    P([[-1.4,0],[1.4,0],[1.2,10],[-1.2,10]]);C(0,10.5,2.2);
+  }else{
+    C(0,0,6.2);P([[-1.6,0],[1.6,0],[1.3,17],[-1.3,17]]);C(0,18.5,3.2);
+    P([[-2.1,-4],[2.1,-4],[2.1,-9],[-2.1,-9]]);E(0,-15,5.4,7.6);
+    P([[-3.2,-21],[3.2,-21],[4.6,-26.5],[-4.6,-26.5]]);C(6.9,-24.6,2);C(-6.9,-24.6,2);
+    E(0,-32.5,5,7.2);
+    P([[-7.4,-38.6],[7.4,-38.6],[5,-42.4],[-5,-42.4]]);C(7.9,-39.6,1.9);C(-7.9,-39.6,1.9);
+    P([[-2.9,-42],[2.9,-42],[1.1,-97],[0,-102],[-1.1,-97]]);E(0,-60,2.9,2.1);E(0,-78,2,1.6);
+  }
+  // l'eix: un disc rodó de debò (sense l'escala)
+  g.setTransform(sc,0,0,sc,W/2*sc,top*sc);C(0,0,minut?8:9.5);escala();
+  // calat: forats retallats
+  g.globalCompositeOperation='destination-out';g.fillStyle='#000';g.strokeStyle='#000';
+  if(!minut){
+    P([[0,-10.6],[2.3,-13.5],[0,-16.9],[-2.3,-13.5]]);
+    C(6.2,-33.3,2.1);C(-6.2,-33.3,2.1);E(0,-37,1.3,3.1);C(4.3,-43.6,1.15);C(-4.3,-43.6,1.15);
+    P([[-1.4,-48.6],[1.4,-48.6],[0,-53]]);
+  }else{
+    E(0,-15,2.1,4.4);E(0,-60,1,.8);
+  }
+  if(minut){g.lineWidth=1.6;g.lineCap='round';g.beginPath();g.moveTo(2.1,-27.6);g.bezierCurveTo(-3.6,-29,3.6,-36,-2.1,-37.4);g.stroke();}
+  g.globalCompositeOperation='source-over';
+  return tfSprites[key]={cv,W,top,bot};
 }
-
+function tfHand(g,ang,minut,dp){
+  // com al model: la minutera porta el cap de flor i l'horària, més curta, el cos calat
+  const sp=tfSprite(!minut,dp);
+  g.save();g.rotate(ang);
+  if(lume){const c=zzH();g.shadowColor=rgba(c,.95*zzK);g.shadowBlur=11*dp*Math.min(1.5,.4+.6*zzK);g.shadowOffsetX=0;g.shadowOffsetY=0;}
+  else{g.shadowColor='rgba(45,28,6,.5)';g.shadowBlur=2.6*dp;g.shadowOffsetX=(minut?3:2.2)*dp;g.shadowOffsetY=(minut?4:3)*dp;}
+  g.drawImage(sp.cv,-sp.W/2,-sp.top,sp.W,sp.top+sp.bot);
+  if(lume){g.shadowBlur=3*dp;g.drawImage(sp.cv,-sp.W/2,-sp.top,sp.W,sp.top+sp.bot);}
+  g.restore();
+}
 function easeOutBack(t){const c1=2.2,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
 function drawHands(d,g,dp){
   if(!g){g=hctx;dp=DPRD;}g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,256,256);g.translate(128,128);
