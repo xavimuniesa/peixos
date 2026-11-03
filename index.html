@@ -232,8 +232,6 @@ body.m-zz .zzv-s{display:inline}
 body.m-zz .wall,body.m-zz .wainscot,body.m-zz .side,body.m-zz .topf,body.m-zz .bstrip,body.m-zz .cback,body.m-zz .wlayer,body.m-zz .pshadow,body.m-zz .pend,body.m-zz .cw,
 body.m-zz .hinge,body.m-zz .df,body.m-zz .glass,body.m-zz .escutcheon,body.m-zz .kw,body.m-zz .klabel,body.m-zz .vdf,body.m-zz .vglass,body.m-zz .vhinge,body.m-zz .vesc,body.m-zz .vbase{filter:brightness(.26)}
 body.m-zz .vcav{background:#060403}
-body.m-zz .dial::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 50% 50%,transparent 127.2px,rgba(0,0,0,.76) 128.6px)}
 body.m-zz .dome{opacity:.22}
 /* Nit: la mateixa penombra dins de l'escena, més suau, amb l'esfera, l'esmalt del termòmetre i les plaques il·luminats */
 body.m-night .zzv{display:block;position:absolute;inset:0;background:rgba(0,0,0,.6);pointer-events:none}
@@ -241,8 +239,6 @@ body.m-night .zzv-s{display:inline;fill-opacity:.6}
 body.m-night .wall,body.m-night .wainscot,body.m-night .side,body.m-night .topf,body.m-night .bstrip,body.m-night .cback,body.m-night .wlayer,body.m-night .pshadow,body.m-night .pend,body.m-night .cw,
 body.m-night .hinge,body.m-night .df,body.m-night .glass,body.m-night .escutcheon,body.m-night .kw,body.m-night .klabel,body.m-night .vdf,body.m-night .vglass,body.m-night .vhinge,body.m-night .vesc,body.m-night .vbase{filter:brightness(.4)}
 body.m-night .vcav{background:#0b0705}
-body.m-night .dial::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 50% 50%,transparent 127.2px,rgba(0,0,0,.45) 128.6px)}
 body.m-night .dome{opacity:.4}
 /* zz: esfera i finestres apagades perquè les agulles fosforescents destaquin */
 #faceCv,#faceCv2,.win{transition:filter 2s}
@@ -612,6 +608,17 @@ body.m-zz .bk-tab.on{background:#1b2a1e;color:#c9ffd0}
 body.m-zz .bk-x{filter:brightness(.35)}
 body.m-zz .r-boto,body.m-zz .p-boto,body.m-zz .al-rep,body.m-zz .al-mobil,body.m-zz .av-l li{background:rgba(120,255,150,.05)}
 body.m-zz .tp-ara svg,body.m-zz .tp-h12 svg,body.m-zz .tp-d5 svg{filter:brightness(.5) sepia(.4) hue-rotate(60deg)}
+/* ===== Esferes sense el marc gran: la cara ocupa tot el disc i l'anella exterior és ara un marc daurat fi ===== */
+.dial{background:none!important}
+.dial::before{display:none!important}
+.dial .dface{left:0;top:0;zoom:1.09375;box-shadow:none}
+.dface::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:5;
+  background:radial-gradient(circle at 50% 50%,transparent 121.2px,rgba(50,32,4,.7) 121.8px,rgba(50,32,4,.15) 123px,rgba(255,248,215,0) 124px,rgba(255,248,215,.45) 125.3px,rgba(255,248,215,0) 126.4px,rgba(40,25,4,.65) 128px),
+    conic-gradient(from 12deg,#7d5a18,#f2dc98,#a47823,#fbe9b0,#86611c,#e9c979,#9b7022,#f7e3a3,#7d5a18);
+  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 121px,#000 121.6px);mask:radial-gradient(circle at 50% 50%,transparent 121px,#000 121.6px);
+  transition:filter 2s}
+body.m-night .dface::after{filter:brightness(.55)}
+body.m-zz .dface::after{filter:brightness(.24)}
 </style>
 </head>
 <body>
@@ -1499,7 +1506,7 @@ function layoutViewer(W,H){
   Object.assign(vd.style,{width:ds+'px',height:ds+'px',marginLeft:(-ds/2)+'px',top:(cy-ds/2)+'px'});
   bigDial.style.transform=`scale(${k})`;
   $('vcap').style.top=(cy+ds/2+gh*.08)+'px';
-  const nd=Math.min(3,Math.max(1,(devicePixelRatio||1)*k));
+  const nd=Math.min(3.3,Math.max(1,(devicePixelRatio||1)*k*1.094));
   if(Math.abs(nd-DPRB)>.01){DPRB=nd;sizeCv(faceCv2,256,256,DPRB);sizeCv(handsCv2,256,256,DPRB);drawDialFace(fctx2,DPRB);drawHands(new Date(),hctx2,DPRB);}
 }
 function applyView(){
@@ -1521,7 +1528,7 @@ function applyView(){
   else t=`scale(${s})`;
   $('scaler').style.transform=t;SCALE=s;
   document.body.classList.toggle('zoom',zoomed);
-  const nd=Math.min(3,Math.max(1,(devicePixelRatio||1)*Math.max(s,b)));
+  const nd=Math.min(3.3,Math.max(1,(devicePixelRatio||1)*Math.max(s,b)*1.094));
   if(Math.abs(nd-DPRD)>.01){DPRD=nd;sizeCv(faceCv,256,256,DPRD);sizeCv(handsCv,256,256,DPRD);drawDialFace();drawHands(new Date());}
   placeVeilSoon();
 }
@@ -1598,7 +1605,7 @@ function drawDialFace(g,dp){
   if(lume){
     const k=zzK,c=zzM();g.setTransform(dp,0,0,dp,0,0);g.translate(128,128);
     g.fillStyle='rgba(3,4,7,.84)';g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
-    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.8,rgba(c,.09*k));hg.addColorStop(.94,rgba(c,.2*k));hg.addColorStop(1,rgba(c,.34*k));
+    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.78,rgba(c,.09*k));hg.addColorStop(.9,rgba(c,.2*k));hg.addColorStop(.95,rgba(c,.34*k));
     g.fillStyle=hg;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
     g.shadowColor=rgba(c,.9*k);g.shadowBlur=5*dp*Math.min(1.6,.4+.6*k);
     const ink=rgba(clar(c,.3),.3+.5*k);marques(g,ink,ink);
@@ -1753,7 +1760,7 @@ function drawDialFaceTF(g,dp){
   if(lume){
     const k=zzK,c=zzM();g.setTransform(dp,0,0,dp,0,0);g.translate(128,128);
     g.fillStyle='rgba(3,4,7,.84)';g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
-    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.8,rgba(c,.09*k));hg.addColorStop(.94,rgba(c,.2*k));hg.addColorStop(1,rgba(c,.34*k));
+    const hg=g.createRadialGradient(0,0,0,0,0,128);hg.addColorStop(0,rgba(c,0));hg.addColorStop(.5,rgba(c,.025*k));hg.addColorStop(.78,rgba(c,.09*k));hg.addColorStop(.9,rgba(c,.2*k));hg.addColorStop(.95,rgba(c,.34*k));
     g.fillStyle=hg;g.beginPath();g.arc(0,0,128,0,TAU);g.fill();
     g.shadowColor=rgba(c,.9*k);g.shadowBlur=5*dp*Math.min(1.6,.4+.6*k);
     const ink=rgba(clar(c,.3),.3+.5*k);marquesTF(g,ink,ink);
