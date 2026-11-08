@@ -202,7 +202,8 @@ body.zoom .dial{cursor:zoom-out}
 .cap::after{content:'';position:absolute;left:50%;top:3px;width:4px;height:14px;margin-left:-2px;border-radius:2px;
   background:#3a2606;box-shadow:0 1px 0 rgba(255,240,200,.6)}
 .knob.on .cap{transform:rotate(55deg)}
-.knob.invite .cap{animation:glint 2.6s ease-in-out infinite}
+.knob.invite .cap{animation:glint 2.6s ease-in-out 4}
+body.m-zz .knob.invite .cap,body.m-night .knob.invite .cap{animation:none}
 @keyframes glint{0%,100%{filter:brightness(1)}50%{filter:brightness(1.45) drop-shadow(0 0 4px rgba(255,220,130,.9))}}
 .klabel{cursor:pointer;position:absolute;top:86px;width:96px;text-align:center;font-family:'Cinzel',serif;font-weight:700;font-size:10px;letter-spacing:1.5px;
   color:#f0cf7a;text-shadow:0 1px 1px rgba(0,0,0,.9),0 0 1px rgba(0,0,0,.6)}
@@ -1804,7 +1805,7 @@ function drawHands(d,g,dp){
   else{breguet(g,hh*TAU/12,64,6.5,44,8.5,[1.6,2.2,2],dp);
   breguet(g,mm*TAU/60,100,4.6,74,6.5,[2.6,3.4,3],dp);}
   // Segons amb salt i petit rebot de l'escapament
-  const f=ms/1000,disp=s-1+(f<.2?easeOutBack(f/.2):1);
+  const f=lume?1:ms/1000,disp=s-1+(f<.2?easeOutBack(f/.2):1);
   g.save();g.rotate(disp*TAU/60);
   g.shadowColor='rgba(45,28,6,.45)';g.shadowBlur=3*dp;g.shadowOffsetX=3.6*dp;g.shadowOffsetY=4.6*dp;
   const p=new Path2D();p.moveTo(-.9,24);p.lineTo(-.55,-96);p.lineTo(0,-112);p.lineTo(.55,-96);p.lineTo(.9,24);p.closePath();
@@ -1930,7 +1931,7 @@ function weightFrac(now){
 }
 function windUp(auto){
   if(windAnim)return;const now=Date.now(),from=baseFrac(now);if(from<.004&&!auto)return;
-  const dur=900+from*2300;windAnim={t0:now,from,dur};wound=now+dur;store.set('corda',String(wound));
+  const dur=900+from*2300;windAnim={t0:now,from,dur};if(typeof kick==='function')kick();wound=now+dur;store.set('corda',String(wound));
   if(soundOn&&ac&&!quiet){const t=ac.currentTime+.02,sec=dur/1000;tick(t,true,.55,.45);creak(t+.05,sec*.95,.014,.5);
     for(let x=.12;x<sec;x+=.062)tick(t+x,(Math.round(x*100)%2)===0,.2,2.3);}
 }
@@ -1944,8 +1945,10 @@ function buildWeights(){
     sc.style.left=(x-WSP.cx-P+11)+'px';sc.dataset.dy=9-P;
   });
 }
+let lastW='';
 function updateWeights(now){
   const f=weightFrac(now),yl=W_TOP+f*W_RANGE-CH,yr=W_TOP+(1-f)*W_RANGE-CH;
+  const key=yl.toFixed(2)+'|'+yr.toFixed(2);if(key===lastW)return;lastW=key;
   $('wL').style.transform=`translateY(${yl.toFixed(2)}px)`;$('wR').style.transform=`translateY(${yr.toFixed(2)}px)`;
   const dy=+$('wsL').dataset.dy||0;
   $('wsL').style.transform=`translateY(${(yl+dy).toFixed(2)}px)`;$('wsR').style.transform=`translateY(${(yr+dy).toFixed(2)}px)`;
@@ -1984,20 +1987,44 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncSwing(
 const clockEl=$('clock'),reflEl=document.querySelector('.refl'),glareEl=$('glare');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let tgX=3,tgY=7,lastMove=-1e9;
+/* Balanceig en repòs: animació al compositor sobre un embolcall (#sway), sense despertar el JavaScript a cada fotograma.
+   Corbes idèntiques a les d'abans (Y: 7°, X: 3±1,5°), mostrejades cada segon en un cicle de 3 minuts. */
+const swayEl=document.createElement('div');swayEl.id='sway';swayEl.style.cssText='position:relative;transform-style:preserve-3d;will-change:transform';
+clockEl.parentNode.insertBefore(swayEl,clockEl);swayEl.appendChild(clockEl);
+let swayAnims=[],swayK=-1;
+function swayPose(t,k){return{x:k*(3+1.5*Math.sin(TAU*t/90)),y:7*k*Math.sin(TAU*t/60)};}
+function setSway(){
+  const k=(phoneLand||reduce)?0:(zoomed?.35:1);if(k===swayK)return;swayK=k;
+  const cur=swayAnims[0]?swayAnims[0].currentTime:0,paused=swayAnims[0]&&swayAnims[0].playState==='paused';
+  swayAnims.forEach(a=>a.cancel());swayAnims=[];
+  if(!k){swayEl.style.transform='';return;}
+  const A=[],R=[],G=[];
+  for(let t=0;t<=180;t++){const q=swayPose(t,k);
+    A.push({transform:`rotateX(${q.x.toFixed(3)}deg) rotateY(${q.y.toFixed(3)}deg)`});
+    R.push({transform:`translateX(${(q.y*3.2).toFixed(2)}px)`});G.push({transform:`translate(${(q.y*1.6).toFixed(2)}px,${(-q.x*2).toFixed(2)}px)`});}
+  const o={duration:180000,iterations:Infinity};
+  swayAnims=[swayEl.animate(A,o),reflEl.animate(R,o),glareEl.animate(G,o)];
+  swayAnims.forEach(a=>{a.currentTime=cur||0;if(paused)a.pause();});
+}
+let tiltOn=false;
 addEventListener('pointermove',e=>{
   if(phoneLand||e.pointerType==='touch')return;
   if(e.target.closest&&e.target.closest('.kw,.klabel,.plaque,.keyhit,.win,.base-front'))return;
   const nx=e.clientX/innerWidth-.5,ny=e.clientY/innerHeight-.5;let k=reduce?.3:1;
   if(zoomed)k*=.35;
   tgY=-nx*26*k;tgX=-ny*14*k;lastMove=performance.now();
+  if(!tiltOn){tiltOn=true;}kick();
 },{passive:true});
+/* Inclinació amb el ratolí (escriptori): només corre mentre el ratolí es mou; en quedar quiet torna a zero i reprèn el balanceig */
 function updateTilt(ts){
-  if(phoneLand){tgX=tgY=0;}
-  else if(ts-lastMove>5000&&!reduce){const k=zoomed?.35:1;tgY=7*k*Math.sin(ts/9000);tgX=k*(3+1.5*Math.sin(ts/13000));}
+  setSway();
+  // mode zz (salvapantalles): el moble queda quiet en la seva postura; el pèndol continua
+  const quiet3d=lume||tiltOn;swayAnims.forEach(a=>{if(quiet3d&&a.playState==='running')a.pause();else if(!quiet3d&&a.playState==='paused')a.play();});
+  if(!tiltOn)return;
+  if(phoneLand||performance.now()-lastMove>5000){tgX=tgY=0;}
   tiltX+=(tgX-tiltX)*.05;tiltY+=(tgY-tiltY)*.05;
   clockEl.style.transform=`rotateX(${tiltX.toFixed(3)}deg) rotateY(${tiltY.toFixed(3)}deg)`;
-  reflEl.style.transform=`translateX(${(tiltY*3.2).toFixed(2)}px)`;
-  glareEl.style.transform=`translate(${(tiltY*1.6).toFixed(2)}px,${(-tiltX*2).toFixed(2)}px)`;
+  if(!tgX&&!tgY&&Math.abs(tiltX)<.05&&Math.abs(tiltY)<.05){tiltX=tiltY=0;clockEl.style.transform='';tiltOn=false;}
 }
 
 /* ================= ÀUDIO ================= */
@@ -2094,16 +2121,18 @@ function westminster(q,hour,t){
   seq.forEach(c=>{[...CHG[c]].forEach((n,i)=>{bell(NT[n],t,.2,3.2);t+=i===3?1.45:.72;});});
   if(q===4){t+=.8;const n=hour%12||12;for(let i=0;i<n;i++){bell(HORA_LA3,t,.34,6);t+=2.1;}}
 }
-setInterval(()=>{
+function planSo(){const now=Date.now();setTimeout(()=>{batec();planSo();},Math.max(5,1000-(now%1000)-110));}
+function batec(){
   if(!(soundOn||chimesOn)||!ac||document.hidden)return;
   const now=Date.now(),next=Math.ceil(now/1000)*1000,lead=next-now;
-  if(next===lastSched||lead>150)return;
+  if(next===lastSched||lead>300)return;
   lastSched=next;
   const t=Math.max(ac.currentTime,ac.currentTime+lead/1000-(ac.outputLatency||0));
   if(soundOn)tick(t,(next/1000)%2===1);
   const d=new Date(next);
   if(chimesOn&&d.getSeconds()===0&&d.getMinutes()%15===0){const q=d.getMinutes()/15||4;warning(t+.25);westminster(q,d.getHours(),t+1.25);}
-},20);
+}
+planSo();
 
 const soundKnob=$('soundKnob'),chimeKnob=$('chimeKnob'),hint=$('hint');
 function setSound(on){
@@ -3720,15 +3749,26 @@ function canviaEsfera(){
 
 /* ================= BUCLE PRINCIPAL ================= */
 let hSec=-1,hSettled=false;
+/* Bucle estalviador: un rellotge que avança un cop per segon. Els fotogrames només corren en ràfegues curtes
+   (rebot de la segonera i caiguda del contrapès) o mentre hi ha moviment (ratolí, corda); la resta del temps, repòs. */
+let rafOn=false,burstUntil=0;
+function kick(){if(!rafOn){rafOn=true;requestAnimationFrame(frame);}}
 function frame(ts){
-  const now=Date.now(),d=new Date(now),sec=d.getSeconds(),ms=d.getMilliseconds();
+  rafOn=false;
+  const now=Date.now(),d=new Date(now),ms=d.getMilliseconds();
   updateTilt(ts);
-  if(sec!==hSec){hSec=sec;hSettled=false;if(window.__comprovaAlarmes)window.__comprovaAlarmes(d);}
-  if(ms<260)drawAllHands(d);else if(!hSettled){drawAllHands(d);hSettled=true;}
-  updateWeights(now);updateCalendar(d);
+  if(now<burstUntil&&!lume&&ms<260)drawAllHands(d);else if(!hSettled){drawAllHands(d);hSettled=true;}
+  updateWeights(now);
+  if(now<burstUntil||tiltOn||windAnim||!hSettled)kick();
+}
+function tickSec(){
+  const now=Date.now(),d=new Date(now);
+  hSec=d.getSeconds();hSettled=false;if(window.__comprovaAlarmes)window.__comprovaAlarmes(d);
+  updateCalendar(d);
   if(now-(frame.lm||0)>30000){frame.lm=now;applyMode(false);if(panelOpen)fillPanel();}
   if(now-(frame.lv||0)>1500){frame.lv=now;placeVeil();}
-  requestAnimationFrame(frame);
+  burstUntil=now+280;kick();
+  setTimeout(tickSec,1000-(Date.now()%1000)+3);
 }
 /* ================= INICI: textos en la llengua desada ================= */
 pintaTextos();pintaMenu();bkPinta();paintWx();$('plLoc').textContent=X.loc;hint.innerHTML=X.hint;consultaAny(new Date().getFullYear());
@@ -3737,7 +3777,7 @@ addEventListener('resize',layout);
 Promise.all(['700 21px "Playfair Display"','20px "IM Fell English"','600 9px "Cinzel"','16px "Pinyon Script"','italic 7px "IM Fell English"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>paintDials());
 fitWindows();
 document.fonts.ready.then(()=>{fitWindows();paintDials();fitText($('plLoc'),21);fitText($('plInfo'),13.5);});
-requestAnimationFrame(frame);
+tickSec();document.addEventListener('visibilitychange',()=>{if(!document.hidden){hSettled=false;kick();}});
 
 /* ================= APP INSTAL·LABLE ================= */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
