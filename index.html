@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Rellotge de Pèndol Clàssic</title>
+<meta name="description" content="Antaviana: rellotge de pèndol de caoba amb carilló de Westminster, calendari, temps, ràdio, notícies i alarmes.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#150c07">
 <meta name="mobile-web-app-capable" content="yes">
@@ -635,7 +636,7 @@ body.m-zz .dface::after{filter:brightness(.24)}
    <div class="box crown">
     <div class="f side l"></div><div class="f side r"></div><div class="f topf"></div>
     <div class="f front">
-     <svg viewBox="0 0 380 170" width="380" height="170" aria-label="Termòmetre">
+     <svg viewBox="0 0 380 170" width="380" height="170" role="img" aria-label="Termòmetre">
       <defs>
        <pattern id="woodPat" patternUnits="userSpaceOnUse" width="1024" height="256"><image id="woodPatImg" width="1024" height="256" preserveAspectRatio="none" href=""/></pattern>
        <linearGradient id="brassG" x1="0" y1="0" x2="1" y2="1">
@@ -1434,7 +1435,10 @@ function makeNoise(seed){
   return (x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf),X=xi&255,Y=yi&255;
     const a=g[p[p[X]+Y]],b=g[p[p[X+1]+Y]],c=g[p[p[X]+Y+1]],d=g[p[p[X+1]+Y+1]];return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;};
 }
-const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+/* Preferències: es desen amb el prefix del projecte. El localStorage és compartit per totes les apps del
+   mateix domini, i claus tan generals com «mode», «chimes» o «lloc» es podien trepitjar amb les d'un altre
+   rellotge. El que ja hi havia desat amb la clau antiga es continua llegint (no es perd res). */
+const store={get(k){try{const v=localStorage.getItem('antaviana-'+k);return v!=null?v:localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem('antaviana-'+k,v)}catch(e){}}};
 
 /* ================= TEXTURA DE CAOBA PROCEDURAL ================= */
 function makeWood(W,H,seed){
@@ -2121,7 +2125,7 @@ function westminster(q,hour,t){
   seq.forEach(c=>{[...CHG[c]].forEach((n,i)=>{bell(NT[n],t,.2,3.2);t+=i===3?1.45:.72;});});
   if(q===4){t+=.8;const n=hour%12||12;for(let i=0;i<n;i++){bell(HORA_LA3,t,.34,6);t+=2.1;}}
 }
-function planSo(){const now=Date.now();setTimeout(()=>{batec();planSo();},Math.max(5,1000-(now%1000)-110));}
+function planSo(){const now=Date.now();setTimeout(()=>{try{batec();}catch(err){console.error('So:',err);}planSo();},Math.max(5,1000-(now%1000)-110));}
 function batec(){
   if(!(soundOn||chimesOn)||!ac||document.hidden)return;
   const now=Date.now(),next=Math.ceil(now/1000)*1000,lead=next-now;
@@ -2147,7 +2151,8 @@ function setChimes(on,preview){
   if(on&&preview){try{initAudio();westminster(1,0,ac.currentTime+.3);}catch(err){console.error(err);}}
 }
 soundKnob.addEventListener('click',e=>{e.stopPropagation();setSound(!soundOn);});
-addEventListener('pointerdown',()=>{try{if(chimesOn||soundOn)initAudio();}catch(err){}},{capture:true,passive:true});
+// (també amb alguna alarma activa: sense un toc previ, el navegador no la deixaria sonar)
+addEventListener('pointerdown',()=>{try{if(chimesOn||soundOn||(window.__hiHaAlarma&&window.__hiHaAlarma()))initAudio();}catch(err){}},{capture:true,passive:true});
 chimeKnob.addEventListener('click',e=>{e.stopPropagation();if(chimesOn===false&&soundOn){try{initAudio();}catch(err){}}setChimes(!chimesOn,true);});
 setChimes(chimesOn,false);
 
@@ -2199,7 +2204,9 @@ document.querySelector('.dial').addEventListener('click',toggleZoom);
 addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('input,select,textarea'))return;
   if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
-  const k=e.key.toLowerCase();
+  if(e.ctrlKey||e.metaKey||e.altKey)return; // Ctrl+C, Ctrl+S, Ctrl+P… són del navegador, no dreceres del rellotge
+  const k=(e.key||'').toLowerCase();
+  if(k==='escape'&&window.__alarmaSona&&window.__alarmaSona()){window.__alarmaAtura();return;}
   if(k==='escape'&&!$('ajudaVelo').hidden){$('ajudaVelo').hidden=true;return;}
   if(k==='escape'&&!menu.hidden){obreMenu(false);return;}
   if(k==='escape'&&window.__anivObert&&window.__anivObert()){window.__anivTanca();return;}
@@ -2213,7 +2220,12 @@ setTimeout(()=>hint.classList.add('gone'),9000);
 
 /* ================= TEMPERATURA I LLOC ================= */
 let place=null,wx=null,meteo=null,meteoErr=false;
-async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json();}
+// JSON amb temps límit: una petició que no respon es talla i no deixa el temps encallat
+async function getJSON(u,ms=12000){
+  const ctl=('AbortController' in window)?new AbortController():null,t=setTimeout(()=>{if(ctl)ctl.abort();},ms);
+  try{const r=await fetch(u,ctl?{signal:ctl.signal}:undefined);if(!r.ok)throw new Error(r.status);return await r.json();}
+  finally{clearTimeout(t);}
+}
 const GEO='https://api.bigdatacloud.net/data/reverse-geocode-client';
 const geoNom=j=>{const tc=territoriCat(j);return(tc&&tc.nom)||j.city||j.locality||j.principalSubdivision||'';};
 async function locate(){
@@ -2227,10 +2239,14 @@ async function locate(){
   return{lat:41.4966,lon:2.1575,name:'Ripollet',geo:null};
 }
 /* Nom del lloc en la llengua triada (es torna a demanar en canviar de llengua) */
+let geoTok=0;
 async function geocode(){
   const p=place;if(!p)return;
+  const tok=++geoTok; // si es canvia de llengua a mig camí, només compta l'última resposta
   try{const j=await getJSON(`${GEO}?latitude=${p.lat.toFixed(4)}&longitude=${p.lon.toFixed(4)}&localityLanguage=${L.geo||LLENGUA}`);
+    if(tok!==geoTok)return;
     j._ll=[p.lat,p.lon];p.geo=j;const n=geoNom(j);if(n)p.name=n;}catch(e){}
+  if(tok!==geoTok)return;
   paintPlace();
 }
 function fitText(el,max){el.style.fontSize=max+'px';let s=max;while(el.scrollWidth>el.clientWidth+1&&s>9){s-=.5;el.style.fontSize=s+'px';}}
@@ -2252,12 +2268,14 @@ function paintWx(){
   if(an)info=`${L.pma}${an.nom?', '+an.nom:''}`;
   $('plInfo').textContent=info;fitText($('plInfo'),13.5);
 }
+let wxOcupat=false,wxAt=0;
 async function updateWeather(){
+  if(wxOcupat)return;wxOcupat=true;
   try{
     if(!place){place=await locate();paintPlace();if(!place.geo)geocode();}
     const j=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${place.lat.toFixed(4)}&longitude=${place.lon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=precipitation_probability,precipitation,wind_gusts_10m,uv_index,weather_code,temperature_2m,is_day&forecast_hours=12&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,weather_code,precipitation_probability_max&forecast_days=6&timezone=auto`);
     const c=j.current,d=j.daily||{},f0=a=>a?a[0]:null;
-    meteo=j;meteoErr=false;
+    meteo=j;meteoErr=false;wxAt=Date.now();
     wx={T:c.temperature_2m,H:c.relative_humidity_2m,code:c.weather_code,feel:c.apparent_temperature,ws:c.wind_speed_10m,wd:c.wind_direction_10m,wg:c.wind_gusts_10m,elev:j.elevation,
         rise:f0(d.sunrise),set:f0(d.sunset),tmax:f0(d.temperature_2m_max),tmin:f0(d.temperature_2m_min)};
     const pr=(j.hourly&&j.hourly.precipitation_probability)||[];maxPluja6=pr.slice(0,7).reduce((a,b)=>Math.max(a,b||0),0);
@@ -2266,9 +2284,16 @@ async function updateWeather(){
     $('needle').style.transform=`rotate(${deg}deg)`;const n2=$('needle2');if(n2)n2.style.transform=`rotate(${deg}deg)`;
     if(panelOpen)repintaLlibre();
   }catch(e){meteoErr=true;paintWx();if(panelOpen)fillPanel();}
+  finally{wxOcupat=false;}
   applyMode(false);
 }
-updateWeather();setInterval(updateWeather,15*60*1000);
+updateWeather();
+/* Cada 15 minuts mentre el rellotge es veu (amagat no gasta dades). En tornar a la pantalla
+   o en recuperar la connexió, es posa al dia de seguida en lloc d'esperar el torn següent. */
+const WX_MS=15*60*1000;
+setInterval(()=>{if(!document.hidden)updateWeather();},WX_MS);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-wxAt>WX_MS)updateWeather();});
+addEventListener('online',()=>{if(meteoErr||Date.now()-wxAt>WX_MS)updateWeather();});
 
 /* ================= SOL I LLUNA ================= */
 const RAD=Math.PI/180,DAYMS=864e5,J1970=2440588,J2000=2451545,OBL=RAD*23.4397;
@@ -2342,10 +2367,10 @@ function fillPanel(){
 function openPanel(pg){
   panelOpen=true;document.body.classList.add('llibre');
   try{repintaLlibre();}catch(err){console.error('Llibre:',err);}
-  const ip=$('ipanel');ip.classList.add('open');ip.setAttribute('aria-hidden','false');hint.classList.add('gone');
+  const ip=$('ipanel');ip.classList.add('open');ip.setAttribute('aria-hidden','false');ip.inert=false;hint.classList.add('gone');
   bkVes(typeof pg==='number'?pg:0,false);
 }
-function closePanel(){panelOpen=false;document.body.classList.remove('llibre');$('ipanel').classList.remove('open');$('ipanel').setAttribute('aria-hidden','true');}
+function closePanel(){panelOpen=false;document.body.classList.remove('llibre');$('ipanel').classList.remove('open');$('ipanel').setAttribute('aria-hidden','true');$('ipanel').inert=true;}
 let tap=null,tapIgnore=false;
 addEventListener('pointerdown',e=>{tap={x:e.clientX,y:e.clientY,t:Date.now()};tapIgnore=false;},{capture:true,passive:true});
 addEventListener('pointerup',e=>{
@@ -2993,6 +3018,8 @@ function repintaLlibre(){
       pintaTemp(); avisa(X.tempOn(m));
     });
     window.__tempLlengua = pintaTemp;
+    // si el mòbil frena els temporitzadors, el so mateix fa de rellotge
+    player.addEventListener('timeupdate', () => { if (tempFi && Date.now() >= tempFi) tic(); });
     function atura(){
       clearInterval(fos); fos = null; treuTemp();
       clearTimeout(tempsPausa);
@@ -3295,7 +3322,7 @@ function repintaLlibre(){
     function fil(rss){
       return rssIntermediari(rss, 0).catch(() => rss2json(rss)).then(items => items
         .map(it => ({ titol: neteja(it.title), url: neteja(it.link), d: Date.parse(it.pubDate || '') || 0 }))
-        .filter(it => it.titol && it.url)
+        .filter(it => it.titol && /^https?:\/\//i.test(it.url)) // els fils arriben per intermediaris: res de javascript: ni data:
         .sort((x, y) => y.d - x.d)
         .slice(0, MAX_N));
     }
@@ -3304,8 +3331,8 @@ function repintaLlibre(){
       return rss2json(rss).catch(() => rssIntermediari(rss, 0)).then(items => items.slice(0, MAX_N).map(it => {
         let titol = neteja(it.title);
         titol = treu ? titol.replace(treu, '') : titol.replace(/\s+-\s+([^-]+)$/, ' · $1');
-        return { titol, url: it.link };
-      }));
+        return { titol, url: neteja(it.link) };
+      }).filter(it => it.titol && /^https?:\/\//i.test(it.url)));
     }
     // ACN: no té RSS; es llegeix la secció «Al minut» de la portada
     function acn(i = 0){
@@ -3395,7 +3422,7 @@ function repintaLlibre(){
       ll.innerHTML = '';
       notDarrer.titulars.forEach((n, i) => {
         const a = document.createElement('a');
-        a.className = 'n-item'; a.draggable = false; a.href = n.url; a.target = '_blank'; a.rel = 'noopener';
+        a.className = 'n-item'; a.draggable = false; a.href = n.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
         a.innerHTML = `<span class="n-num"></span><span class="n-txt"></span><span class="n-ext">${ICON_EXT}</span>`;
         a.querySelector('.n-num').textContent = i + 1;
         a.querySelector('.n-txt').textContent = n.titol;   // les notícies es mostren tal com arriben
@@ -3472,8 +3499,12 @@ function repintaLlibre(){
     const CLAU = 'antaviana-alarmes';
     const REP = ['cada', 'feiners', 'cap', 'un'];
     let alarmes = [{ on:false, h:'07:00', rep:'feiners' }, { on:false, h:'08:30', rep:'cap' }, { on:false, h:'13:00', rep:'un' }];
-    try { const g = JSON.parse(localStorage.getItem(CLAU) || 'null'); if (Array.isArray(g) && g.length === 3) alarmes = g; } catch(e){}
-    const desa = () => { try { localStorage.setItem(CLAU, JSON.stringify(alarmes)); } catch(e){} };
+    try { const g = JSON.parse(localStorage.getItem(CLAU) || 'null');
+      // es validen camp per camp: unes dades desades malmeses aturaven tot el rellotge en obrir-lo
+      if (Array.isArray(g) && g.length === 3) alarmes = g.map((a, i) => ({ on: !!(a && a.on), h: a && /^\d\d:\d\d$/.test(a.h) ? a.h : alarmes[i].h, rep: a && REP.includes(a.rep) ? a.rep : alarmes[i].rep }));
+    } catch(e){}
+    const desa = () => { try { localStorage.setItem(CLAU, JSON.stringify(alarmes)); } catch(e){} try { keepAwake(); } catch(e){} };
+    window.__hiHaAlarma = () => alarmes.some(a => a.on);
     const dosD = n => String(n).padStart(2, '0');
     const tocaAvui = (a, dow) => a.rep === 'cada' || a.rep === 'un' || (a.rep === 'feiners' ? dow >= 1 && dow <= 5 : dow === 0 || dow === 6);
     // propera vegada que sonarà una alarma (dins els 8 dies vinents)
@@ -3501,8 +3532,8 @@ function repintaLlibre(){
         int.setAttribute('role', 'switch'); int.setAttribute('aria-checked', a.on ? 'true' : 'false'); int.setAttribute('aria-label', `${L.alarma} ${i+1}`);
         const hora = document.createElement('input'); hora.type = 'time'; hora.className = 'al-hora'; hora.value = a.h; hora.setAttribute('aria-label', `${L.alarma} ${i+1}`);
         const rep = document.createElement('button'); rep.type = 'button'; rep.className = 'al-rep'; rep.textContent = L.repet[REP.indexOf(a.rep)];
-        int.addEventListener('click', () => { a.on = !a.on; desa(); pinta(); });
-        hora.addEventListener('change', () => { if (hora.value){ a.h = hora.value; a.on = true; desa(); pinta(); } });
+        int.addEventListener('click', () => { a.on = !a.on; desa(); pinta(); if (a.on) desbloquejaSo(); });
+        hora.addEventListener('change', () => { if (hora.value){ a.h = hora.value.slice(0, 5); a.on = true; desa(); pinta(); } });
         rep.addEventListener('click', () => { a.rep = REP[(REP.indexOf(a.rep) + 1) % REP.length]; desa(); pinta(); });
         const mob = document.createElement('button'); mob.type = 'button'; mob.className = 'al-mobil';
         mob.setAttribute('aria-label', L.alMobil); mob.title = L.alMobil; mob.hidden = !(esIOS || esAndroid);
@@ -3542,40 +3573,110 @@ function repintaLlibre(){
     $('drTanca').addEventListener('click', () => { $('alDrecera').hidden = true; pendent = null; });
 
     // Sona: la melodia d'Els Segadors repetida, i l'hora dita en veu alta; s'atura sola als 3 minuts
-    let sonant = null, posposada = null;
+    /* ---- So de l'alarma en un fitxer (WAV fet aquí mateix) ----
+       A l'iPhone, el sintetitzador (Web Audio) queda mut amb l'interruptor de silenci; un fitxer de so, no.
+       Per això el carilló de l'alarma es calcula un cop com a fitxer: els dos quarts de Westminster i tres
+       cops de la campana de les hores, amb les mateixes notes i els mateixos harmònics que les campanes del
+       rellotge. Fa 21 s i es repeteix. Si el fitxer no pot sonar, es fa com abans, amb el sintetitzador. */
+    const AL_SR = 16000, AL_CICLE = 21;
+    function fesWavAlarma(){
+      const n = AL_SR * AL_CICLE, d = new Float32Array(n);
+      const nota = (f, t0, vol, decay) => PARTIALS.forEach(([r, a, dm]) => {
+        const dur = decay * dm, i0 = Math.floor(t0 * AL_SR), att = Math.floor(.004 * AL_SR), fi = Math.min(n, i0 + Math.floor(dur * AL_SR));
+        const w = 2 * Math.PI * f * r / AL_SR, k = Math.pow(.0001 / a, 1 / Math.max(1, dur * AL_SR - att));
+        let e = a;
+        for (let i = i0; i < fi; i++){ const j = i - i0; let g; if (j < att) g = a * j / att; else { g = e; e *= k; } d[i] += vol * g * Math.sin(w * j); }
+      });
+      let t = .3;
+      [2, 3].forEach(c => [...CHG[c]].forEach((x, i) => { nota(NT[x], t, .2, 3.2); t += i === 3 ? 1.45 : .72; }));
+      for (let k = 0; k < 3; k++) nota(HORA_LA3, 7.7 + k * 2.1, .34, 6);
+      let pk = 0; for (let i = 0; i < n; i++) pk = Math.max(pk, Math.abs(d[i]));
+      const g = .9 / (pk || 1);
+      const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf), w = (o, x) => { for (let i = 0; i < x.length; i++) v.setUint8(o + i, x.charCodeAt(i)); };
+      w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, AL_SR, true); v.setUint32(28, AL_SR * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+      for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i] * g)) * 32767, true);
+      return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+    }
+    let alAudio = null, alDesbloquejat = false, alFitxer = false, alProvant = false;
+    // El fitxer només es calcula quan cal (hi ha alguna alarma activa), no en obrir el rellotge
+    function preparaSo(){ if (alAudio) return; try { const a = new Audio(); a.preload = 'auto'; a.src = fesWavAlarma(); alAudio = a; } catch(e){ alAudio = null; } }
+    // Un toc qualsevol amb alguna alarma activa deixa el fitxer a punt: després podrà sonar sol, sense tocar res
+    function desbloquejaSo(){
+      if (alDesbloquejat || alProvant || sonant || !alarmes.some(a => a.on)) return;
+      preparaSo(); if (!alAudio) return;
+      alAudio.muted = true; alAudio.loop = false;
+      let p; try { p = alAudio.play(); } catch(e){ alAudio.muted = false; return; }
+      alProvant = true;
+      if (p && p.then) p.then(() => {
+        alProvant = false; alDesbloquejat = true;
+        if (sonant) return; // ha començat a sonar mentrestant: no s'ha de tallar
+        alAudio.pause(); try { alAudio.currentTime = 0; } catch(e){} alAudio.muted = false;
+      }).catch(() => { alProvant = false; if (!sonant) alAudio.muted = false; });
+      else alProvant = false;
+    }
+    ['click', 'touchend'].forEach(ev => addEventListener(ev, desbloquejaSo, { capture: true, passive: true }));
+    let sonant = null, posposada = null, veuT = null, finSo = 0;
     function sona(etiqueta){
       if (sonant) return;
       $('alSonaHora').textContent = etiqueta;
       $('alSona').hidden = false;
       // Sona amb el carilló del rellotge: avís mecànic, dos quarts de Westminster, tres cops de campana i l'hora dita en veu alta
-      const toc = () => {
-        try { initAudio(); const t = ac.currentTime + .1; warning(t); westminster(2, 0, t + 1); for (let k = 0; k < 3; k++) bell(HORA_LA3, t + 8.4 + k*2.1, .34, 6); } catch(e){}
-        try { if ('speechSynthesis' in window){ const ara = new Date(); const u = new SpeechSynthesisUtterance(L.hora(ara.getHours(), ara.getMinutes())); u.lang = L.veu; const v = triaVeu(); if (v) u.voice = v; setTimeout(() => speechSynthesis.speak(u), 15000); } } catch(e){}
+      const campanes = () => {
+        try { initAudio(); const t = ac.currentTime + .1;
+          master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(.9, ac.currentTime); // per si venia d'un «Atura» recent
+          warning(t); westminster(2, 0, t + 1); for (let k = 0; k < 3; k++) bell(HORA_LA3, t + 8.4 + k*2.1, .34, 6);
+          finSo = t + 20; // fins aquí hi ha campanes programades
+        } catch(e){}
       };
+      const toc = () => {
+        if (!alFitxer) campanes(); // amb el fitxer sonant, el sintetitzador no hi afegeix res
+        // l'hora es diu al cap de 15 s, i només si l'alarma encara sona (abans es deia igualment després d'aturar-la)
+        try { if ('speechSynthesis' in window){ clearTimeout(veuT); veuT = setTimeout(() => { if (!sonant) return;
+          const ara = new Date(); const u = new SpeechSynthesisUtterance(L.hora(ara.getHours(), ara.getMinutes())); u.lang = L.veu; const v = triaVeu(); if (v) u.voice = v; speechSynthesis.speak(u); }, 15000); } } catch(e){}
+      };
+      // Primer, el fitxer de so (sona també amb l'iPhone en silenci); si no pot, el sintetitzador
+      alFitxer = false; preparaSo();
+      if (alAudio){ try {
+        alAudio.muted = false; alAudio.loop = true; try { alAudio.currentTime = 0; } catch(e){}
+        const p = alAudio.play(); alFitxer = true;
+        if (p && p.then) p.then(() => { alDesbloquejat = true; }).catch(() => { alFitxer = false; if (sonant) campanes(); });
+      } catch(e){ alFitxer = false; } }
       toc();
-      sonant = { int: setInterval(toc, 21000), fi: setTimeout(atura, 3*60*1000) };
+      sonant = { int: setInterval(toc, AL_CICLE * 1000), fi: setTimeout(atura, 3*60*1000) };
       try { if (navigator.vibrate) navigator.vibrate([400, 200, 400]); } catch(e){}
     }
     function atura(){
       if (!sonant) return;
-      clearInterval(sonant.int); clearTimeout(sonant.fi); sonant = null;
+      clearInterval(sonant.int); clearTimeout(sonant.fi); clearTimeout(veuT); sonant = null;
+      if (alAudio){ try { alAudio.pause(); alAudio.loop = false; alAudio.currentTime = 0; } catch(e){} }
       try { speechSynthesis.cancel(); } catch(e){}
+      // Les campanes ja programades (fins a 20 s) callen de seguida; el so del rellotge torna tot sol quan haurien acabat
+      try { if (ac && master && finSo > ac.currentTime){ const t = ac.currentTime, g = master.gain;
+        g.cancelScheduledValues(t); g.setTargetAtTime(0, t, .04); g.setValueAtTime(0, finSo); g.linearRampToValueAtTime(.9, finSo + .4); } } catch(e){}
+      finSo = 0;
       $('alSona').hidden = true;
     }
     $('alAtura').addEventListener('click', e => { e.stopPropagation(); atura(); posposada = null; });
     $('alPosposa').addEventListener('click', e => { e.stopPropagation(); atura(); posposada = Date.now() + 5*60*1000; });
-    let darrera = '';
+    // Es comprova minut a minut. Si el mòbil ha frenat la pàgina i s'ha saltat el minut de l'alarma,
+    // encara sona fins a 3 minuts tard (abans es perdia). Una alarma posada per a un minut que ja
+    // corre o ja ha passat no sona ara: queda per al proper dia.
+    const MARGE_MIN = 3;
+    let darrerMin = Math.floor(Date.now() / 60000) - 1;
     window.__comprovaAlarmes = function(ara){
       if (posposada && Date.now() >= posposada){ posposada = null; sona(`${dosD(ara.getHours())}:${dosD(ara.getMinutes())}`); }
-      const clau = `${ara.toDateString()} ${dosD(ara.getHours())}:${dosD(ara.getMinutes())}`;
-      if (clau === darrera) return;
-      const hm = `${dosD(ara.getHours())}:${dosD(ara.getMinutes())}`;
-      let cal = false;
-      alarmes.forEach(a => {
-        if (a.on && a.h === hm && tocaAvui(a, ara.getDay())){ cal = true; if (a.rep === 'un') a.on = false; }
-      });
-      darrera = clau;
-      if (cal){ desa(); pinta(); sona(hm); }
+      const minAra = Math.floor(ara.getTime() / 60000);
+      if (minAra <= darrerMin) return;
+      let cal = null;
+      for (let m = Math.max(darrerMin + 1, minAra - MARGE_MIN); m <= minAra; m++){
+        const d = new Date(m * 60000), hm = `${dosD(d.getHours())}:${dosD(d.getMinutes())}`;
+        alarmes.forEach(a => {
+          if (a.on && a.h === hm && tocaAvui(a, d.getDay())){ cal = hm; if (a.rep === 'un') a.on = false; }
+        });
+      }
+      darrerMin = minAra;
+      if (cal){ desa(); pinta(); sona(cal); }
       else if (ara.getSeconds() === 0) pintaPeu();
     };
     window.__alarmesLlengua = pinta;
@@ -3594,6 +3695,8 @@ function pintaTextos(){
   $('codiIdioma').textContent=LLENGUA.toUpperCase();
   $('botoVeu').setAttribute('aria-label',L.parla);$('botoVeu').title=L.parla;
   $('botoIdioma').setAttribute('aria-label',L.idioma);$('botoIdioma').title=L.idioma;
+  ['sonaTanca','ajudaTanca','drTanca','anivTanca'].forEach(id=>$(id).setAttribute('aria-label',L.tanca));
+  $('anBoto').setAttribute('aria-label',L.aniv);chimeKnob.setAttribute('aria-label',L.campanades);
   pintaAjuda();
 }
 function posaLlengua(codi){
@@ -3620,8 +3723,14 @@ $('botoAjuda').addEventListener('click',e=>{e.stopPropagation();pintaAjuda();$('
 $('ajudaTanca').addEventListener('click',e=>{e.stopPropagation();$('ajudaVelo').hidden=true;});
 $('ajudaVelo').addEventListener('click',e=>{if(e.target.id==='ajudaVelo')$('ajudaVelo').hidden=true;});
 const menu=$('menuIdioma'),botoIdioma=$('botoIdioma');
-function pintaMenu(){menu.innerHTML=Object.keys(I18N).map(k=>`<li role="menuitem" data-codi="${k}" class="${k===LLENGUA?'on':''}"><b>${k.toUpperCase()}</b>${I18N[k].nom}</li>`).join('');}
-function obreMenu(o){menu.hidden=!o;botoIdioma.setAttribute('aria-expanded',o?'true':'false');}
+function pintaMenu(){menu.innerHTML=Object.keys(I18N).map(k=>`<li role="menuitem" tabindex="0" data-codi="${k}" class="${k===LLENGUA?'on':''}"><b>${k.toUpperCase()}</b>${I18N[k].nom}</li>`).join('');}
+function obreMenu(o){menu.hidden=!o;botoIdioma.setAttribute('aria-expanded',o?'true':'false');
+  if(o){const li=menu.querySelector('li.on')||menu.querySelector('li');if(li)li.focus({preventScroll:true});}}
+// Amb teclat: fletxes per moure's, Retorn o espai per triar
+menu.addEventListener('keydown',e=>{const li=e.target.closest('li');if(!li)return;
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();posaLlengua(li.dataset.codi);obreMenu(false);botoIdioma.focus();}
+  else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();e.stopPropagation();const n=e.key==='ArrowDown'?li.nextElementSibling:li.previousElementSibling;if(n)n.focus();}
+});
 botoIdioma.addEventListener('click',e=>{e.stopPropagation();obreMenu(menu.hidden);});
 menu.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;e.stopPropagation();posaLlengua(li.dataset.codi);obreMenu(false);});
 addEventListener('pointerdown',e=>{if(!menu.hidden&&!e.target.closest('#menuIdioma,#botoIdioma'))obreMenu(false);},{capture:true});
@@ -3762,18 +3871,22 @@ function frame(ts){
   if(now<burstUntil||tiltOn||windAnim||!hSettled)kick();
 }
 function tickSec(){
-  const now=Date.now(),d=new Date(now);
-  hSec=d.getSeconds();hSettled=false;if(window.__comprovaAlarmes)window.__comprovaAlarmes(d);
-  updateCalendar(d);
-  if(now-(frame.lm||0)>30000){frame.lm=now;applyMode(false);if(panelOpen)fillPanel();}
-  if(now-(frame.lv||0)>1500){frame.lv=now;placeVeil();}
-  burstUntil=now+280;kick();
+  // passi el que passi dins del tic, el següent es programa igualment: un error no pot aturar el rellotge
+  try{
+    const now=Date.now(),d=new Date(now);
+    hSec=d.getSeconds();hSettled=false;if(window.__comprovaAlarmes)window.__comprovaAlarmes(d);
+    updateCalendar(d);
+    if(now-(frame.lm||0)>30000){frame.lm=now;applyMode(false);if(panelOpen)fillPanel();}
+    if(now-(frame.lv||0)>1500){frame.lv=now;placeVeil();}
+    burstUntil=now+280;kick();
+  }catch(err){console.error('Tic:',err);}
   setTimeout(tickSec,1000-(Date.now()%1000)+3);
 }
 /* ================= INICI: textos en la llengua desada ================= */
-pintaTextos();pintaMenu();bkPinta();paintWx();$('plLoc').textContent=X.loc;hint.innerHTML=X.hint;consultaAny(new Date().getFullYear());
+$('ipanel').inert=true;pintaTextos();pintaMenu();bkPinta();paintWx();$('plLoc').textContent=X.loc;hint.innerHTML=X.hint;consultaAny(new Date().getFullYear());
 layout();
-addEventListener('resize',layout);
+// En arrossegar la vora de la finestra arriben desenes de «resize» per segon: es refà un cop per fotograma
+{let rz=0;addEventListener('resize',()=>{if(rz)return;rz=requestAnimationFrame(()=>{rz=0;layout();});});}
 Promise.all(['700 21px "Playfair Display"','20px "IM Fell English"','600 9px "Cinzel"','16px "Pinyon Script"','italic 7px "IM Fell English"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>paintDials());
 fitWindows();
 document.fonts.ready.then(()=>{fitWindows();paintDials();fitText($('plLoc'),21);fitText($('plInfo'),13.5);});
@@ -3786,8 +3899,12 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
 // Instal·lada com a app: manté la pantalla encesa (ús com a salvapantalles)
 const standalone=matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches||navigator.standalone===true;
 let wakeLock=null;
+// També amb alguna alarma activa: si la pantalla s'apaga, el mòbil atura la pàgina i l'alarma no sona
+const calDesperta=()=>standalone||!!(window.__hiHaAlarma&&window.__hiHaAlarma());
 async function keepAwake(){
-  if(!standalone||!('wakeLock' in navigator)||document.hidden)return;
+  if(!('wakeLock' in navigator))return;
+  if(!calDesperta()){if(wakeLock&&!wakeLock.released){try{await wakeLock.release();}catch(e){}}wakeLock=null;return;}
+  if(document.hidden||(wakeLock&&!wakeLock.released))return;
   try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
 }
 keepAwake();
